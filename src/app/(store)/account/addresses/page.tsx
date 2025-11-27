@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Card, CardContent } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
 import { Badge } from "../../../components/ui/badge"
 import { EditAddressModal } from "../../../components/account/edit-address-modal"
-import { MapPin, Plus, Edit2, Trash2, Home, Briefcase } from "lucide-react"
+import { MapPin, Plus, Edit2, Trash2 } from "lucide-react"
 import { Address } from "../../../types"
 
 const initialAddresses: Address[] = [

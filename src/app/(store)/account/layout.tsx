@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation"
 import { User, Package, MapPin, Heart, CreditCard, Bell, Settings, LogOut, ChevronRight } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { useAuthStore } from "@/app/store/auth-store"
+import AuthService from "@/app/lib/api/services/auth.service"
+const authService = new AuthService();
 
 
 const sidebarLinks = [
@@ -33,9 +35,14 @@ export default function AccountLayout({
     }
   }, [isAuthenticated, router])
 
-  const handleLogout = () => {
-    logout()
-    router.push("/")
+  const handleLogout = async () => {
+    try {
+      await authService.logout(); // clear backend session if needed
+    } catch {
+      // Optionally handle error
+    }
+    logout(); // clear local store
+    router.push("/");
   }
 
   if (!isAuthenticated) {

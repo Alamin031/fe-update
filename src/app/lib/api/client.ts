@@ -15,16 +15,15 @@ export const apiClient: AxiosInstance = axios.create({
 // Request interceptor to add token to headers
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const authStore = useAuthStore.getState()
+    const authStore = useAuthStore.getState();
+    console.log("Token in request interceptor:", authStore.token); // DEBUG
     if (authStore.token) {
-      config.headers.Authorization = `Bearer ${authStore.token}`
+      config.headers.Authorization = `Bearer ${authStore.token}`;
     }
-    return config
+    return config;
   },
-  (error) => {
-    return Promise.reject(error)
-  },
-)
+  (error) => Promise.reject(error)
+);
 
 // Response interceptor to handle errors and token refresh
 apiClient.interceptors.response.use(

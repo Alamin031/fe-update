@@ -6,6 +6,13 @@ import { useAuthStore } from "@/store/auth-store"
 
 export type UserRole = "user" | "admin" | "management"
 
+export interface User {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+}
+
 interface ProtectedRouteOptions {
   requiredRoles?: UserRole[]
   fallbackTo?: string
@@ -15,7 +22,7 @@ interface ProtectedRouteOptions {
 interface ProtectedRouteProps {
   isAuthenticated: boolean
   isLoading: boolean
-  user: any | null
+  user: User | null
   hasRequiredRole: boolean
 }
 
@@ -142,15 +149,6 @@ export function ProtectedContent({
   requiredRoles = [],
 }: ProtectedContentProps) {
   const { user, token, isAuthenticated } = useAuthStore()
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    setIsLoading(false)
-  }, [])
-
-  if (isLoading) {
-    return fallback
-  }
 
   if (!isAuthenticated || !token) {
     return fallback
