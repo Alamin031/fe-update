@@ -19,6 +19,7 @@ export interface SocialLoginRequest {
 export interface AuthResponse {
   user: User
   token: string
+  access_token?: string
   refreshToken?: string
 }
 

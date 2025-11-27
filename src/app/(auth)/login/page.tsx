@@ -44,6 +44,7 @@ const demoAccounts = [
 ];
 
 export default function LoginPage() {
+  const authService = new AuthService();
   const router = useRouter();
   const { initiateOAuth, isOAuthLoading } = useOAuth();
   const { login } = useAuthStore();
@@ -56,8 +57,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await AuthService.login({ email, password });
-      // normalize API user role ("management") to the app's User type ("admin" | "user")
+      const res = await authService.login({ email, password });
       const userToStore: User = {
         ...res.user,
         role:
@@ -65,7 +65,9 @@ export default function LoginPage() {
             ? "admin"
             : (res.user.role as "admin" | "user"),
       };
-      login(userToStore, res.token);
+      const token = res.token ?? res.access_token;
+      if (!token) throw new Error("No token received from API");
+      login(userToStore, token);
       toast.success("Login successful");
       if (res.user.role === "admin" || res.user.role === "management") {
         router.push("/admin");

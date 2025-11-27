@@ -14,7 +14,7 @@ export class AuthService {
   /**
    * Register a new user
    */
-  static async register(data: RegisterRequest): Promise<AuthResponse> {
+   async register(data: RegisterRequest): Promise<AuthResponse> {
     const response = await apiClient.post<ApiResponse<AuthResponse>>(
       API_ENDPOINTS.AUTH_REGISTER,
       data
@@ -31,24 +31,29 @@ export class AuthService {
   /**
    * Login with email and password
    */
-  static async login(data: LoginRequest): Promise<AuthResponse> {
-    const response = await apiClient.post<ApiResponse<AuthResponse>>(
-      API_ENDPOINTS.AUTH_LOGIN,
-      data
-    )
+  async login(data: LoginRequest): Promise<AuthResponse> {
+    const response = await apiClient.post(API_ENDPOINTS.AUTH_LOGIN, data);
 
-    if (response.data.data) {
-      const { token, refreshToken } = response.data.data
-      TokenManager.setTokens(token, refreshToken)
+    // Handle both possible response shapes
+    const resData =
+      response.data?.data ??
+      (response.data && response.data.access_token && response.data.user
+        ? response.data
+        : undefined);
+
+    if (resData) {
+      const { token, access_token, refreshToken } = resData;
+      TokenManager.setTokens(token ?? access_token, refreshToken);
+      return resData;
     }
 
-    return response.data.data!
+    throw new Error("Invalid login response from server");
   }
 
   /**
    * Login with social provider
    */
-  static async socialLogin(data: SocialLoginRequest): Promise<AuthResponse> {
+   async socialLogin(data: SocialLoginRequest): Promise<AuthResponse> {
     const response = await apiClient.post<ApiResponse<AuthResponse>>(
       API_ENDPOINTS.AUTH_SOCIAL_LOGIN,
       data
@@ -65,7 +70,7 @@ export class AuthService {
   /**
    * Refresh access token
    */
-  static async refreshToken(): Promise<string> {
+   async refreshToken(): Promise<string> {
     const refreshToken = TokenManager.getRefreshToken()
     if (!refreshToken) {
       throw new Error("No refresh token available")
@@ -88,7 +93,7 @@ export class AuthService {
   /**
    * Logout user
    */
-  static async logout(): Promise<void> {
+   async logout(): Promise<void> {
     try {
       await apiClient.post(API_ENDPOINTS.AUTH_LOGOUT)
     } finally {
@@ -99,7 +104,7 @@ export class AuthService {
   /**
    * Get current user info
    */
-  static async getCurrentUser(): Promise<User> {
+   async getCurrentUser(): Promise<User> {
     const response = await apiClient.get<ApiResponse<User>>(API_ENDPOINTS.USERS_ME)
     return response.data.data!
   }
@@ -107,28 +112,28 @@ export class AuthService {
   /**
    * Check if user is authenticated
    */
-  static isAuthenticated(): boolean {
+   isAuthenticated(): boolean {
     return TokenManager.hasToken() && !TokenManager.isTokenExpired()
   }
 
   /**
    * Get authentication token
    */
-  static getToken(): string | null {
+   getToken(): string | null {
     return TokenManager.getToken()
   }
 
   /**
    * Get user role from token
    */
-  static getUserRole(): string | null {
+   getUserRole(): string | null {
     return TokenManager.getUserRole()
   }
 
   /**
    * Check if user is admin
    */
-  static isAdmin(): boolean {
+   isAdmin(): boolean {
     const role = this.getUserRole()
     return role === "admin"
   }
@@ -136,7 +141,7 @@ export class AuthService {
   /**
    * Check if user is manager
    */
-  static isManager(): boolean {
+   isManager(): boolean {
     const role = this.getUserRole()
     return role === "manager" || role === "admin"
   }
