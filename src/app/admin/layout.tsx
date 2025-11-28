@@ -33,6 +33,7 @@ const sidebarLinks = [
   {href: '/admin/products', label: 'Products', icon: Package},
   {href: '/admin/product-faqs', label: 'Product Faqs', icon: MessageSquare},
   {href: '/admin/homeshow-category', label: 'HomeShow Category', icon: FolderTree},
+  {href: '/admin/product-care-plan', label: 'Product Care Plan', icon: Settings},
   {href: '/admin/orders', label: 'Orders', icon: ShoppingCart, badge: '12'},
   {href: '/admin/customers', label: 'Customers', icon: Users},
   {
@@ -54,29 +55,31 @@ export default function AdminLayout({children}: {children: React.ReactNode}) {
               Admin Panel
             </Link>
           </div>
-          <nav className="space-y-1 p-4">
-            {sidebarLinks.map(link => (
+          <div className="flex flex-col h-[calc(100vh-64px)]">
+            <nav className="flex-1 overflow-y-auto space-y-1 p-4">
+              {sidebarLinks.map(link => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                  <link.icon className="h-5 w-5" />
+                  {link.label}
+                  {link.badge && (
+                    <Badge variant="secondary" className="ml-auto">
+                      {link.badge}
+                    </Badge>
+                  )}
+                </Link>
+              ))}
+            </nav>
+            <div className="border-t border-border p-4">
               <Link
-                key={link.href}
-                href={link.href}
+                href="/"
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-                <link.icon className="h-5 w-5" />
-                {link.label}
-                {link.badge && (
-                  <Badge variant="secondary" className="ml-auto">
-                    {link.badge}
-                  </Badge>
-                )}
+                <LogOut className="h-5 w-5" />
+                Back to Store
               </Link>
-            ))}
-          </nav>
-          <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
-            <Link
-              href="/"
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-              <LogOut className="h-5 w-5" />
-              Back to Store
-            </Link>
+            </div>
           </div>
         </aside>
       </Suspense>
