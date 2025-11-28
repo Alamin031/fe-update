@@ -124,6 +124,7 @@ export interface Brand {
 }
 
 export interface CreateBrandRequest {
+  slug: string
   name: string
   description?: string
   logo: string
@@ -132,6 +133,7 @@ export interface CreateBrandRequest {
 }
 
 export interface UpdateBrandRequest {
+  slug?: string
   name?: string
   description?: string
   logo?: string

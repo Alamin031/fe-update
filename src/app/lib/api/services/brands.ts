@@ -2,13 +2,25 @@ import { apiClient } from "../client"
 import { Brand, CreateBrandRequest, UpdateBrandRequest, BrandProductsResponse } from "../types"
 import { API_ENDPOINTS } from "../config"
 
+type CreateBrandRequestWithFile = Omit<CreateBrandRequest, 'logo'> & { logo: File | string };
+type UpdateBrandRequestWithFile = Omit<UpdateBrandRequest, 'logo'> & { logo?: File | string };
 export const brandsService = {
   /**
    * Create a new brand (Admin only)
    */
-  create: async (data: CreateBrandRequest): Promise<Brand> => {
-    const response = await apiClient.post<Brand>(API_ENDPOINTS.BRANDS_CREATE, data)
-    return response.data
+  create: async (data: CreateBrandRequestWithFile): Promise<Brand> => {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("slug", data.slug);
+    if (data.logo instanceof File) {
+      formData.append("logo", data.logo);
+    } else if (typeof data.logo === "string" && data.logo) {
+      formData.append("logo", data.logo);
+    }
+    const response = await apiClient.post<Brand>(API_ENDPOINTS.BRANDS_CREATE, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
   },
 
   /**
@@ -52,10 +64,20 @@ export const brandsService = {
   /**
    * Update brand (Admin only)
    */
-  update: async (id: string, data: UpdateBrandRequest): Promise<Brand> => {
-    const endpoint = API_ENDPOINTS.BRANDS_UPDATE.replace("{id}", id)
-    const response = await apiClient.patch<Brand>(endpoint, data)
-    return response.data
+  update: async (id: string, data: UpdateBrandRequestWithFile): Promise<Brand> => {
+    const formData = new FormData();
+    if (data.name) formData.append("name", data.name);
+    if (data.slug) formData.append("slug", data.slug);
+    if (data.logo instanceof File) {
+      formData.append("logo", data.logo);
+    } else if (typeof data.logo === "string" && data.logo) {
+      formData.append("logo", data.logo);
+    }
+    const endpoint = API_ENDPOINTS.BRANDS_UPDATE.replace("{id}", id);
+    const response = await apiClient.patch<Brand>(endpoint, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
   },
 
   /**

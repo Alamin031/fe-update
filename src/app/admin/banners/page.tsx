@@ -216,6 +216,7 @@ export default function Page() {
                     width={160}
                     height={80}
                     className="h-full w-full object-cover"
+                    unoptimized
                   />
                 </div>
                 <div className="flex-1" />
