@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -10,10 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/ta
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../components/ui/dropdown-menu'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
-import { productNotifyService } from '../../lib/api'
 import { toast } from 'sonner'
-import type { ProductNotifyRequest } from '../../lib/api/services/notify'
+import { productNotifyService, type ProductNotifyRequest } from '../../lib/api/services/notify'
 
 export default function NotifyProductsPage() {
   const [notifications, setNotifications] = useState<ProductNotifyRequest[]>([])
@@ -79,7 +78,7 @@ export default function NotifyProductsPage() {
       filtered = filtered.filter(
         notif =>
           notif.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          notif.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (notif.email && notif.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
           notif.productId.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }

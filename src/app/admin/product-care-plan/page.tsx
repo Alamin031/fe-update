@@ -11,10 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../components/ui/dropdown-menu'
 import { Textarea } from '../../components/ui/textarea'
-import { careService } from '../../lib/api'
 import { toast } from 'sonner'
 import { formatPrice } from '../../lib/utils/format'
-import type { ProductCarePlan } from '../../lib/api/services/care'
+import { careService, type ProductCarePlan } from '../../lib/api/services/care'
 
 export default function ProductCarePlanPage() {
   const [carePlans, setCarePlans] = useState<ProductCarePlan[]>([])
