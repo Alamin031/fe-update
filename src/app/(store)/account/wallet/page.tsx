@@ -19,12 +19,12 @@ export default function WalletPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Wallet & Rewards</h1>
-        <p className="text-muted-foreground">Manage your wallet balance and rewards.</p>
+        <h1 className="text-2xl font-bold tracking-tight">Rewards</h1>
+        <p className="text-muted-foreground">Manage your rewards.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+        {/* <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20">
@@ -49,9 +49,9 @@ export default function WalletPage() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
-        <Card>
+        <Card className="md:col-span-2">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-yellow-500/10">
@@ -63,9 +63,9 @@ export default function WalletPage() {
               </div>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              = {formatPrice(1250)} value • Earn 1 point per ₹100 spent
+              = {formatPrice(1250)} value • Earn 1 point per ৳100 spent
             </p>
-            <Button className="mt-4 w-full bg-transparent" variant="outline">
+            <Button className="mt-4 w-full" variant="fjhfhs">
               Redeem Points
             </Button>
           </CardContent>
@@ -97,7 +97,7 @@ export default function WalletPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Available Coupons</CardTitle>
         </CardHeader>
@@ -122,7 +122,7 @@ export default function WalletPage() {
             ))}
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   )
 }

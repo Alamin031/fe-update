@@ -19,7 +19,11 @@ const buttonVariants = cva(
         ghost:
           'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
+        success: 'bg-green-600 text-white hover:bg-green-700 focus-visible:ring-green-300 dark:bg-green-500 dark:hover:bg-green-600',
         fjhfhs: 'bg-green-500 text-white hover:bg-green-600 focus-visible:ring-green-300',
+        warning: 'bg-yellow-500 text-black hover:bg-yellow-600 focus-visible:ring-yellow-200 dark:bg-yellow-400',
+        info: 'bg-sky-500 text-white hover:bg-sky-600 focus-visible:ring-sky-200 dark:bg-sky-400',
+        muted: 'bg-muted text-muted-foreground hover:bg-muted/90 dark:bg-muted/80',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

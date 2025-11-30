@@ -16,7 +16,7 @@ const sidebarLinks = [
   { href: "/account/orders", label: "My Orders", icon: Package },
   { href: "/account/addresses", label: "Addresses", icon: MapPin },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart },
-  { href: "/account/wallet", label: "Wallet & Rewards", icon: CreditCard },
+  { href: "/account/wallet", label: "Rewards", icon: CreditCard },
   { href: "/account/notifications", label: "Notifications", icon: Bell },
   { href: "/account/settings", label: "Settings", icon: Settings },
 ]

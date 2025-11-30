@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
@@ -22,12 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../../components/ui/tabs";
+// Tabs are not used in this page; removed unused import to tidy file
 
 export default function NewProductPage() {
   // Product Name and Slug state
@@ -49,9 +45,11 @@ export default function NewProductPage() {
     setProductName(newName);
     // Only auto-update slug if user hasn't manually changed it
     setSlug((prevSlug) => {
-      const autoSlug = slugify(productName);
-      if (prevSlug === autoSlug || prevSlug === "") {
-        return slugify(newName);
+      // compute previous auto-slug (based on the previous productName) and the new auto-slug
+      const prevAuto = slugify(productName);
+      const newAuto = slugify(newName);
+      if (prevSlug === prevAuto || prevSlug === "") {
+        return newAuto;
       }
       return prevSlug;
     });
@@ -137,6 +135,15 @@ export default function NewProductPage() {
     }
   };
 
+  // Handle product images upload (primary images grid)
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      const newImages = filesArray.map((file) => URL.createObjectURL(file));
+      setImages((prev) => [...prev, ...newImages]);
+    }
+  };
+
   const removeGalleryImage = (index: number) => {
     setGalleryImages(galleryImages.filter((_, i) => i !== index));
   };
@@ -197,6 +204,20 @@ export default function NewProductPage() {
 
   const removeVariant = (id: string) => {
     setVariants(variants.filter((v) => v.id !== id));
+  };
+
+  const updateVariant = (
+    id: string,
+    field: "name" | "price" | "stock",
+    value: string | number
+  ) => {
+    setVariants(
+      variants.map((v) =>
+        v.id === id
+          ? { ...v, [field]: field === "name" ? String(value) : Number(value) }
+          : v
+      )
+    );
   };
 
   return (
@@ -276,268 +297,273 @@ export default function NewProductPage() {
                 </Select>
               </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="productCode">Product Code</Label>
-              <Input id="productCode" placeholder="Enter product code" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="sku">SKU</Label>
-              <Input id="sku" placeholder="Enter SKU" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="reviewStar">Review Star Point</Label>
-              <Input id="reviewStar" type="number" min="0" max="5" step="0.1" placeholder="e.g. 4.5" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="rewardPoints">Reward Points</Label>
-              <Input id="rewardPoints" type="number" min="0" placeholder="e.g. 100" />
+
+            {/* Combine Product Code, SKU, Review Star, Reward Points into one responsive row */}
+            <div className="grid gap-4 sm:grid-cols-4">
+              <div className="grid gap-2">
+                <Label htmlFor="productCode">Product Code</Label>
+                <Input id="productCode" placeholder="Enter product code" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="sku">SKU</Label>
+                <Input id="sku" placeholder="Enter SKU" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="reviewStar">Review Star Point</Label>
+                <Input id="reviewStar" type="number" min="0" max="5" step="0.1" placeholder="e.g. 4.5" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="rewardPoints">Reward Points</Label>
+                <Input id="rewardPoints" type="number" min="0" placeholder="e.g. 100" />
+              </div>
             </div>
           </div>
 
-          {/* Region Management (Manual Add/Edit) */}
-          <div className="space-y-2">
-            <Label className="font-semibold">Regions:</Label>
-            <div className="rounded-lg border p-4 space-y-2">
-              {regions.map((r, idx) => (
-                <div
-                  key={r.id}
-                  className="flex flex-wrap items-center gap-2 mb-2"
-                >
-                  <Input
-                    placeholder="Region name (e.g. E-Sim USA)"
-                    value={r.name}
-                    className="w-40"
-                    onChange={(e) => updateRegion(r.id, "name", e.target.value)}
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Price"
-                    value={r.price}
-                    className="w-28"
-                    onChange={(e) =>
-                      updateRegion(r.id, "price", Number(e.target.value))
-                    }
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Stock"
-                    value={r.stock}
-                    className="w-24"
-                    onChange={(e) =>
-                      updateRegion(r.id, "stock", Number(e.target.value))
-                    }
-                  />
-                  {regions.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeRegion(r.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                onClick={addRegion}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Add Region
-              </Button>
-            </div>
-            {/* Region selection for price/stock display */}
-            <div className="rounded-lg border p-4 flex flex-wrap gap-4 mt-2">
-              {regions.map((r) => (
-                <button
-                  key={r.id}
+          {/* Regions and Colors side-by-side on small+ screens */}
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="font-semibold">Regions:</Label>
+              <div className="rounded-lg border p-4 space-y-2">
+                {regions.map((r, idx) => (
+                  <div
+                    key={r.id}
+                    className="flex flex-wrap items-center gap-2 mb-2"
+                  >
+                    <Input
+                      placeholder="Region name (e.g. E-Sim USA)"
+                      value={r.name}
+                      className="w-40"
+                      onChange={(e) => updateRegion(r.id, "name", e.target.value)}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Price"
+                      value={r.price}
+                      className="w-28"
+                      onChange={(e) =>
+                        updateRegion(r.id, "price", Number(e.target.value))
+                      }
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Stock"
+                      value={r.stock}
+                      className="w-24"
+                      onChange={(e) =>
+                        updateRegion(r.id, "stock", Number(e.target.value))
+                      }
+                    />
+                    {regions.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeRegion(r.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
                   type="button"
-                  className={`flex items-center gap-2 px-6 py-2 rounded-full border transition-colors focus:outline-none ${
-                    selectedRegion === r.id
-                      ? "border-orange-400 ring-2 ring-orange-200 font-semibold"
-                      : "border-transparent"
-                  } bg-muted`}
-                  onClick={() => setSelectedRegion(r.id)}
+                  onClick={addRegion}
                 >
-                  {r.name || "Unnamed"}
-                </button>
-              ))}
+                  <Plus className="mr-2 h-4 w-4" /> Add Region
+                </Button>
+              </div>
+              {/* Region selection for price/stock display */}
+              <div className="rounded-lg border p-4 flex flex-wrap gap-4 mt-2">
+                {regions.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    className={`flex items-center gap-2 px-6 py-2 rounded-full border transition-colors focus:outline-none ${
+                      selectedRegion === r.id
+                        ? "border-orange-400 ring-2 ring-orange-200 font-semibold"
+                        : "border-transparent"
+                    } bg-muted`}
+                    onClick={() => setSelectedRegion(r.id)}
+                  >
+                    {r.name || "Unnamed"}
+                  </button>
+                ))}
+              </div>
+              {/* Show price and stock for selected region */}
+              <div className="mt-2 text-sm text-muted-foreground">
+                {regions.length > 0 && (
+                  <>
+                    <span>
+                      Price:{" "}
+                      <b>
+                        {regions.find((r) => r.id === selectedRegion)?.price ?? 0}
+                      </b>
+                    </span>
+                    <span className="ml-6">
+                      Stock:{" "}
+                      <b>
+                        {regions.find((r) => r.id === selectedRegion)?.stock ?? 0}
+                      </b>
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
-            {/* Show price and stock for selected region */}
-            <div className="mt-2 text-sm text-muted-foreground">
-              {regions.length > 0 && (
-                <>
-                  <span>
-                    Price:{" "}
-                    <b>
-                      {regions.find((r) => r.id === selectedRegion)?.price ?? 0}
-                    </b>
-                  </span>
-                  <span className="ml-6">
-                    Stock:{" "}
-                    <b>
-                      {regions.find((r) => r.id === selectedRegion)?.stock ?? 0}
-                    </b>
-                  </span>
-                </>
-              )}
+
+            <div className="space-y-2">
+              <Label className="font-semibold">Colors:</Label>
+              <div className="rounded-lg border p-4 space-y-2">
+                {colors.map((c, idx) => (
+                  <div key={c.id} className="flex items-center gap-2 mb-2">
+                    <Input
+                      placeholder="Color name (e.g. Midnight)"
+                      value={c.name}
+                      className="w-40"
+                      onChange={(e) => updateColor(c.id, "name", e.target.value)}
+                    />
+                    <input
+                      type="color"
+                      value={c.code}
+                      className="w-10 h-10 border rounded"
+                      onChange={(e) => updateColor(c.id, "code", e.target.value)}
+                    />
+                    {colors.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeColor(c.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={addColor}
+                >
+                  <Plus className="mr-2 h-4 w-4" /> Add Color
+                </Button>
+              </div>
+              {/* Show color swatches */}
+              <div className="flex flex-wrap gap-4 mt-2">
+                {colors.map((c) => (
+                  <div key={c.id} className="flex flex-col items-center">
+                    <span
+                      className="inline-block w-7 h-7 rounded-full border mb-1"
+                      style={{ backgroundColor: c.code, borderColor: "#bbb" }}
+                    ></span>
+                    <span className="text-xs text-muted-foreground">
+                      {c.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Color Selection (Multiple) */}
-          <div className="space-y-2">
-            <Label className="font-semibold">Colors:</Label>
-            <div className="rounded-lg border p-4 space-y-2">
-              {colors.map((c, idx) => (
-                <div key={c.id} className="flex items-center gap-2 mb-2">
-                  <Input
-                    placeholder="Color name (e.g. Midnight)"
-                    value={c.name}
-                    className="w-40"
-                    onChange={(e) => updateColor(c.id, "name", e.target.value)}
-                  />
-                  <input
-                    type="color"
-                    value={c.code}
-                    className="w-10 h-10 border rounded"
-                    onChange={(e) => updateColor(c.id, "code", e.target.value)}
-                  />
-                  {colors.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeColor(c.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                onClick={addColor}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Add Color
-              </Button>
+          {/* Network, Size, and Plug side-by-side on small+ screens */}
+          <div className="grid gap-6 sm:grid-cols-3">
+            <div className="space-y-2">
+              <Label className="font-semibold">Network:</Label>
+              <div className="rounded-lg border p-4 space-y-2">
+                {networks.map((n, idx) => (
+                  <div key={n.id} className="flex items-center gap-2 mb-2">
+                    <Input
+                      placeholder="Network (e.g. 5G, LTE, GSM)"
+                      value={n.value}
+                      className="w-48"
+                      onChange={(e) => updateNetwork(n.id, e.target.value)}
+                    />
+                    {networks.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeNetwork(n.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={addNetwork}
+                >
+                  <Plus className="mr-2 h-4 w-4" /> Add Network
+                </Button>
+              </div>
             </div>
-            {/* Show color swatches */}
-            <div className="flex flex-wrap gap-4 mt-2">
-              {colors.map((c) => (
-                <div key={c.id} className="flex flex-col items-center">
-                  <span
-                    className="inline-block w-7 h-7 rounded-full border mb-1"
-                    style={{ backgroundColor: c.code, borderColor: "#bbb" }}
-                  ></span>
-                  <span className="text-xs text-muted-foreground">
-                    {c.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Network Section */}
-          <div className="space-y-2">
-            <Label className="font-semibold">Network:</Label>
-            <div className="rounded-lg border p-4 space-y-2">
-              {networks.map((n, idx) => (
-                <div key={n.id} className="flex items-center gap-2 mb-2">
-                  <Input
-                    placeholder="Network (e.g. 5G, LTE, GSM)"
-                    value={n.value}
-                    className="w-48"
-                    onChange={(e) => updateNetwork(n.id, e.target.value)}
-                  />
-                  {networks.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeNetwork(n.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                onClick={addNetwork}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Add Network
-              </Button>
+            <div className="space-y-2">
+              <Label className="font-semibold">Size:</Label>
+              <div className="rounded-lg border p-4 space-y-2">
+                {sizes.map((s, idx) => (
+                  <div key={s.id} className="flex items-center gap-2 mb-2">
+                    <Input
+                      placeholder="Size (e.g. 6.1-inch, Large)"
+                      value={s.value}
+                      className="w-48"
+                      onChange={(e) => updateSize(s.id, e.target.value)}
+                    />
+                    {sizes.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeSize(s.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={addSize}
+                >
+                  <Plus className="mr-2 h-4 w-4" /> Add Size
+                </Button>
+              </div>
             </div>
-          </div>
 
-          {/* Size Section */}
-          <div className="space-y-2">
-            <Label className="font-semibold">Size:</Label>
-            <div className="rounded-lg border p-4 space-y-2">
-              {sizes.map((s, idx) => (
-                <div key={s.id} className="flex items-center gap-2 mb-2">
-                  <Input
-                    placeholder="Size (e.g. 6.1-inch, Large)"
-                    value={s.value}
-                    className="w-48"
-                    onChange={(e) => updateSize(s.id, e.target.value)}
-                  />
-                  {sizes.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeSize(s.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                onClick={addSize}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Add Size
-              </Button>
-            </div>
-          </div>
-
-          {/* Plug Section */}
-          <div className="space-y-2">
-            <Label className="font-semibold">Plug:</Label>
-            <div className="rounded-lg border p-4 space-y-2">
-              {plugs.map((p, idx) => (
-                <div key={p.id} className="flex items-center gap-2 mb-2">
-                  <Input
-                    placeholder="Plug (e.g. US, EU, UK)"
-                    value={p.value}
-                    className="w-48"
-                    onChange={(e) => updatePlug(p.id, e.target.value)}
-                  />
-                  {plugs.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removePlug(p.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                onClick={addPlug}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Add Plug
-              </Button>
+            <div className="space-y-2">
+              <Label className="font-semibold">Plug:</Label>
+              <div className="rounded-lg border p-4 space-y-2">
+                {plugs.map((p, idx) => (
+                  <div key={p.id} className="flex items-center gap-2 mb-2">
+                    <Input
+                      placeholder="Plug (e.g. US, EU, UK)"
+                      value={p.value}
+                      className="w-48"
+                      onChange={(e) => updatePlug(p.id, e.target.value)}
+                    />
+                    {plugs.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removePlug(p.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={addPlug}
+                >
+                  <Plus className="mr-2 h-4 w-4" /> Add Plug
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -561,6 +587,13 @@ export default function NewProductPage() {
                   <div className="absolute left-2 top-2 cursor-grab text-muted-foreground">
                     <GripVertical className="h-4 w-4" />
                   </div>
+                  {image && (
+                    <img
+                      src={image}
+                      alt={`Image ${index + 1}`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  )}
                 </div>
               ))}
               <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/50 hover:bg-muted">
@@ -571,6 +604,7 @@ export default function NewProductPage() {
                   className="hidden"
                   accept="image/*"
                   multiple
+                  onChange={handleImageChange}
                 />
               </label>
             </div>
@@ -665,7 +699,7 @@ export default function NewProductPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Variants</CardTitle>
-                <Button variant="outline" size="sm" onClick={addVariant}>
+                <Button variant="default" size="sm" onClick={addVariant}>
                   <Plus className="mr-2 h-4 w-4" />
                   Add Variant
                 </Button>
@@ -681,17 +715,34 @@ export default function NewProductPage() {
                       <div className="grid flex-1 gap-4 sm:grid-cols-3">
                         <Input
                           placeholder="Variant name (e.g., 256GB)"
-                          defaultValue={variant.name}
+                          value={variant.name}
+                          onChange={(e) =>
+                            updateVariant(variant.id, "name", e.target.value)
+                          }
                         />
                         <Input
                           type="number"
                           placeholder="Price"
-                          defaultValue={variant.price}
+                          value={variant.price}
+                          onChange={(e) =>
+                            updateVariant(
+                              variant.id,
+                              "price",
+                              Number(e.target.value || 0)
+                            )
+                          }
                         />
                         <Input
                           type="number"
                           placeholder="Stock"
-                          defaultValue={variant.stock}
+                          value={variant.stock}
+                          onChange={(e) =>
+                            updateVariant(
+                              variant.id,
+                              "stock",
+                              Number(e.target.value || 0)
+                            )
+                          }
                         />
                       </div>
                       {variants.length > 1 && (
@@ -823,7 +874,7 @@ export default function NewProductPage() {
 
       <div className="flex items-center justify-end gap-4">
         <Button variant="outline">Save as Draft</Button>
-        <Button>Publish Product</Button>
+        <Button variant="success">Publish Product</Button>
       </div>
     </div>
   );
