@@ -52,8 +52,13 @@ export function CategoryFAQ({ categoryName, categorySlug, faqs }: CategoryFAQPro
             : [];
           setDynamicFaqs(apiFaqs);
         } catch (e) {
+          // Silently fail - default FAQs will be shown
+          // Log only in development for debugging
+          if (process.env.NODE_ENV === 'development') {
+            console.error("Failed to fetch category FAQs:", e);
+          }
           if (!cancelled) {
-            setError("Could not load FAQs for this category.");
+            setDynamicFaqs([]);
           }
         } finally {
           if (!cancelled) {
