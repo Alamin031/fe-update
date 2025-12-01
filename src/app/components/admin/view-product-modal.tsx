@@ -68,13 +68,12 @@ export function ViewProductModal({
               {/* Main Image */}
               <div className="space-y-2">
                 <h3 className="font-semibold">Product Image</h3>
-                <div className="rounded-lg bg-muted p-4 flex items-center justify-center min-h-80">
+                <div className="relative rounded-lg bg-muted p-4 flex items-center justify-center min-h-80">
                   <Image
                     src={mainImage}
                     alt={product.name}
-                    width={300}
-                    height={300}
-                    className="max-w-sm max-h-80 object-contain"
+                    fill
+                    className="object-contain p-4"
                   />
                 </div>
               </div>
