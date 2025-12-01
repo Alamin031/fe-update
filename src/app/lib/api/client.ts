@@ -77,7 +77,11 @@ apiClient.interceptors.response.use(
     // Handle 500 Server Error
     if (error.response?.status === 500) {
       const message = (error.response.data as any)?.error?.message || "Server error"
-      console.error("Server Error:", message)
+      // Don't log FAQ category endpoint errors - they're gracefully handled with fallback FAQs
+      const url = (error.config?.url || "").toString()
+      if (!url.includes("/faqs/category")) {
+        console.error("Server Error:", message)
+      }
     }
 
     return Promise.reject(error)

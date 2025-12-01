@@ -9,7 +9,7 @@ import { CategoryFAQ } from "@/app/components/category/category-faq";
 import type { Category, Product } from "@/app/types/index";
 
 interface CategoryPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
@@ -31,7 +31,7 @@ type RawCategory = {
 export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const categoriesRaw = await categoriesService.getAll();
   const categories: Category[] = (
     categoriesRaw as unknown as RawCategory[]
@@ -74,7 +74,7 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: CategoryPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const categoriesRaw = await categoriesService.getAll();
   const categories: Category[] = (
     categoriesRaw as unknown as RawCategory[]
@@ -163,7 +163,7 @@ export default async function Page({ params }: CategoryPageProps) {
 
       {/* FAQ Section */}
       <div className="mt-16">
-        <CategoryFAQ categoryName={category?.name ?? slug} />
+        <CategoryFAQ categoryName={category?.name ?? slug} categorySlug={slug} />
       </div>
     </div>
   );

@@ -14,10 +14,11 @@ export interface FAQItem {
 
 interface CategoryFAQProps {
   categoryName: string;
+  categorySlug?: string;
   faqs?: FAQItem[];
 }
 
-export function CategoryFAQ({ categoryName, faqs }: CategoryFAQProps) {
+export function CategoryFAQ({ categoryName, categorySlug, faqs }: CategoryFAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [dynamicFaqs, setDynamicFaqs] = useState<FAQItem[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,7 @@ export function CategoryFAQ({ categoryName, faqs }: CategoryFAQProps) {
         setError(null);
 
         try {
-          const res = await faqsService.getByCategory(categoryName);
+          const res = await faqsService.getByCategory(categorySlug || categoryName);
           if (cancelled) return;
 
           // Map API FAQ shape to FAQItem if needed
@@ -51,8 +52,13 @@ export function CategoryFAQ({ categoryName, faqs }: CategoryFAQProps) {
             : [];
           setDynamicFaqs(apiFaqs);
         } catch (e) {
+          // Silently fail - default FAQs will be shown
+          // Log only in development for debugging
+          if (process.env.NODE_ENV === 'development') {
+            console.error("Failed to fetch category FAQs:", e);
+          }
           if (!cancelled) {
-            setError("Could not load FAQs for this category.");
+            setDynamicFaqs([]);
           }
         } finally {
           if (!cancelled) {
@@ -67,7 +73,7 @@ export function CategoryFAQ({ categoryName, faqs }: CategoryFAQProps) {
         cancelled = true;
       };
     }
-  }, [faqs, categoryName]);
+  }, [faqs, categoryName, categorySlug]);
 
   const defaultFaqs: FAQItem[] = [
     {
