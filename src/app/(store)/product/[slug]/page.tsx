@@ -5,7 +5,7 @@ import { ProductGallery } from "../../../components/product/product-gallery"
 import { ProductInfo } from "../../../components/product/product-info"
 import { ProductTabs } from "../../../components/product/product-tabs"
 import { ProductSection } from "../../../components/home/product-section"
-import NotFound from "../../../app/not-found"
+import NotFound from "../../not-found"
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>
