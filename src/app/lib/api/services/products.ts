@@ -182,7 +182,7 @@ export const productsService = {
    * Get product by ID
    */
   getById: async (id: string): Promise<Product> => {
-    const endpoint = API_ENDPOINTS.PRODUCTS_UPDATE.replace("{id}", id)
+    const endpoint = API_ENDPOINTS.PRODUCTS_GET_ONE.replace("{id}", id)
     const response = await apiClient.get<Product>(endpoint)
     return response.data
   },
