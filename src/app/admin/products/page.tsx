@@ -133,7 +133,8 @@ function AdminProductsPage() {
       const fullProduct = await productsService.getById(product.id);
       setSelectedProduct(fullProduct);
       setViewOpen(true);
-    } catch {
+    } catch (err: any) {
+      console.error("Failed to fetch full product details:", err);
       setSelectedProduct(product);
       setViewOpen(true);
     }
@@ -144,7 +145,8 @@ function AdminProductsPage() {
       const fullProduct = await productsService.getById(product.id);
       setSelectedProduct(fullProduct);
       setEditOpen(true);
-    } catch {
+    } catch (err: any) {
+      console.error("Failed to fetch full product details:", err);
       setSelectedProduct(product);
       setEditOpen(true);
     }
