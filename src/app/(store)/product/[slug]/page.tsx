@@ -49,15 +49,6 @@ export default async function ProductPage({params}: ProductPageProps) {
 
   let category = apiProduct.category;
   // যদি category না থাকে, তাহলে categoryId দিয়ে ফেচ করো
-  if (!category && apiProduct.categoryId) {
-    try {
-      category = await categoriesService.getById(apiProduct.categoryId);
-      console.log('Fetched category by ID:', category);
-    } catch (e) {
-      console.error('Category fetch error:', e);
-      category = undefined;
-    }
-  }
 
   // Allow page to render even without category data - fallback values will be used
   if (!apiProduct || !apiProduct.slug || !apiProduct.name) {
