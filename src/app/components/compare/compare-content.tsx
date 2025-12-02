@@ -51,6 +51,7 @@ export function CompareContent() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2">
+        {/* Product Cards */}
         {items.map((product) => (
           <div key={product.id} className="flex flex-col rounded-lg border border-border bg-card">
             {/* Search Bar */}
