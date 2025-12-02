@@ -170,6 +170,43 @@ export default function AdminCustomersPage() {
     }
   }
 
+  const handleCloseView = (open: boolean) => {
+    setViewOpen(open)
+    if (!open) {
+      setSelectedCustomer(null)
+    }
+  }
+
+  const handleCloseEdit = (open: boolean) => {
+    setEditOpen(open)
+    if (!open) {
+      setSelectedCustomer(null)
+      setEditFormData(null)
+    }
+  }
+
+  const handleCloseEmail = (open: boolean) => {
+    setEmailOpen(open)
+    if (!open) {
+      setSelectedCustomer(null)
+      setEmailFormData({ subject: "", message: "" })
+    }
+  }
+
+  const handleCloseBlock = (open: boolean) => {
+    setBlockOpen(open)
+    if (!open) {
+      setSelectedCustomer(null)
+    }
+  }
+
+  const handleCloseDelete = (open: boolean) => {
+    setDeleteOpen(open)
+    if (!open) {
+      setSelectedCustomer(null)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
