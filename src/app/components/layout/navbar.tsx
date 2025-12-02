@@ -34,6 +34,7 @@ export function Navbar() {
   const [brands, setBrands] = useState<Brand[]>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
   const [isLoadingBrands, setIsLoadingBrands] = useState(true)
+  const [isHydrated, setIsHydrated] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
 
@@ -41,6 +42,10 @@ export function Navbar() {
   const wishlistCount = useWishlistStore((state) => state.items.length)
   const compareCount = useCompareStore((state) => state.items.length)
   const { isAuthenticated, user, logout } = useAuthStore()
+
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -178,7 +183,7 @@ export function Navbar() {
             <Link href="/compare" className="hidden sm:inline-flex">
               <Button variant="ghost" size="icon" className="relative">
                 <BarChart3 className="h-5 w-5" />
-                {compareCount > 0 && (
+                {isHydrated && compareCount > 0 && (
                   <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs">{compareCount}</Badge>
                 )}
                 <span className="sr-only">Compare</span>
@@ -189,7 +194,7 @@ export function Navbar() {
             <Link href="/wishlist" className="hidden sm:inline-flex">
               <Button variant="ghost" size="icon" className="relative">
                 <Heart className="h-5 w-5" />
-                {wishlistCount > 0 && (
+                {isHydrated && wishlistCount > 0 && (
                   <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs">{wishlistCount}</Badge>
                 )}
                 <span className="sr-only">Wishlist</span>
@@ -200,7 +205,7 @@ export function Navbar() {
             <Link href="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
-                {cartItemCount > 0 && (
+                {isHydrated && cartItemCount > 0 && (
                   <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs">{cartItemCount}</Badge>
                 )}
                 <span className="sr-only">Cart</span>
@@ -222,24 +227,28 @@ export function Navbar() {
                     <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/account">Dashboard</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/account/orders">My Orders</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/account/wishlist">Wishlist</Link>
-                  </DropdownMenuItem>
+                  {user?.role !== "admin" && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/account">Dashboard</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/account/orders">My Orders</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/account/wishlist">Wishlist</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
                   {user?.role === "admin" && (
                     <>
-                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link href="/admin">Admin Panel</Link>
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                     </>
                   )}
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
                     Logout
                   </DropdownMenuItem>
@@ -308,7 +317,7 @@ export function Navbar() {
                             className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
                           >
                             Wishlist
-                            {wishlistCount > 0 && <Badge variant="secondary">{wishlistCount}</Badge>}
+                            {isHydrated && wishlistCount > 0 && <Badge variant="secondary">{wishlistCount}</Badge>}
                           </Link>
                         </SheetClose>
                         <SheetClose asChild>
@@ -317,7 +326,7 @@ export function Navbar() {
                             className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
                           >
                             Compare
-                            {compareCount > 0 && <Badge variant="secondary">{compareCount}</Badge>}
+                            {isHydrated && compareCount > 0 && <Badge variant="secondary">{compareCount}</Badge>}
                           </Link>
                         </SheetClose>
                         <SheetClose asChild>
@@ -334,13 +343,24 @@ export function Navbar() {
                   <div className="border-t border-border p-4">
                     {isAuthenticated ? (
                       <div className="space-y-2">
-                        <SheetClose asChild>
-                          <Link href="/account">
-                            <Button variant="outline" className="w-full bg-transparent">
-                              Dashboard
-                            </Button>
-                          </Link>
-                        </SheetClose>
+                        {user?.role !== "admin" && (
+                          <SheetClose asChild>
+                            <Link href="/account">
+                              <Button variant="outline" className="w-full bg-transparent">
+                                Dashboard
+                              </Button>
+                            </Link>
+                          </SheetClose>
+                        )}
+                        {user?.role === "admin" && (
+                          <SheetClose asChild>
+                            <Link href="/admin">
+                              <Button variant="outline" className="w-full bg-transparent">
+                                Admin Panel
+                              </Button>
+                            </Link>
+                          </SheetClose>
+                        )}
                         <button
                           onClick={handleLogout}
                           className="w-full"

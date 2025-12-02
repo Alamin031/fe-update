@@ -99,25 +99,28 @@ function AdminProductsPage() {
         }
         // ProductListResponse: { data: Product[], ... }
         const apiProducts = Array.isArray(res) ? res : [];
-        const mapped: UIProduct[] = apiProducts.map((p) => ({
-          id: p.id,
-          name: p.name,
-          image:
-            (Array.isArray(p.images) && p.images.length > 0 && p.images[0]) ||
-            p.thumbnail ||
-            "/placeholder.svg",
-          sku: p.sku || "",
-          category: p.categoryId || "",
-          price: Number(p.price) || Number(p.basePrice) || 0,
-          stock: Number(p.stock) || 0,
-          status:
-            typeof p.status === "string"
-              ? p.status
-              : !p.stock || p.stock === 0
-              ? "Out of Stock"
-              : "Active",
-          description: p.description || "",
-        }));
+        const mapped: UIProduct[] = apiProducts.map((p) => {
+          const categoryObj = categories.find((c) => c.id === p.categoryId);
+          return {
+            id: p.id,
+            name: p.name,
+            image:
+              (Array.isArray(p.images) && p.images.length > 0 && p.images[0]) ||
+              p.thumbnail ||
+              "/placeholder.svg",
+            sku: p.sku || "",
+            category: categoryObj ? categoryObj.name : "Uncategorized",
+            price: Number(p.price) || Number(p.basePrice) || 0,
+            stock: Number(p.stock) || 0,
+            status:
+              typeof p.status === "string"
+                ? p.status
+                : !p.stock || p.stock === 0
+                ? "Out of Stock"
+                : "Active",
+            description: p.description || "",
+          };
+        });
         setProducts(mapped);
       } catch {
         setProducts([]);
@@ -126,11 +129,17 @@ function AdminProductsPage() {
       }
     };
     fetchProducts();
-  }, [selectedCategory]);
+  }, [selectedCategory, categories]);
 
-  const handleViewClick = (product: UIProduct) => {
-    setSelectedProduct(product);
-    setViewOpen(true);
+  const handleViewClick = async (product: UIProduct) => {
+    try {
+      const fullProduct = await productsService.getById(product.id);
+      setSelectedProduct(fullProduct);
+      setViewOpen(true);
+    } catch {
+      setSelectedProduct(product);
+      setViewOpen(true);
+    }
   };
 
   const handleEditClick = (product: UIProduct) => {

@@ -75,12 +75,14 @@ export function ProductInfo({ product }: ProductInfoProps) {
   return (
     <div className="flex flex-col">
       {/* Brand */}
-      <Link
-        href={`/brand/${product.brand.slug}`}
-        className="text-sm font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground"
-      >
-        {product.brand.name}
-      </Link>
+      {product.brand && (
+        <Link
+          href={`/brand/${product.brand.slug}`}
+          className="text-sm font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground"
+        >
+          {product.brand.name}
+        </Link>
+      )}
 
       {/* Title */}
       <h1 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{product.name}</h1>

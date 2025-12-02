@@ -111,11 +111,6 @@ export const categoriesService = {
     return normalizeCategory(response.data);
   },
 
-   getById: async (id: string): Promise<Category> => {
-    const endpoint = API_ENDPOINTS.CATEGORIES_GET_ONE.replace('{id}', id);
-    const response = await apiClient.get<Category>(endpoint);
-    return normalizeCategory(response.data);
-  },
 
   /**
    * ✅ Get products in category

@@ -46,7 +46,7 @@ export function CartContent() {
                 className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-muted"
               >
                 <Image
-                  src={item.product.images[0] || "/placeholder.svg?height=100&width=100"}
+                  src={Array.isArray(item.product.images) && item.product.images.length > 0 ? item.product.images[0] : "/placeholder.svg?height=100&width=100"}
                   alt={item.product.name}
                   fill
                   className="object-cover"
@@ -60,7 +60,9 @@ export function CartContent() {
                     <Link href={`/product/${item.product.slug}`} className="font-medium hover:underline">
                       {item.product.name}
                     </Link>
-                    <p className="mt-0.5 text-sm text-muted-foreground">{item.product.brand.name}</p>
+                    {item.product.brand && (
+                      <p className="mt-0.5 text-sm text-muted-foreground">{item.product.brand.name}</p>
+                    )}
                     {Object.entries(item.selectedVariants).length > 0 && (
                       <p className="mt-1 text-xs text-muted-foreground">
                         {Object.entries(item.selectedVariants).map(([key, value]) => (

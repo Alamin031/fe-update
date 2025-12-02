@@ -2,7 +2,6 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 import type {Metadata} from 'next';
 import {productsService} from '../../../lib/api/services/products';
-import {categoriesService} from '../../../lib/api/services/categories';
 import {ProductGallery} from '../../../components/product/product-gallery';
 import {ProductInfo} from '../../../components/product/product-info';
 import {ProductTabs} from '../../../components/product/product-tabs';
@@ -47,19 +46,8 @@ export async function generateMetadata({
 export default async function ProductPage({params}: ProductPageProps) {
   const {slug} = await params;
   const apiProduct = await productsService.getBySlug(slug);
-  console.log('Fetched product:', apiProduct);
 
   let category = apiProduct.category;
-  // যদি category না থাকে, তাহলে categoryId দিয়ে ফেচ করো
-  if (!category && apiProduct.categoryId) {
-    try {
-      category = await categoriesService.getById(apiProduct.categoryId);
-      console.log('Fetched category by ID:', category);
-    } catch (e) {
-      console.error('Category fetch error:', e);
-      category = undefined;
-    }
-  }
 
   // Allow page to render even without category data - fallback values will be used
   if (!apiProduct || !apiProduct.slug || !apiProduct.name) {
