@@ -30,6 +30,7 @@ import { careService, type ProductCarePlan } from '../../lib/api/services/care';
 import { productsService } from '../../lib/api/services/products';
 import { categoriesService } from '../../lib/api/services/categories';
 import type { Product, Category } from '../../lib/api/types';
+import { withProtectedRoute } from '../../lib/auth/protected-route';
 
 // Custom MultiSelect Component
 interface MultiSelectProps {
