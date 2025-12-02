@@ -51,7 +51,7 @@ export function MegaMenu({ isOpen, onClose, categories }: MegaMenuProps) {
         <div>
           {/* Categories Only */}
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Categories</h3>
-          <div className="grid gap-3 grid-cols-6">
+          <div className="grid gap-3 grid-cols-10">
             {sortedCategories.length > 0 ? (
               <>
                 {sortedCategories.map((category) => (
