@@ -102,3 +102,7 @@ function WishlistPage() {
     </div>
   )
 }
+
+export default withProtectedRoute(WishlistPage, {
+  requiredRoles: ["user"],
+})
