@@ -349,16 +349,16 @@ export default function AdminCustomersPage() {
                   />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{selectedCustomer.name}</h2>
-                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{selectedCustomer.email}</p>
+                  <h2 className="text-2xl font-bold text-slate-900">{selectedCustomer.name}</h2>
+                  <p className="mt-1 text-sm text-slate-600">{selectedCustomer.email}</p>
                   <Badge
                     variant="secondary"
                     className={`mt-2 border-0 font-semibold ${
                       selectedCustomer.status === "Active"
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                        ? "bg-emerald-100 text-emerald-700"
                         : selectedCustomer.status === "Inactive"
-                          ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                          : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-red-100 text-red-700"
                     }`}
                   >
                     {selectedCustomer.status}
