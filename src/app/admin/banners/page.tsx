@@ -323,3 +323,9 @@ function Page() {
     </div>
   );
 }
+
+export default withProtectedRoute(Page, {
+  requiredRoles: ["admin"],
+  fallbackTo: "/login",
+  showLoader: true,
+})
