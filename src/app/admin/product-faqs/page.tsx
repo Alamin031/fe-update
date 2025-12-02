@@ -195,7 +195,7 @@ function MultiSelect({
   );
 }
 
-export default function ProductFAQsPage() {
+function ProductFAQsPage() {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [filteredFaqs, setFilteredFaqs] = useState<FAQ[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
