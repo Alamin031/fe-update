@@ -1,472 +1,431 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-
 import { useState, useEffect } from "react";
-import Image from "next/image";
-import { Plus, Edit, Trash2, MoreVertical, Eye } from "lucide-react";
-
+import { toast } from "sonner";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogDescription,
 } from "../../components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "../../components/ui/alert-dialog";
-import categoriesService from "../../lib/api/services/categories";
+import { Label } from "../../components/ui/label";
+import { Plus } from "lucide-react";
+import brandsService from "../../lib/api/services/brands";
+import { Brand } from "@/app/types";
 
-// ===== TYPES =====
-interface Subcategory {
-  id: string;
-  name: string;
-  categoryId?: string;
-}
+export default function BrandPage() {
+  const [brands, setBrands] = useState<Brand[] | null>(null);
 
-interface Category {
-  id: string;
-  name: string;
-  slug?: string;
-  description?: string;
-  banner?: string | File;
-  priority?: number;
-  subcategories?: Subcategory[];
-  createdAt?: string;
-  updatedAt?: string;
-}
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [viewMode, setViewMode] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<{
+    id: string;
+    name: string;
+    slug: string;
+    logo: File | string;
+  } | null>(null);
+  const [form, setForm] = useState<{
+    name: string;
+    slug: string;
+    logo: File | string;
+  }>({ name: "", slug: "", logo: "" });
+  const [loading, setLoading] = useState(false);
 
-type AddFormData = {
-  name: string;
-  slug: string;
-  priority: string;
-  subcategories: Subcategory[];
-  banner: string | File;
-};
+  // For delete confirmation modal
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [brandToDelete, setBrandToDelete] = useState<{
+    id: string;
+    name: string;
+    slug: string;
+    logo: string;
+  } | null>(null);
 
-export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [viewOpen, setViewOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const slugify = (text: string) =>
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
-  const [editFormData, setEditFormData] = useState<Category | null>(null);
+  // Fetch brands from API
+  useEffect(() => {
+    fetchBrands();
+  }, []);
 
-  const [addFormData, setAddFormData] = useState<AddFormData>({
-    name: "",
-    slug: "",
-    priority: "",
-    subcategories: [],
-    banner: "",
-  });
-
-  // ===== FETCH =====
-  const fetchCategories = async () => {
+  const fetchBrands = async () => {
+    // setLoading(true);
     try {
-      const res = await categoriesService.getAll();
-      console.log("Fetched categories:", res);
-      setCategories(res);
+      const data = await brandsService.findAll();
+      setBrands(data); // Use only the array, not the whole response object
     } catch {
-      setCategories([]);
+      // handle error
+    } finally {
+      // setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const load = async () => {
-      await fetchCategories();
-    };
-    load();
-  }, []);
-
-  // ===== IMAGE HANDLERS =====
-  const handleAddBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setAddFormData((f) => ({ ...f, banner: file || "" }));
-  };
-
-  const handleEditBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editFormData) return;
-    setEditFormData({ ...editFormData, banner: file });
-  };
-
-  // ===== CREATE =====
-  const handleCreateCategory = async () => {
+  // Handlers
+  const handleSaveBrand = async () => {
+    setLoading(true);
     try {
-      const newCat = await categoriesService.create({
-        name: addFormData.name,
-        slug: addFormData.slug,
-        priority: Number(addFormData.priority),
-        banner: addFormData.banner,
-      });
-
-      setCategories((prev) =>
-        Array.isArray(prev) ? [newCat, ...prev] : [newCat]
-      );
-
-      setAddFormData({
-        name: "",
-        slug: "",
-        banner: "",
-        priority: "",
-        subcategories: [],
-      });
-
-      setIsAddDialogOpen(false);
-    } catch (err) {}
+      const payload = {
+        name: form.name,
+        slug: form.slug,
+        logo: form.logo,
+      };
+      // Simulate 1.5s delay for UX
+      await new Promise((res) => setTimeout(res, 1500));
+      if (editMode && selectedBrand) {
+        await brandsService.update(selectedBrand.id, payload);
+        toast.success("Brand updated successfully!");
+      } else {
+        await brandsService.create(payload);
+        toast.success("Brand added successfully!");
+      }
+      await fetchBrands();
+      setModalOpen(false);
+    } catch (err: any) {
+      let errorMsg = "Something went wrong!";
+      if (err && typeof err === "object") {
+        if (err.message) {
+          errorMsg = err.message;
+        } else if (
+          err.response &&
+          err.response.data &&
+          err.response.data.message
+        ) {
+          errorMsg = err.response.data.message;
+        }
+      }
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleDeleteBrand = (brand: {
+    id: string;
+    name: string;
+    slug: string;
+    logo: string;
+  }) => {
+    setBrandToDelete(brand);
+    setDeleteModalOpen(true);
   };
 
-  // ===== UPDATE =====
-  const handleSaveEdit = async () => {
-    if (!editFormData) return;
-
+  const confirmDeleteBrand = async () => {
+    if (!brandToDelete) return;
+    setLoading(true);
     try {
-      const updated = await categoriesService.update(editFormData.id, {
-        name: editFormData.name,
-        slug: editFormData.slug,
-        priority: editFormData.priority,
-        banner: editFormData.banner,
-      });
-
-      setCategories((cats) =>
-        cats.map((c) => (c.id === updated.id ? updated : c))
-      );
-    } catch (err) {}
-
-    setEditOpen(false);
-    setEditFormData(null);
+      await brandsService.delete(brandToDelete.id);
+      await fetchBrands();
+      toast.success("Brand deleted successfully!");
+    } catch {
+      toast.error("Failed to delete brand.");
+    } finally {
+      setLoading(false);
+      setDeleteModalOpen(false);
+      setBrandToDelete(null);
+    }
   };
-
-  // ===== DELETE =====
-  const handleConfirmDelete = async () => {
-    if (!selectedCategory) return;
-
-    try {
-      await categoriesService.delete(selectedCategory.id);
-      setCategories((cats) => cats.filter((c) => c.id !== selectedCategory.id));
-    } catch (err) {}
-
-    setDeleteOpen(false);
-    setSelectedCategory(null);
+  const handleAddBrand = () => {
+    setForm({ name: "", slug: "", logo: "" });
+    setEditMode(false);
+    setViewMode(false);
+    setModalOpen(true);
   };
-
-  // ===== SUBCATEGORY =====
+  const handleEditBrand = (brand: {
+    id: string;
+    name: string;
+    slug: string;
+    logo: string;
+  }) => {
+    setSelectedBrand(brand);
+    setForm({ name: brand.name, slug: brand.slug, logo: brand.logo });
+    setEditMode(true);
+    setViewMode(false);
+    setModalOpen(true);
+  };
+  const handleViewBrand = (brand: {
+    id: string;
+    name: string;
+    slug: string;
+    logo: string;
+  }) => {
+    setSelectedBrand(brand);
+    setForm({ name: brand.name, slug: brand.slug, logo: brand.logo });
+    setEditMode(false);
+    setViewMode(true);
+    setModalOpen(true);
+  };
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, files } = e.target;
+    if (type === "file" && files && files[0]) {
+      setForm((prev) => ({ ...prev, logo: files[0] }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+        slug: name === "name" ? slugify(value) : prev.slug,
+      }));
+    }
+  };
 
   return (
-    <div className="space-y-6 p-2 sm:p-4">
-      {/* ===== HEADER ===== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-bold">Categories</h1>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" /> Add Category
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight">Brands</h1>
+        <Button onClick={handleAddBrand} className="gap-2">
+          <Plus className="h-4 w-4" /> Add Brand
+        </Button>
+      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Brand List</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-border">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 text-left">Name</th>
+                  <th className="px-4 py-2 text-left">Slug</th>
+                  <th className="px-4 py-2 text-left">Logo</th>
+                  <th className="px-4 py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(Array.isArray(brands) ? brands : []).map((brand) => (
+                  <tr key={brand.id}>
+                    <td className="px-4 py-2">{brand.name}</td>
+                    <td className="px-4 py-2">{brand.slug}</td>
+                    <td className="px-4 py-2">
+                      {brand.logo && typeof brand.logo === "string" ? (
+                        // Show image for both base64 and URL
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="h-8 w-16 object-contain"
+                        />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          No logo
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleViewBrand(brand)}
+                        >
+                          View
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditBrand(brand)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-destructive"
+                          onClick={() => handleDeleteBrand(brand)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {(Array.isArray(brands) ? brands.length : 0) === 0 && (
+              <div className="text-center text-muted-foreground py-8">
+                No brands found.
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+      {/* Add/Edit/View Brand Modal */}
+      {/* Delete Confirmation Modal (not nested) */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Brand</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete <b>{brandToDelete?.name}</b>? This
+              action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteModalOpen(false)}
+              disabled={loading}
+            >
+              Cancel
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add Category</DialogTitle>
-            </DialogHeader>
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                await handleCreateCategory();
-              }}
-              className="space-y-4 py-2"
+            <Button
+              type="button"
+              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={confirmDeleteBrand}
+              disabled={loading}
             >
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={addFormData.name}
-                  onChange={(e) => {
-                    const name = e.target.value;
-                    setAddFormData((f) => ({
-                      ...f,
-                      name,
-                      slug: name
-                        .toLowerCase()
-                        .replace(/[^a-z0-9]+/g, "-")
-                        .replace(/(^-|-$)/g, ""),
-                    }));
-                  }}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
-                <Input
-                  id="slug"
-                  value={addFormData.slug}
-                  onChange={(e) =>
-                    setAddFormData((f) => ({
-                      ...f,
-                      slug: e.target.value,
-                    }))
-                  }
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="banner">Banner</Label>
-                <Input
-                  id="banner"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAddBannerChange}
-                />
-                {addFormData.banner &&
-                  typeof addFormData.banner !== "string" && (
-                    <img
-                      src={URL.createObjectURL(addFormData.banner)}
-                      alt="Preview"
-                      className="h-16 w-32 object-contain mt-2 rounded border"
-                    />
-                  )}
-                {addFormData.banner &&
-                  typeof addFormData.banner === "string" &&
-                  addFormData.banner !== "" && (
-                    <img
-                      src={addFormData.banner}
-                      alt="Preview"
-                      className="h-16 w-32 object-contain mt-2 rounded border"
-                    />
-                  )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="priority">Priority</Label>
-                <Input
-                  id="priority"
-                  type="number"
-                  value={addFormData.priority}
-                  onChange={(e) =>
-                    setAddFormData((f) => ({
-                      ...f,
-                      priority: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Create
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* ===== TABLE LIST ===== */}
-      <div className="w-full bg-white rounded-lg shadow overflow-x-auto border mt-4">
-        <table className="min-w-[700px] w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50">
-              {/* <th className="px-3 py-2 text-left font-semibold">ID</th> */}
-              <th className="px-3 py-2 text-left font-semibold">Name</th>
-              <th className="px-3 py-2 text-left font-semibold">Slug</th>
-              <th className="px-3 py-2 text-left font-semibold">Description</th>
-              <th className="px-3 py-2 text-left font-semibold">Banner</th>
-              <th className="px-3 py-2 text-left font-semibold">Priority</th>
-              <th className="px-3 py-2 text-left font-semibold">Created</th>
-              <th className="px-3 py-2 text-left font-semibold">Updated</th>
-              <th className="px-3 py-2 text-left font-semibold">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(Array.isArray(categories) ? categories : []).map((cat) => (
-              <tr key={cat.id} className="border-b hover:bg-gray-50">
-                <td className="px-3 py-2 whitespace-nowrap">{cat.name}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{cat.slug}</td>
-                <td className="px-3 py-2 max-w-[200px] truncate">
-                  {cat.description || "-"}
-                </td>
-                <td className="px-3 py-2 align-middle">
-                  <div className="flex items-center justify-center min-w-12 min-h-12">
-                    <Image
-                      src={
-                        typeof cat.banner === "string" && cat.banner
-                          ? cat.banner
-                          : "/placeholder.svg"
-                      }
-                      alt={cat.name}
-                      width={48}
-                      height={48}
-                      className="rounded border object-cover bg-gray-100 max-w-12 max-h-12 w-auto h-auto"
-                    />
-                  </div>
-                </td>
-                <td className="px-3 py-2 whitespace-nowrap">
-                  {cat.priority ?? "-"}
-                </td>
-                <td className="px-3 py-2 whitespace-nowrap">
-                  {cat.createdAt
-                    ? new Date(cat.createdAt).toLocaleString()
-                    : "-"}
-                </td>
-                <td className="px-3 py-2 whitespace-nowrap">
-                  {cat.updatedAt
-                    ? new Date(cat.updatedAt).toLocaleString()
-                    : "-"}
-                </td>
-                <td className="px-3 py-2 whitespace-nowrap">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedCategory(cat);
-                          setViewOpen(true);
-                        }}
-                      >
-                        <Eye className="mr-2 h-4 w-4" /> View
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedCategory(cat);
-                          setEditFormData(cat);
-                          setEditOpen(true);
-                        }}
-                      >
-                        <Edit className="mr-2 h-4 w-4" /> Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedCategory(cat);
-                          setDeleteOpen(true);
-                        }}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* ===== EDIT MODAL ===== */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
-          {editFormData && (
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                await handleSaveEdit();
-              }}
-              className="space-y-4 py-2"
-            >
-              <div className="space-y-2">
-                <Label htmlFor="edit-name">Name</Label>
-                <Input
-                  id="edit-name"
-                  value={editFormData.name}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-slug">Slug</Label>
-                <Input
-                  id="edit-slug"
-                  value={editFormData.slug}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, slug: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-banner">Banner</Label>
-                <Input
-                  id="edit-banner"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleEditBannerChange}
-                />
-                {editFormData.banner &&
-                  typeof editFormData.banner !== "string" && (
-                    <img
-                      src={URL.createObjectURL(editFormData.banner)}
-                      alt="Preview"
-                      className="h-16 w-32 object-contain mt-2 rounded border"
-                    />
-                  )}
-                {editFormData.banner &&
-                  typeof editFormData.banner === "string" &&
-                  editFormData.banner !== "" && (
-                    <img
-                      src={editFormData.banner}
-                      alt="Preview"
-                      className="h-16 w-32 object-contain mt-2 rounded border"
-                    />
-                  )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-priority">Priority</Label>
-                <Input
-                  id="edit-priority"
-                  type="number"
-                  value={editFormData.priority ?? ""}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      priority: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Save
-              </Button>
-            </form>
-          )}
+              {loading ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
-      {/* ===== DELETE MODAL ===== */}
-      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete</AlertDialogTitle>
-            <AlertDialogDescription>Are you sure?</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {viewMode ? "View Brand" : editMode ? "Edit Brand" : "Add Brand"}
+            </DialogTitle>
+            <DialogDescription>
+              {viewMode
+                ? "View brand details."
+                : editMode
+                ? "Edit the selected brand."
+                : "Add a new brand."}
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!viewMode) handleSaveBrand();
+            }}
+            className="space-y-4 py-2"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="name">Brand Name</Label>
+              <Input
+                id="name"
+                name="name"
+                value={form.name}
+                onChange={handleFormChange}
+                disabled={viewMode}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="slug">Slug</Label>
+              <Input
+                id="slug"
+                name="slug"
+                value={form.slug}
+                onChange={handleFormChange}
+                disabled={viewMode}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="logo">Logo</Label>
+              <Input
+                id="logo"
+                name="logo"
+                type="file"
+                accept="image/*"
+                onChange={handleFormChange}
+                disabled={viewMode}
+              />
+              {form.logo && typeof form.logo !== "string" && (
+                <>
+                  <img
+                    src={URL.createObjectURL(form.logo)}
+                    alt="Preview"
+                    className="h-16 w-32 object-contain mt-2"
+                  />
+                  <span className="block text-xs text-muted-foreground mt-1 text-center">
+                    Image size: 140x80px
+                  </span>
+                </>
+              )}
+              {form.logo && typeof form.logo === "string" && (
+                <>
+                  <img
+                    src={form.logo}
+                    alt="Preview"
+                    className="h-16 w-32 object-contain mt-2"
+                  />
+                  <span className="block text-xs text-muted-foreground mt-1 text-center">
+                    Image size: 140x80px
+                  </span>
+                </>
+              )}
+              {!form.logo && (
+                <span className="block text-xs text-muted-foreground mt-1 text-center">
+                  Image size: 140x80px
+                </span>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                type="button"
+                className="px-4 py-2 border rounded"
+                onClick={() => setModalOpen(false)}
+              >
+                {viewMode ? "Close" : "Cancel"}
+              </Button>
+              {!viewMode && (
+                <Button
+                  type="submit"
+                  className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 flex items-center gap-2"
+                  disabled={loading}
+                >
+                  {loading && (
+                    <svg
+                      className="animate-spin h-4 w-4 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      ></path>
+                    </svg>
+                  )}
+                  {editMode
+                    ? loading
+                      ? "Saving..."
+                      : "Save Changes"
+                    : loading
+                    ? "Adding..."
+                    : "Add Brand"}
+                </Button>
+              )}
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
