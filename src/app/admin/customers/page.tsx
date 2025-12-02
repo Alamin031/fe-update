@@ -536,7 +536,7 @@ export default function AdminCustomersPage() {
       </Dialog>
 
       {/* Send Email Drawer */}
-      <Sheet open={emailOpen} onOpenChange={setEmailOpen}>
+      <Sheet open={emailOpen} onOpenChange={handleCloseEmail}>
         <SheetContent side="right" className="drawer-animate w-full border-l border-slate-200 bg-white p-0 shadow-2xl sm:w-[500px]">
           <div className="flex h-full flex-col">
             <SheetHeader className="border-b border-slate-200 bg-slate-50 px-6 py-5">
