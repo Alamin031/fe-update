@@ -46,7 +46,6 @@ export async function generateMetadata({
 export default async function ProductPage({params}: ProductPageProps) {
   const {slug} = await params;
   const apiProduct = await productsService.getBySlug(slug);
-  console.log('Fetched product:', apiProduct);
 
   let category = apiProduct.category;
   // যদি category না থাকে, তাহলে categoryId দিয়ে ফেচ করো
