@@ -5,39 +5,26 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { cn } from "@/app/lib/utils"
-const megaMenuData = {
-  categories: [
-    { name: "Smartphones", slug: "smartphones", image: "/modern-smartphone.png" },
-    { name: "Laptops", slug: "laptops", image: "/modern-laptop-workspace.png" },
-    { name: "Tablets", slug: "tablets", image: "/modern-tablet-display.png" },
-    { name: "Audio", slug: "audio", image: "/diverse-people-listening-headphones.png" },
-    { name: "Wearables", slug: "wearables", image: "/modern-smartwatch.png" },
-    { name: "Accessories", slug: "accessories", image: "/fashion-accessories-flatlay.png" },
-  ],
-  brands: [
-    { name: "Apple", slug: "apple", logo: "/apple-logo-minimalist.png" },
-    { name: "Samsung", slug: "samsung", logo: "/samsung-logo.png" },
-    { name: "Google", slug: "google", logo: "/google-logo.png" },
-    { name: "OnePlus", slug: "oneplus", logo: "/oneplus-logo.jpg" },
-    { name: "Sony", slug: "sony", logo: "/sony-logo.png" },
-    { name: "Xiaomi", slug: "xiaomi", logo: "/xiaomi-logo.png" },
-  ],
-  trending: [
-    { name: "iPhone 15 Pro Max", slug: "iphone-15-pro-max" },
-    { name: "Samsung Galaxy S24 Ultra", slug: "samsung-galaxy-s24-ultra" },
-    { name: "MacBook Pro M3", slug: "macbook-pro-m3" },
-    { name: "AirPods Pro 2", slug: "airpods-pro-2" },
-  ],
-  deals: [
-    { name: "Flash Sale - Up to 50% Off", slug: "flash-sale" },
-    { name: "Bundle Deals", slug: "bundle-deals" },
-    { name: "Clearance Sale", slug: "clearance" },
-  ],
-}
+import type { Category, Brand } from "@/app/types"
+
+const trendingData = [
+  { name: "iPhone 15 Pro Max", slug: "iphone-15-pro-max" },
+  { name: "Samsung Galaxy S24 Ultra", slug: "samsung-galaxy-s24-ultra" },
+  { name: "MacBook Pro M3", slug: "macbook-pro-m3" },
+  { name: "AirPods Pro 2", slug: "airpods-pro-2" },
+]
+
+const dealsData = [
+  { name: "Flash Sale - Up to 50% Off", slug: "flash-sale" },
+  { name: "Bundle Deals", slug: "bundle-deals" },
+  { name: "Clearance Sale", slug: "clearance" },
+]
 
 interface MegaMenuProps {
   isOpen: boolean
   onClose: () => void
+  categories: Category[]
+  brands: Brand[]
 }
 
 export function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
