@@ -183,7 +183,7 @@ export function Navbar() {
             <Link href="/compare" className="hidden sm:inline-flex">
               <Button variant="ghost" size="icon" className="relative">
                 <BarChart3 className="h-5 w-5" />
-                {compareCount > 0 && (
+                {isHydrated && compareCount > 0 && (
                   <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs">{compareCount}</Badge>
                 )}
                 <span className="sr-only">Compare</span>
@@ -194,7 +194,7 @@ export function Navbar() {
             <Link href="/wishlist" className="hidden sm:inline-flex">
               <Button variant="ghost" size="icon" className="relative">
                 <Heart className="h-5 w-5" />
-                {wishlistCount > 0 && (
+                {isHydrated && wishlistCount > 0 && (
                   <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs">{wishlistCount}</Badge>
                 )}
                 <span className="sr-only">Wishlist</span>
@@ -205,7 +205,7 @@ export function Navbar() {
             <Link href="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
-                {cartItemCount > 0 && (
+                {isHydrated && cartItemCount > 0 && (
                   <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs">{cartItemCount}</Badge>
                 )}
                 <span className="sr-only">Cart</span>
