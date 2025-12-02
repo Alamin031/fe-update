@@ -338,8 +338,8 @@ export default function AdminCustomersPage() {
           </DialogHeader>
           {selectedCustomer && (
             <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-4">
-              <div className="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800">
-                <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-slate-200 bg-gradient-to-br from-blue-100 to-purple-100 shadow-md dark:border-slate-600 dark:from-blue-900 dark:to-purple-900">
+              <div className="flex items-center gap-4 rounded-xl bg-slate-50 p-4 shadow-sm border border-slate-200">
+                <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-slate-200 bg-gradient-to-br from-blue-100 to-purple-100 shadow-md">
                   <Image
                     src={selectedCustomer.avatar || "/placeholder.svg"}
                     alt={selectedCustomer.name}
