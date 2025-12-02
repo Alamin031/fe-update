@@ -16,7 +16,7 @@ const coupons = [
   { code: "FLAT500", discount: "₹500 off", validity: "Nov 30, 2024", minOrder: 4999 },
 ]
 
-export default function WalletPage() {
+function WalletPage() {
   return (
     <div className="space-y-6">
       <div>
