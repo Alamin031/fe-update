@@ -46,7 +46,7 @@ export function CartContent() {
                 className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-muted"
               >
                 <Image
-                  src={item.product.images[0] || "/placeholder.svg?height=100&width=100"}
+                  src={Array.isArray(item.product.images) && item.product.images.length > 0 ? item.product.images[0] : "/placeholder.svg?height=100&width=100"}
                   alt={item.product.name}
                   fill
                   className="object-cover"
