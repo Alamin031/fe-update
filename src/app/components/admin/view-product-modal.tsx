@@ -173,9 +173,29 @@ export function ViewProductModal({
                 <label className="text-xs font-semibold text-muted-foreground uppercase">
                   Description
                 </label>
-                <p className="mt-2 text-sm whitespace-pre-wrap">{product.description}</p>
+                <p className="mt-2 text-sm whitespace-pre-wrap">{String(product.description)}</p>
               </div>
             )}
+
+            {/* Highlights */}
+            {(() => {
+              const highlights = parseJSON(product.highlights, null);
+              if (Array.isArray(highlights) && highlights.length > 0) {
+                return (
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase">
+                      Highlights
+                    </label>
+                    <ul className="mt-2 space-y-1">
+                      {highlights.map((highlight: string, idx: number) => (
+                        <li key={idx} className="text-sm">• {highlight}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              }
+              return null;
+            })()}
 
             {/* Gallery Images */}
             {galleryImages && galleryImages.length > 0 && (
