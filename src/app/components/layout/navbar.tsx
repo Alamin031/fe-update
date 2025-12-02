@@ -50,6 +50,38 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        setIsLoadingCategories(true)
+        const data = await categoriesService.getAll()
+        setCategories(data)
+      } catch (error) {
+        console.error("Error fetching categories:", error)
+        setCategories([])
+      } finally {
+        setIsLoadingCategories(false)
+      }
+    }
+    fetchCategories()
+  }, [])
+
+  useEffect(() => {
+    async function fetchBrands() {
+      try {
+        setIsLoadingBrands(true)
+        const data = await brandsService.findAll()
+        setBrands(data)
+      } catch (error) {
+        console.error("Error fetching brands:", error)
+        setBrands([])
+      } finally {
+        setIsLoadingBrands(false)
+      }
+    }
+    fetchBrands()
+  }, [])
+
   const handleLogout = () => {
     logout()
     router.push("/")
