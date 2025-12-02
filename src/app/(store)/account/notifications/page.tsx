@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui
 import { Button } from "../../../components/ui/button"
 import { Switch } from "../../../components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
+import { withProtectedRoute } from "../../../lib/auth/protected-route"
 
 const notifications = [
   {
