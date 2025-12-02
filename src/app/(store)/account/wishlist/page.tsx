@@ -59,7 +59,7 @@ export default function WishlistPage() {
                 <Link href={`/product/${item.slug}`}>
                   <div className="relative aspect-square overflow-hidden bg-muted">
                     <Image
-                      src={Array.isArray(item.images) ? item.images[0] || "/placeholder.svg" : item.images || "/placeholder.svg"}
+                      src={Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : "/placeholder.svg"}
                       alt={item.name}
                       fill
                       className="object-cover transition-transform group-hover:scale-105"
