@@ -29,10 +29,13 @@ export interface User {
   id: string
   name: string
   email: string
-  phone?: string
+  phone?: string | null
   avatar?: string
+  image?: string | null
   role: "user" | "admin" | "management"
-  addresses: Address[]
+  isAdmin?: boolean
+  roles?: string[]
+  addresses?: Address[]
   createdAt: string
   updatedAt: string
 }
