@@ -437,6 +437,56 @@ function NewProductPage() {
     );
   };
 
+  // Color image upload for network colors
+  const handleNetworkColorImageUpload = (
+    networkId: string,
+    colorId: string,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNetworks(
+          networks.map(n =>
+            n.id === networkId
+              ? {
+                  ...n,
+                  colors: n.colors.map(c =>
+                    c.id === colorId
+                      ? {
+                          ...c,
+                          colorImage: reader.result as string,
+                          colorImageFile: file,
+                        }
+                      : c,
+                  ),
+                }
+              : n,
+          ),
+        );
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeNetworkColorImage = (networkId: string, colorId: string) => {
+    setNetworks(
+      networks.map(n =>
+        n.id === networkId
+          ? {
+              ...n,
+              colors: n.colors.map(c =>
+                c.id === colorId
+                  ? {...c, colorImage: '', colorImageFile: null}
+                  : c,
+              ),
+            }
+          : n,
+      ),
+    );
+  };
+
   const addColorToNetwork = (networkId: string) => {
     setNetworks(
       networks.map(n =>
@@ -1704,17 +1754,6 @@ function NewProductPage() {
                         placeholder="e.g., Retail Partner A"
                       />
                     </div>
-                    <div className="flex-1">
-                      <Label>Price Adjustment</Label>
-                      <Input
-                        type="number"
-                        value={network.priceAdjustment}
-                        onChange={e =>
-                          updateNetwork(network.id, 'priceAdjustment', e.target.value)
-                        }
-                        placeholder="0"
-                      />
-                    </div>
                     <button
                       type="button"
                       onClick={() => removeNetwork(network.id)}
@@ -1741,6 +1780,39 @@ function NewProductPage() {
                             }
                             placeholder="e.g., Midnight Black"
                           />
+                        </div>
+                        <div className="flex-1">
+                          <Label className="text-sm">Color Image</Label>
+                          {color.colorImage ? (
+                            <div className="relative inline-block">
+                              <img
+                                src={color.colorImage}
+                                alt={color.colorName}
+                                className="h-12 w-12 rounded object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removeNetworkColorImage(network.id, color.id)
+                                }
+                                className="absolute -right-2 -top-2 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="flex cursor-pointer items-center justify-center rounded border-2 border-dashed border-gray-300 p-2">
+                              <Upload className="h-4 w-4 text-gray-400" />
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={e =>
+                                  handleNetworkColorImageUpload(network.id, color.id, e)
+                                }
+                                className="hidden"
+                              />
+                            </label>
+                          )}
                         </div>
                         <button
                           type="button"
