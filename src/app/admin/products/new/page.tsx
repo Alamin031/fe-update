@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
@@ -13,7 +12,6 @@ import {
   Upload,
   X,
   Plus,
-  GripVertical,
   Image as ImageIcon,
 } from 'lucide-react';
 import {
@@ -36,13 +34,12 @@ import {
 } from '../../../components/ui/select';
 import {withProtectedRoute} from '../../../lib/auth/protected-route';
 
-type Tab = 'basic' | 'networks' | 'regions';
+type ProductType = 'basic' | 'network' | 'region';
 
 function NewProductPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('basic');
-  const [productId, setProductId] = useState<string>('');
+  const [productType, setProductType] = useState<ProductType>('basic');
 
-  // Basic product info
+  // Basic product info (shared across all types)
   const [productName, setProductName] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
@@ -100,43 +97,16 @@ function NewProductPage() {
     }>
   >([{id: 'video-1', url: '', type: 'youtube'}]);
 
-  interface DirectColorVariant {
-    defaultPrice: string;
-    defaultComparePrice: string;
-    defaultDiscountPercent: string;
-    defaultDiscountPrice: string;
-    defaultStockQuantity: string;
-    defaultLowStockAlert: string;
-    colors: Array<{
+  // Specifications
+  const [specifications, setSpecifications] = useState<
+    Array<{
       id: string;
-      colorName: string;
-      colorImage: string;
-    }>;
-    customPricing: Array<{
-      id: string;
-      colorId: string;
-      price: string;
-      comparePrice: string;
-      discountPercent: string;
-      discountPrice: string;
-      stockQuantity: string;
-      lowStockAlert: string;
-    }>;
-  }
+      key: string;
+      value: string;
+    }>
+  >([{id: 'spec-1', key: '', value: ''}]);
 
-  const [directColorVariant, setDirectColorVariant] =
-    useState<DirectColorVariant>({
-      defaultPrice: '',
-      defaultComparePrice: '',
-      defaultDiscountPercent: '',
-      defaultDiscountPrice: '',
-      defaultStockQuantity: '',
-      defaultLowStockAlert: '5',
-      colors: [],
-      customPricing: [],
-    });
-
-  // Networks → Colors → Storages → Prices
+  // Networks (for network product type)
   const [networks, setNetworks] = useState<
     Array<{
       id: string;
@@ -164,7 +134,7 @@ function NewProductPage() {
     }>
   >([]);
 
-  // Regions → Default Storages + Colors (with optional custom storages)
+  // Regions (for region product type)
   const [regions, setRegions] = useState<
     Array<{
       id: string;
@@ -199,16 +169,37 @@ function NewProductPage() {
         }>;
       }>;
     }>
-  >([]);
-
-  // Specifications (flat list)
-  const [specifications, setSpecifications] = useState<
-    Array<{
-      id: string;
-      key: string;
-      value: string;
-    }>
-  >([{id: 'spec-1', key: '', value: ''}]);
+  >([
+    {
+      id: 'region-1',
+      regionName: 'International',
+      isDefault: true,
+      defaultStorages: [
+        {
+          id: 'default-storage-1',
+          storageSize: '256GB',
+          regularPrice: '',
+          discountPrice: '',
+          discountPercent: '',
+          stockQuantity: '',
+          lowStockAlert: '5',
+        },
+      ],
+      colors: [
+        {
+          id: 'color-1',
+          colorName: 'Midnight',
+          colorImage: '',
+          hasStorage: true,
+          useDefaultStorages: true,
+          singlePrice: '',
+          singleComparePrice: '',
+          singleStockQuantity: '',
+          storages: [],
+        },
+      ],
+    },
+  ]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -328,7 +319,7 @@ function NewProductPage() {
       {
         id: `network-${Date.now()}`,
         networkName: '',
-        priceAdjustment: '',
+        priceAdjustment: '0',
         isDefault: false,
         colors: [
           {
@@ -347,7 +338,7 @@ function NewProductPage() {
                 discountPrice: '',
                 discountPercent: '',
                 stockQuantity: '',
-                lowStockAlert: '',
+                lowStockAlert: '5',
               },
             ],
           },
@@ -390,7 +381,7 @@ function NewProductPage() {
                       discountPrice: '',
                       discountPercent: '',
                       stockQuantity: '',
-                      lowStockAlert: '',
+                      lowStockAlert: '5',
                     },
                   ],
                 },
@@ -450,7 +441,7 @@ function NewProductPage() {
                           discountPrice: '',
                           discountPercent: '',
                           stockQuantity: '',
-                          lowStockAlert: '',
+                          lowStockAlert: '5',
                         },
                       ],
                     }
@@ -530,7 +521,7 @@ function NewProductPage() {
             discountPrice: '',
             discountPercent: '',
             stockQuantity: '',
-            lowStockAlert: '',
+            lowStockAlert: '5',
           },
         ],
         colors: [
@@ -635,7 +626,7 @@ function NewProductPage() {
                           discountPrice: '',
                           discountPercent: '',
                           stockQuantity: '',
-                          lowStockAlert: '',
+                          lowStockAlert: '5',
                         },
                       ],
                     }
@@ -756,7 +747,7 @@ function NewProductPage() {
     );
   };
 
-  // SUBMIT FUNCTIONS FOR EACH TAB
+  // SUBMIT FUNCTIONS
   const handleBasicProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -825,10 +816,7 @@ function NewProductPage() {
       });
 
       const response = await productsService.createWithFormData(formData);
-      setProductId(response.id);
-
       alert('✓ Basic product created successfully!');
-      setActiveTab('networks');
     } catch (err: any) {
       console.error('Error creating basic product:', err);
       alert(`Error: ${err?.response?.data?.message || err?.message || 'Unknown error'}`);
@@ -837,50 +825,156 @@ function NewProductPage() {
     }
   };
 
-  const handleNetworksSubmit = async (e: React.FormEvent) => {
+  const handleNetworkProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productId) {
-      alert('Please create basic product first');
-      return;
-    }
-
     setIsSubmitting(true);
     try {
+      const formData = new FormData();
+
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
+      }
+
+      galleryImageFiles.forEach(file => {
+        formData.append('galleryImages', file);
+      });
+
       const payload: any = {
-        directColors: directColorVariant.colors.length > 0 ? directColorVariant : undefined,
+        name: productName,
+        slug,
+        description: description || undefined,
+        shortDescription: shortDescription || undefined,
+        categoryId: selectedCategory || undefined,
+        brandId: selectedBrand || undefined,
+        productCode: productCode || undefined,
+        sku: sku || undefined,
+        warranty: warranty || undefined,
+        isActive,
+        isOnline,
+        isPos,
+        isPreOrder,
+        isOfficial,
+        freeShipping,
+        isEmi,
+        rewardPoints: rewardPoints ? Number(rewardPoints) : undefined,
+        minBookingPrice: minBookingPrice ? Number(minBookingPrice) : undefined,
+        seoTitle: seoTitle || undefined,
+        seoDescription: seoDescription || undefined,
+        seoKeywords: seoKeywords
+          ? seoKeywords.split(',').map(k => k.trim())
+          : undefined,
+        seoCanonical: seoCanonical || undefined,
+        tags: tags ? tags.split(',').map(t => t.trim()) : undefined,
+        videos: videos
+          .filter(v => v.url)
+          .map((v, idx) => ({
+            videoUrl: v.url,
+            videoType: v.type,
+            displayOrder: idx,
+          })),
+        specifications: specifications
+          .filter(s => s.key && s.value)
+          .map((s, idx) => ({
+            specKey: s.key,
+            specValue: s.value,
+            displayOrder: idx,
+          })),
         networks: networks.length > 0 ? networks : undefined,
       };
 
-      const response = await productsService.update(productId, payload);
-      alert('✓ Networks and colors saved successfully!');
-      setActiveTab('regions');
+      Object.keys(payload).forEach(key => {
+        const value = payload[key];
+        if (value !== undefined) {
+          if (typeof value === 'object') {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, String(value));
+          }
+        }
+      });
+
+      const response = await productsService.createWithFormData(formData);
+      alert('✓ Network product created successfully!');
     } catch (err: any) {
-      console.error('Error saving networks:', err);
+      console.error('Error creating network product:', err);
       alert(`Error: ${err?.response?.data?.message || err?.message || 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleRegionsSubmit = async (e: React.FormEvent) => {
+  const handleRegionProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productId) {
-      alert('Please create basic product first');
-      return;
-    }
-
     setIsSubmitting(true);
     try {
+      const formData = new FormData();
+
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
+      }
+
+      galleryImageFiles.forEach(file => {
+        formData.append('galleryImages', file);
+      });
+
       const payload: any = {
+        name: productName,
+        slug,
+        description: description || undefined,
+        shortDescription: shortDescription || undefined,
+        categoryId: selectedCategory || undefined,
+        brandId: selectedBrand || undefined,
+        productCode: productCode || undefined,
+        sku: sku || undefined,
+        warranty: warranty || undefined,
+        isActive,
+        isOnline,
+        isPos,
+        isPreOrder,
+        isOfficial,
+        freeShipping,
+        isEmi,
+        rewardPoints: rewardPoints ? Number(rewardPoints) : undefined,
+        minBookingPrice: minBookingPrice ? Number(minBookingPrice) : undefined,
+        seoTitle: seoTitle || undefined,
+        seoDescription: seoDescription || undefined,
+        seoKeywords: seoKeywords
+          ? seoKeywords.split(',').map(k => k.trim())
+          : undefined,
+        seoCanonical: seoCanonical || undefined,
+        tags: tags ? tags.split(',').map(t => t.trim()) : undefined,
+        videos: videos
+          .filter(v => v.url)
+          .map((v, idx) => ({
+            videoUrl: v.url,
+            videoType: v.type,
+            displayOrder: idx,
+          })),
+        specifications: specifications
+          .filter(s => s.key && s.value)
+          .map((s, idx) => ({
+            specKey: s.key,
+            specValue: s.value,
+            displayOrder: idx,
+          })),
         regions: regions.length > 0 ? regions : undefined,
       };
 
-      await productsService.update(productId, payload);
-      alert('✓ Regions saved successfully! Product is complete.');
-      setActiveTab('basic');
-      setProductId('');
+      Object.keys(payload).forEach(key => {
+        const value = payload[key];
+        if (value !== undefined) {
+          if (typeof value === 'object') {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, String(value));
+          }
+        }
+      });
+
+      const response = await productsService.createWithFormData(formData);
+      alert('✓ Region product created successfully!');
     } catch (err: any) {
-      console.error('Error saving regions:', err);
+      console.error('Error creating region product:', err);
       alert(`Error: ${err?.response?.data?.message || err?.message || 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
@@ -899,326 +993,324 @@ function NewProductPage() {
 
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
-        <p className="mt-2 text-gray-600">Create a new product listing with 3 steps</p>
+        <p className="mt-2 text-gray-600">Create a new product listing</p>
       </div>
 
-      <div className="mb-6 border-b border-gray-200">
-        <div className="flex gap-4">
-          <button
-            onClick={() => setActiveTab('basic')}
-            className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-              activeTab === 'basic'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            1. Basic Product
-          </button>
-          <button
-            onClick={() => {
-              if (productId) setActiveTab('networks');
-              else alert('Create basic product first');
-            }}
-            className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-              activeTab === 'networks'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            } ${!productId ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            2. Networks & Colors
-          </button>
-          <button
-            onClick={() => {
-              if (productId) setActiveTab('regions');
-              else alert('Create basic product first');
-            }}
-            className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-              activeTab === 'regions'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            } ${!productId ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            3. Regions
-          </button>
-        </div>
+      <div className="mb-6 grid grid-cols-3 gap-4">
+        <button
+          onClick={() => setProductType('basic')}
+          className={`rounded-lg border-2 p-4 text-left transition-colors ${
+            productType === 'basic'
+              ? 'border-blue-600 bg-blue-50'
+              : 'border-gray-200 bg-white hover:border-gray-300'
+          }`}
+        >
+          <h3 className={`font-semibold ${productType === 'basic' ? 'text-blue-600' : 'text-gray-900'}`}>
+            Basic Product
+          </h3>
+          <p className="mt-1 text-sm text-gray-600">Simple product with basic info only</p>
+        </button>
+
+        <button
+          onClick={() => setProductType('network')}
+          className={`rounded-lg border-2 p-4 text-left transition-colors ${
+            productType === 'network'
+              ? 'border-blue-600 bg-blue-50'
+              : 'border-gray-200 bg-white hover:border-gray-300'
+          }`}
+        >
+          <h3 className={`font-semibold ${productType === 'network' ? 'text-blue-600' : 'text-gray-900'}`}>
+            Network Product
+          </h3>
+          <p className="mt-1 text-sm text-gray-600">Product with network variants & pricing</p>
+        </button>
+
+        <button
+          onClick={() => setProductType('region')}
+          className={`rounded-lg border-2 p-4 text-left transition-colors ${
+            productType === 'region'
+              ? 'border-blue-600 bg-blue-50'
+              : 'border-gray-200 bg-white hover:border-gray-300'
+          }`}
+        >
+          <h3 className={`font-semibold ${productType === 'region' ? 'text-blue-600' : 'text-gray-900'}`}>
+            Region Product
+          </h3>
+          <p className="mt-1 text-sm text-gray-600">Product with regional variants & pricing</p>
+        </button>
       </div>
 
-      {activeTab === 'basic' && (
-        <form onSubmit={handleBasicProductSubmit} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Product Name *</Label>
-                  <Input
-                    id="name"
-                    value={productName}
-                    onChange={handleProductNameChange}
-                    placeholder="Enter product name"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="slug">URL Slug *</Label>
-                  <Input
-                    id="slug"
-                    value={slug}
-                    onChange={handleSlugChange}
-                    placeholder="product-url-slug"
-                    required
-                  />
-                </div>
-              </div>
-
+      <form
+        onSubmit={
+          productType === 'basic'
+            ? handleBasicProductSubmit
+            : productType === 'network'
+              ? handleNetworkProductSubmit
+              : handleRegionProductSubmit
+        }
+        className="space-y-6"
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>Basic Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={e => setDescription(e.target.value)}
-                  placeholder="Enter product description (Markdown supported)"
-                  rows={4}
+                <Label htmlFor="name">Product Name *</Label>
+                <Input
+                  id="name"
+                  value={productName}
+                  onChange={handleProductNameChange}
+                  placeholder="Enter product name"
+                  required
                 />
               </div>
-
               <div>
-                <Label>Short Description</Label>
-                <div className="mb-2 flex gap-1 border-b border-gray-200 pb-2">
-                  <button
-                    type="button"
-                    onClick={() => formatText('bold')}
-                    className="rounded px-3 py-1 text-sm font-medium hover:bg-gray-100"
-                  >
-                    Bold
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => formatText('italic')}
-                    className="rounded px-3 py-1 text-sm font-medium hover:bg-gray-100"
-                  >
-                    Italic
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => formatText('underline')}
-                    className="rounded px-3 py-1 text-sm font-medium hover:bg-gray-100"
-                  >
-                    Underline
-                  </button>
-                </div>
-                <div
-                  id="shortDescription"
-                  contentEditable
-                  onInput={handleShortDescriptionChange}
-                  className="min-h-24 rounded border border-gray-300 p-3 focus:border-blue-500 focus:outline-none"
-                  suppressContentEditableWarning
+                <Label htmlFor="slug">URL Slug *</Label>
+                <Input
+                  id="slug"
+                  value={slug}
+                  onChange={handleSlugChange}
+                  placeholder="product-url-slug"
+                  required
                 />
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="category">Category *</Label>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map(cat => (
-                        <SelectItem key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="brand">Brand *</Label>
-                  <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-                    <SelectTrigger id="brand">
-                      <SelectValue placeholder="Select brand" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {brands.map(br => (
-                        <SelectItem key={br.id} value={br.id}>
-                          {br.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Enter product description (Markdown supported)"
+                rows={4}
+              />
+            </div>
+
+            <div>
+              <Label>Short Description</Label>
+              <div className="mb-2 flex gap-1 border-b border-gray-200 pb-2">
+                <button
+                  type="button"
+                  onClick={() => formatText('bold')}
+                  className="rounded px-3 py-1 text-sm font-medium hover:bg-gray-100"
+                >
+                  Bold
+                </button>
+                <button
+                  type="button"
+                  onClick={() => formatText('italic')}
+                  className="rounded px-3 py-1 text-sm font-medium hover:bg-gray-100"
+                >
+                  Italic
+                </button>
+                <button
+                  type="button"
+                  onClick={() => formatText('underline')}
+                  className="rounded px-3 py-1 text-sm font-medium hover:bg-gray-100"
+                >
+                  Underline
+                </button>
               </div>
+              <div
+                id="shortDescription"
+                contentEditable
+                onInput={handleShortDescriptionChange}
+                className="min-h-24 rounded border border-gray-300 p-3 focus:border-blue-500 focus:outline-none"
+                suppressContentEditableWarning
+              />
+            </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="productCode">Product Code</Label>
-                  <Input
-                    id="productCode"
-                    value={productCode}
-                    onChange={e => setProductCode(e.target.value)}
-                    placeholder="e.g., SKU-001"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="sku">SKU</Label>
-                  <Input
-                    id="sku"
-                    value={sku}
-                    onChange={e => setSku(e.target.value)}
-                    placeholder="e.g., SKU123"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="warranty">Warranty</Label>
-                  <Input
-                    id="warranty"
-                    value={warranty}
-                    onChange={e => setWarranty(e.target.value)}
-                    placeholder="e.g., 1 year"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Status</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isActive">Active</Label>
-                  <Switch
-                    id="isActive"
-                    checked={isActive}
-                    onCheckedChange={setIsActive}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isOnline">Online</Label>
-                  <Switch
-                    id="isOnline"
-                    checked={isOnline}
-                    onCheckedChange={setIsOnline}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isPos">POS</Label>
-                  <Switch id="isPos" checked={isPos} onCheckedChange={setIsPos} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isPreOrder">Pre-Order</Label>
-                  <Switch
-                    id="isPreOrder"
-                    checked={isPreOrder}
-                    onCheckedChange={setIsPreOrder}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isOfficial">Official</Label>
-                  <Switch
-                    id="isOfficial"
-                    checked={isOfficial}
-                    onCheckedChange={setIsOfficial}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="freeShipping">Free Shipping</Label>
-                  <Switch
-                    id="freeShipping"
-                    checked={freeShipping}
-                    onCheckedChange={setFreeShipping}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isEmi">EMI Available</Label>
-                  <Switch
-                    id="isEmi"
-                    checked={isEmi}
-                    onCheckedChange={setIsEmi}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Media</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Thumbnail Image</Label>
-                <div className="mt-2 rounded border-2 border-dashed border-gray-300 p-6">
-                  {thumbnailPreview ? (
-                    <div className="relative inline-block">
-                      <img
-                        src={thumbnailPreview}
-                        alt="Thumbnail"
-                        className="h-32 w-32 rounded object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeThumbnail}
-                        className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <label className="flex cursor-pointer flex-col items-center justify-center gap-2">
-                      <Upload className="h-8 w-8 text-gray-400" />
-                      <span className="text-sm text-gray-600">Click to upload thumbnail</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleThumbnailUpload}
-                        className="hidden"
-                      />
-                    </label>
-                  )}
-                </div>
+                <Label htmlFor="category">Category *</Label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(cat => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-
               <div>
-                <Label>Gallery Images</Label>
-                <div className="mt-2 rounded border-2 border-dashed border-gray-300 p-6">
-                  {galleryImagePreviews.length > 0 ? (
-                    <div className="grid grid-cols-4 gap-4">
-                      {galleryImagePreviews.map((preview, idx) => (
-                        <div key={idx} className="relative">
-                          <img
-                            src={preview.url}
-                            alt={`Gallery ${idx}`}
-                            className="h-24 w-24 rounded object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeGalleryImage(idx)}
-                            className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                      <label className="flex cursor-pointer items-center justify-center rounded border-2 border-dashed border-gray-300">
-                        <Plus className="h-6 w-6 text-gray-400" />
-                        <input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          onChange={handleGalleryImageUpload}
-                          className="hidden"
+                <Label htmlFor="brand">Brand *</Label>
+                <Select value={selectedBrand} onValueChange={setSelectedBrand}>
+                  <SelectTrigger id="brand">
+                    <SelectValue placeholder="Select brand" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {brands.map(br => (
+                      <SelectItem key={br.id} value={br.id}>
+                        {br.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="productCode">Product Code</Label>
+                <Input
+                  id="productCode"
+                  value={productCode}
+                  onChange={e => setProductCode(e.target.value)}
+                  placeholder="e.g., SKU-001"
+                />
+              </div>
+              <div>
+                <Label htmlFor="sku">SKU</Label>
+                <Input
+                  id="sku"
+                  value={sku}
+                  onChange={e => setSku(e.target.value)}
+                  placeholder="e.g., SKU123"
+                />
+              </div>
+              <div>
+                <Label htmlFor="warranty">Warranty</Label>
+                <Input
+                  id="warranty"
+                  value={warranty}
+                  onChange={e => setWarranty(e.target.value)}
+                  placeholder="e.g., 1 year"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Product Status</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="isActive">Active</Label>
+                <Switch
+                  id="isActive"
+                  checked={isActive}
+                  onCheckedChange={setIsActive}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="isOnline">Online</Label>
+                <Switch
+                  id="isOnline"
+                  checked={isOnline}
+                  onCheckedChange={setIsOnline}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="isPos">POS</Label>
+                <Switch id="isPos" checked={isPos} onCheckedChange={setIsPos} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="isPreOrder">Pre-Order</Label>
+                <Switch
+                  id="isPreOrder"
+                  checked={isPreOrder}
+                  onCheckedChange={setIsPreOrder}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="isOfficial">Official</Label>
+                <Switch
+                  id="isOfficial"
+                  checked={isOfficial}
+                  onCheckedChange={setIsOfficial}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="freeShipping">Free Shipping</Label>
+                <Switch
+                  id="freeShipping"
+                  checked={freeShipping}
+                  onCheckedChange={setFreeShipping}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="isEmi">EMI Available</Label>
+                <Switch
+                  id="isEmi"
+                  checked={isEmi}
+                  onCheckedChange={setIsEmi}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Media</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <Label>Thumbnail Image</Label>
+              <div className="mt-2 rounded border-2 border-dashed border-gray-300 p-6">
+                {thumbnailPreview ? (
+                  <div className="relative inline-block">
+                    <img
+                      src={thumbnailPreview}
+                      alt="Thumbnail"
+                      className="h-32 w-32 rounded object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeThumbnail}
+                      className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex cursor-pointer flex-col items-center justify-center gap-2">
+                    <Upload className="h-8 w-8 text-gray-400" />
+                    <span className="text-sm text-gray-600">Click to upload thumbnail</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailUpload}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label>Gallery Images</Label>
+              <div className="mt-2 rounded border-2 border-dashed border-gray-300 p-6">
+                {galleryImagePreviews.length > 0 ? (
+                  <div className="grid grid-cols-4 gap-4">
+                    {galleryImagePreviews.map((preview, idx) => (
+                      <div key={idx} className="relative">
+                        <img
+                          src={preview.url}
+                          alt={`Gallery ${idx}`}
+                          className="h-24 w-24 rounded object-cover"
                         />
-                      </label>
-                    </div>
-                  ) : (
-                    <label className="flex cursor-pointer flex-col items-center justify-center gap-2">
-                      <ImageIcon className="h-8 w-8 text-gray-400" />
-                      <span className="text-sm text-gray-600">Click to upload gallery images</span>
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(idx)}
+                          className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <label className="flex cursor-pointer items-center justify-center rounded border-2 border-dashed border-gray-300">
+                      <Plus className="h-6 w-6 text-gray-400" />
                       <input
                         type="file"
                         multiple
@@ -1227,203 +1319,153 @@ function NewProductPage() {
                         className="hidden"
                       />
                     </label>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <label className="flex cursor-pointer flex-col items-center justify-center gap-2">
+                    <ImageIcon className="h-8 w-8 text-gray-400" />
+                    <span className="text-sm text-gray-600">Click to upload gallery images</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleGalleryImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>SEO Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="seoTitle">SEO Title</Label>
-                <Input
-                  id="seoTitle"
-                  value={seoTitle}
-                  onChange={e => setSeoTitle(e.target.value)}
-                  placeholder="SEO title"
-                />
-              </div>
-              <div>
-                <Label htmlFor="seoDescription">SEO Description</Label>
-                <Textarea
-                  id="seoDescription"
-                  value={seoDescription}
-                  onChange={e => setSeoDescription(e.target.value)}
-                  placeholder="SEO description"
-                  rows={3}
-                />
-              </div>
-              <div>
-                <Label htmlFor="seoKeywords">SEO Keywords (comma-separated)</Label>
-                <Input
-                  id="seoKeywords"
-                  value={seoKeywords}
-                  onChange={e => setSeoKeywords(e.target.value)}
-                  placeholder="keyword1, keyword2, keyword3"
-                />
-              </div>
-              <div>
-                <Label htmlFor="seoCanonical">Canonical URL</Label>
-                <Input
-                  id="seoCanonical"
-                  value={seoCanonical}
-                  onChange={e => setSeoCanonical(e.target.value)}
-                  placeholder="https://example.com/product"
-                />
-              </div>
-            </CardContent>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>SEO Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="seoTitle">SEO Title</Label>
+              <Input
+                id="seoTitle"
+                value={seoTitle}
+                onChange={e => setSeoTitle(e.target.value)}
+                placeholder="SEO title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="seoDescription">SEO Description</Label>
+              <Textarea
+                id="seoDescription"
+                value={seoDescription}
+                onChange={e => setSeoDescription(e.target.value)}
+                placeholder="SEO description"
+                rows={3}
+              />
+            </div>
+            <div>
+              <Label htmlFor="seoKeywords">SEO Keywords (comma-separated)</Label>
+              <Input
+                id="seoKeywords"
+                value={seoKeywords}
+                onChange={e => setSeoKeywords(e.target.value)}
+                placeholder="keyword1, keyword2, keyword3"
+              />
+            </div>
+            <div>
+              <Label htmlFor="seoCanonical">Canonical URL</Label>
+              <Input
+                id="seoCanonical"
+                value={seoCanonical}
+                onChange={e => setSeoCanonical(e.target.value)}
+                placeholder="https://example.com/product"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Specifications</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {specifications.map((spec, idx) => (
-                <div key={spec.id} className="flex gap-2">
-                  <Input
-                    placeholder="Key (e.g., Color)"
-                    value={spec.key}
-                    onChange={e =>
-                      updateSpecification(spec.id, 'key', e.target.value)
-                    }
-                  />
-                  <Input
-                    placeholder="Value (e.g., Black)"
-                    value={spec.value}
-                    onChange={e =>
-                      updateSpecification(spec.id, 'value', e.target.value)
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeSpecification(spec.id)}
-                    className="rounded bg-red-100 px-3 py-2 text-red-600 hover:bg-red-200"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addSpecification}
-                className="mt-2 rounded bg-blue-100 px-4 py-2 text-blue-600 hover:bg-blue-200"
-              >
-                + Add Specification
-              </button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Additional Info</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="rewardPoints">Reward Points</Label>
-                  <Input
-                    id="rewardPoints"
-                    type="number"
-                    value={rewardPoints}
-                    onChange={e => setRewardPoints(e.target.value)}
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="minBookingPrice">Min Booking Price</Label>
-                  <Input
-                    id="minBookingPrice"
-                    type="number"
-                    value={minBookingPrice}
-                    onChange={e => setMinBookingPrice(e.target.value)}
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="tags">Tags (comma-separated)</Label>
+        <Card>
+          <CardHeader>
+            <CardTitle>Specifications</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {specifications.map((spec, idx) => (
+              <div key={spec.id} className="flex gap-2">
                 <Input
-                  id="tags"
-                  value={tags}
-                  onChange={e => setTags(e.target.value)}
-                  placeholder="tag1, tag2, tag3"
+                  placeholder="Key (e.g., Color)"
+                  value={spec.key}
+                  onChange={e =>
+                    updateSpecification(spec.id, 'key', e.target.value)
+                  }
                 />
+                <Input
+                  placeholder="Value (e.g., Black)"
+                  value={spec.value}
+                  onChange={e =>
+                    updateSpecification(spec.id, 'value', e.target.value)
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() => removeSpecification(spec.id)}
+                  className="rounded bg-red-100 px-3 py-2 text-red-600 hover:bg-red-200"
+                >
+                  Remove
+                </button>
               </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex gap-4">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+            ))}
+            <button
+              type="button"
+              onClick={addSpecification}
+              className="mt-2 rounded bg-blue-100 px-4 py-2 text-blue-600 hover:bg-blue-200"
             >
-              {isSubmitting ? 'Creating...' : 'Create Basic Product & Continue'}
-            </Button>
-            <Link href="/admin/products">
-              <Button
-                type="button"
-                variant="outline"
-                className="text-gray-600 hover:bg-gray-100"
-              >
-                Cancel
-              </Button>
-            </Link>
-          </div>
-        </form>
-      )}
+              + Add Specification
+            </button>
+          </CardContent>
+        </Card>
 
-      {activeTab === 'networks' && (
-        <form onSubmit={handleNetworksSubmit} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Direct Colors (No Variants)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-gray-600">
-                For simple products with just color options (no storage/size variants)
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Default Price</Label>
-                  <Input
-                    type="number"
-                    value={directColorVariant.defaultPrice}
-                    onChange={e =>
-                      setDirectColorVariant({
-                        ...directColorVariant,
-                        defaultPrice: e.target.value,
-                      })
-                    }
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <Label>Default Compare Price</Label>
-                  <Input
-                    type="number"
-                    value={directColorVariant.defaultComparePrice}
-                    onChange={e =>
-                      setDirectColorVariant({
-                        ...directColorVariant,
-                        defaultComparePrice: e.target.value,
-                      })
-                    }
-                    placeholder="0"
-                  />
-                </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Additional Info</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="rewardPoints">Reward Points</Label>
+                <Input
+                  id="rewardPoints"
+                  type="number"
+                  value={rewardPoints}
+                  onChange={e => setRewardPoints(e.target.value)}
+                  placeholder="0"
+                />
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <Label htmlFor="minBookingPrice">Min Booking Price</Label>
+                <Input
+                  id="minBookingPrice"
+                  type="number"
+                  value={minBookingPrice}
+                  onChange={e => setMinBookingPrice(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="tags">Tags (comma-separated)</Label>
+              <Input
+                id="tags"
+                value={tags}
+                onChange={e => setTags(e.target.value)}
+                placeholder="tag1, tag2, tag3"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
+        {productType === 'network' && (
           <Card>
             <CardHeader>
-              <CardTitle>Networks & Colors with Storage</CardTitle>
+              <CardTitle>Networks & Colors</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {networks.map(network => (
@@ -1611,31 +1653,12 @@ function NewProductPage() {
               </button>
             </CardContent>
           </Card>
+        )}
 
-          <div className="flex gap-4">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isSubmitting ? 'Saving...' : 'Save Networks & Continue'}
-            </Button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('basic')}
-              className="rounded px-4 py-2 text-gray-600 hover:bg-gray-100"
-            >
-              Back
-            </button>
-          </div>
-        </form>
-      )}
-
-      {activeTab === 'regions' && (
-        <form onSubmit={handleRegionsSubmit} className="space-y-6">
+        {productType === 'region' && (
           <Card>
             <CardHeader>
-              <CardTitle>Regional Variants</CardTitle>
+              <CardTitle>Regions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {regions.map(region => (
@@ -1962,25 +1985,27 @@ function NewProductPage() {
               </button>
             </CardContent>
           </Card>
+        )}
 
-          <div className="flex gap-4">
+        <div className="flex gap-4">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {isSubmitting ? 'Creating...' : `Create ${productType === 'basic' ? 'Basic' : productType === 'network' ? 'Network' : 'Region'} Product`}
+          </Button>
+          <Link href="/admin/products">
             <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
-            >
-              {isSubmitting ? 'Saving...' : 'Complete & Save Product'}
-            </Button>
-            <button
               type="button"
-              onClick={() => setActiveTab('networks')}
-              className="rounded px-4 py-2 text-gray-600 hover:bg-gray-100"
+              variant="outline"
+              className="text-gray-600 hover:bg-gray-100"
             >
-              Back
-            </button>
-          </div>
-        </form>
-      )}
+              Cancel
+            </Button>
+          </Link>
+        </div>
+      </form>
     </div>
   );
 }
