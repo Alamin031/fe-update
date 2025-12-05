@@ -89,6 +89,19 @@ function NewProductPage() {
     }>
   >([]);
 
+  // Basic product colors
+  const [basicColors, setBasicColors] = useState<
+    Array<{
+      id: string;
+      colorName: string;
+      colorImage: string;
+      colorImageFile: File | null;
+      regularPrice: string;
+      discountPrice: string;
+      stockQuantity: string;
+    }>
+  >([]);
+
   // Videos
   const [videos, setVideos] = useState<
     Array<{
@@ -291,6 +304,66 @@ function NewProductPage() {
   const removeGalleryImage = (index: number) => {
     setGalleryImageFiles(prev => prev.filter((_, i) => i !== index));
     setGalleryImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Basic color management
+  const addBasicColor = () => {
+    setBasicColors([
+      ...basicColors,
+      {
+        id: `color-${Date.now()}`,
+        colorName: '',
+        colorImage: '',
+        colorImageFile: null,
+        regularPrice: '',
+        discountPrice: '',
+        stockQuantity: '',
+      },
+    ]);
+  };
+
+  const removeBasicColor = (colorId: string) => {
+    setBasicColors(basicColors.filter(c => c.id !== colorId));
+  };
+
+  const updateBasicColor = (colorId: string, field: string, value: any) => {
+    setBasicColors(
+      basicColors.map(c => (c.id === colorId ? {...c, [field]: value} : c)),
+    );
+  };
+
+  const handleBasicColorImageUpload = (
+    colorId: string,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBasicColors(
+          basicColors.map(c =>
+            c.id === colorId
+              ? {
+                  ...c,
+                  colorImage: reader.result as string,
+                  colorImageFile: file,
+                }
+              : c,
+          ),
+        );
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeBasicColorImage = (colorId: string) => {
+    setBasicColors(
+      basicColors.map(c =>
+        c.id === colorId
+          ? {...c, colorImage: '', colorImageFile: null}
+          : c,
+      ),
+    );
   };
 
   // Specification management
@@ -763,6 +836,12 @@ function NewProductPage() {
         formData.append('galleryImages', file);
       });
 
+      basicColors.forEach((color, idx) => {
+        if (color.colorImageFile) {
+          formData.append(`colors[${idx}][colorImage]`, color.colorImageFile);
+        }
+      });
+
       const payload: any = {
         name: productName,
         slug,
@@ -803,6 +882,16 @@ function NewProductPage() {
             specValue: s.value,
             displayOrder: idx,
           })),
+        colors:
+          basicColors.length > 0
+            ? basicColors.map((c, idx) => ({
+                colorName: c.colorName,
+                regularPrice: c.regularPrice ? Number(c.regularPrice) : undefined,
+                discountPrice: c.discountPrice ? Number(c.discountPrice) : undefined,
+                stockQuantity: c.stockQuantity ? Number(c.stockQuantity) : undefined,
+                displayOrder: idx,
+              }))
+            : undefined,
       };
 
       Object.keys(payload).forEach(key => {
