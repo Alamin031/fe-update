@@ -198,37 +198,7 @@ function NewProductPage() {
         }>;
       }>;
     }>
-  >([
-    {
-      id: 'region-1',
-      regionName: 'International',
-      isDefault: true,
-      defaultStorages: [
-        {
-          id: 'default-storage-1',
-          storageSize: '256GB',
-          regularPrice: '',
-          discountPrice: '',
-          discountPercent: '',
-          stockQuantity: '',
-          lowStockAlert: '5',
-        },
-      ],
-      colors: [
-        {
-          id: 'color-1',
-          colorName: 'Midnight',
-          colorImage: '',
-          hasStorage: true,
-          useDefaultStorages: true,
-          singlePrice: '',
-          singleComparePrice: '',
-          singleStockQuantity: '',
-          storages: [],
-        },
-      ],
-    },
-  ]);
+  >([]);
 
   // Specifications (flat list)
   const [specifications, setSpecifications] = useState<
@@ -357,7 +327,7 @@ function NewProductPage() {
       {
         id: `network-${Date.now()}`,
         networkName: '',
-        priceAdjustment: '0',
+        priceAdjustment: '',
         isDefault: false,
         colors: [
           {
@@ -376,7 +346,7 @@ function NewProductPage() {
                 discountPrice: '',
                 discountPercent: '',
                 stockQuantity: '',
-                lowStockAlert: '5',
+                lowStockAlert: '',
               },
             ],
           },
@@ -419,7 +389,7 @@ function NewProductPage() {
                       discountPrice: '',
                       discountPercent: '',
                       stockQuantity: '',
-                      lowStockAlert: '5',
+                      lowStockAlert: '',
                     },
                   ],
                 },
@@ -479,7 +449,7 @@ function NewProductPage() {
                           discountPrice: '',
                           discountPercent: '',
                           stockQuantity: '',
-                          lowStockAlert: '5',
+                          lowStockAlert: '',
                         },
                       ],
                     }
@@ -559,7 +529,7 @@ function NewProductPage() {
             discountPrice: '',
             discountPercent: '',
             stockQuantity: '',
-            lowStockAlert: '5',
+            lowStockAlert: '',
           },
         ],
         colors: [
@@ -664,7 +634,7 @@ function NewProductPage() {
                           discountPrice: '',
                           discountPercent: '',
                           stockQuantity: '',
-                          lowStockAlert: '5',
+                          lowStockAlert: '',
                         },
                       ],
                     }
