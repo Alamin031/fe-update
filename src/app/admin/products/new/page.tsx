@@ -1552,6 +1552,133 @@ function NewProductPage() {
           </CardContent>
         </Card>
 
+        {productType === 'basic' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Colors</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {basicColors.map((color, idx) => (
+                <div key={color.id} className="space-y-4 rounded border p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Color Name</Label>
+                      <Input
+                        value={color.colorName}
+                        onChange={e =>
+                          updateBasicColor(color.id, 'colorName', e.target.value)
+                        }
+                        placeholder="e.g., Midnight Black"
+                      />
+                    </div>
+                    <div>
+                      <Label>Stock Quantity</Label>
+                      <Input
+                        type="number"
+                        value={color.stockQuantity}
+                        onChange={e =>
+                          updateBasicColor(
+                            color.id,
+                            'stockQuantity',
+                            e.target.value,
+                          )
+                        }
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Color Image</Label>
+                    <div className="mt-2 rounded border-2 border-dashed border-gray-300 p-4">
+                      {color.colorImage ? (
+                        <div className="relative inline-block">
+                          <img
+                            src={color.colorImage}
+                            alt={color.colorName}
+                            className="h-24 w-24 rounded object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeBasicColorImage(color.id)}
+                            className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex cursor-pointer flex-col items-center justify-center gap-2">
+                          <Upload className="h-6 w-6 text-gray-400" />
+                          <span className="text-sm text-gray-600">
+                            Click to upload color image
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={e =>
+                              handleBasicColorImageUpload(color.id, e)
+                            }
+                            className="hidden"
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Regular Price</Label>
+                      <Input
+                        type="number"
+                        value={color.regularPrice}
+                        onChange={e =>
+                          updateBasicColor(
+                            color.id,
+                            'regularPrice',
+                            e.target.value,
+                          )
+                        }
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <Label>Discount Price</Label>
+                      <Input
+                        type="number"
+                        value={color.discountPrice}
+                        onChange={e =>
+                          updateBasicColor(
+                            color.id,
+                            'discountPrice',
+                            e.target.value,
+                          )
+                        }
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => removeBasicColor(color.id)}
+                    className="rounded bg-red-100 px-4 py-2 text-red-600 hover:bg-red-200"
+                  >
+                    Remove Color
+                  </button>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={addBasicColor}
+                className="rounded bg-blue-100 px-4 py-2 text-blue-600 hover:bg-blue-200"
+              >
+                + Add Color
+              </button>
+            </CardContent>
+          </Card>
+        )}
+
         {productType === 'network' && (
           <Card>
             <CardHeader>
