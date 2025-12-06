@@ -1657,34 +1657,60 @@ function NewProductPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="category">Category *</Label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger id="category">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(cat => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Category *</Label>
+                <div className="mt-2 rounded border border-gray-300 bg-white p-3 max-h-48 overflow-y-auto">
+                  {categories.length > 0 ? (
+                    <div className="space-y-2">
+                      {categories.map(cat => (
+                        <div key={cat.id} className="flex items-center gap-2">
+                          <Checkbox
+                            id={`category-${cat.id}`}
+                            checked={selectedCategories.includes(cat.id)}
+                            onCheckedChange={() => toggleCategory(cat.id)}
+                          />
+                          <Label htmlFor={`category-${cat.id}`} className="font-normal cursor-pointer">
+                            {cat.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Loading categories...</p>
+                  )}
+                </div>
+                {selectedCategories.length > 0 && (
+                  <p className="mt-2 text-xs text-gray-600">
+                    {selectedCategories.length} selected
+                  </p>
+                )}
               </div>
               <div>
-                <Label htmlFor="brand">Brand *</Label>
-                <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-                  <SelectTrigger id="brand">
-                    <SelectValue placeholder="Select brand" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {brands.map(br => (
-                      <SelectItem key={br.id} value={br.id}>
-                        {br.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Brand *</Label>
+                <div className="mt-2 rounded border border-gray-300 bg-white p-3 max-h-48 overflow-y-auto">
+                  {brands.length > 0 ? (
+                    <div className="space-y-2">
+                      {brands.map(br => (
+                        <div key={br.id} className="flex items-center gap-2">
+                          <Checkbox
+                            id={`brand-${br.id}`}
+                            checked={selectedBrands.includes(br.id)}
+                            onCheckedChange={() => toggleBrand(br.id)}
+                          />
+                          <Label htmlFor={`brand-${br.id}`} className="font-normal cursor-pointer">
+                            {br.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Loading brands...</p>
+                  )}
+                </div>
+                {selectedBrands.length > 0 && (
+                  <p className="mt-2 text-xs text-gray-600">
+                    {selectedBrands.length} selected
+                  </p>
+                )}
               </div>
             </div>
 
