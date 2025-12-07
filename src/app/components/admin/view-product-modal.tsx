@@ -85,25 +85,35 @@ interface Product {
   // For Network Products
   networks?: Array<{
     id?: string;
+    networkType?: string;
     name?: string;
     priceAdjustment?: number | null;
     isDefault?: boolean;
     defaultStorages?: Array<{
       id?: string;
-      size?: string;
+      storageSize?: string;
+      displayOrder?: number;
       price?: {
-        regular?: number;
-        compare?: number;
-        discount?: number;
+        id?: string;
+        storageId?: string;
+        regularPrice?: number;
+        comparePrice?: number;
+        discountPrice?: number;
         discountPercent?: number;
-        final?: number;
+        campaignPrice?: number | null;
+        campaignStart?: string | null;
+        campaignEnd?: string | null;
+        stockQuantity?: number;
+        lowStockAlert?: number;
+        createdAt?: string;
+        updatedAt?: string;
       };
-      stock?: number;
-      inStock?: boolean;
     }>;
     colors?: Array<{
       id?: string;
+      colorName?: string;
       name?: string;
+      colorImage?: string;
       image?: string;
       hasStorage?: boolean;
       useDefaultStorages?: boolean;
@@ -113,28 +123,41 @@ interface Product {
       features?: string | null;
     }>;
   }>;
-  
+
   // For Region Products
   regions?: Array<{
     id?: string;
+    regionName?: string;
     name?: string;
     isDefault?: boolean;
+    displayOrder?: number;
     defaultStorages?: Array<{
       id?: string;
-      size?: string;
+      regionId?: string;
+      storageSize?: string;
+      displayOrder?: number;
       price?: {
-        regular?: number;
-        compare?: number;
-        discount?: number;
+        id?: string;
+        storageId?: string;
+        regularPrice?: number;
+        comparePrice?: number;
+        discountPrice?: number;
         discountPercent?: number;
-        final?: number;
+        campaignPrice?: number | null;
+        campaignStart?: string | null;
+        campaignEnd?: string | null;
+        stockQuantity?: number;
+        lowStockAlert?: number;
+        createdAt?: string;
+        updatedAt?: string;
       };
-      stock?: number;
-      inStock?: boolean;
     }>;
     colors?: Array<{
       id?: string;
+      regionId?: string;
+      colorName?: string;
       name?: string;
+      colorImage?: string;
       image?: string;
       hasStorage?: boolean;
       useDefaultStorages?: boolean;
@@ -143,6 +166,7 @@ interface Product {
       stockQuantity?: number | null;
       features?: string | null;
     }>;
+    createdAt?: string;
   }>;
   
   // Specifications
@@ -180,7 +204,7 @@ export function ViewProductModal({
 
   const getThumbnailImage = () => {
     const thumbnail = product?.images?.find((img) => img.isThumbnail);
-    return thumbnail?.url || product?.images?.[0]?.url || "/placeholder.svg";
+    return thumbnail?.imageUrl || product?.images?.[0]?.imageUrl || "/placeholder.svg";
   };
 
   const getGalleryImages = () => {
@@ -372,7 +396,7 @@ export function ViewProductModal({
                         title={img.altText}
                       >
                         <Image
-                          src={img.url || "/placeholder.svg"}
+                          src={img.imageUrl || "/placeholder.svg"}
                           alt={img.altText || `Gallery ${idx + 1}`}
                           width={150}
                           height={150}
@@ -387,44 +411,6 @@ export function ViewProductModal({
 
             {/* Pricing Tab */}
             <TabsContent value="pricing" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Price Range</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-muted-foreground uppercase">
-                        Min Price
-                      </label>
-                      <p className="mt-2 text-xl font-bold">
-                        {product.priceRange?.min !== undefined
-                          ? formatPrice(product.priceRange.min)
-                          : "N/A"}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-muted-foreground uppercase">
-                        Max Price
-                      </label>
-                      <p className="mt-2 text-xl font-bold">
-                        {product.priceRange?.max !== undefined
-                          ? formatPrice(product.priceRange.max)
-                          : "N/A"}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-muted-foreground uppercase">
-                        Currency
-                      </label>
-                      <p className="mt-2 text-lg font-semibold">
-                        {product.priceRange?.currency || "BDT"}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               {product.minBookingPrice && (
                 <Card>
                   <CardHeader>
@@ -434,6 +420,39 @@ export function ViewProductModal({
                     <p className="text-2xl font-bold">
                       {formatPrice(Number(product.minBookingPrice))}
                     </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Basic Products - Direct Colors Pricing */}
+              {product.directColors && product.directColors.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Color Pricing</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-2 px-2 font-semibold">Color</th>
+                            <th className="text-right py-2 px-2 font-semibold">Regular Price</th>
+                            <th className="text-right py-2 px-2 font-semibold">Discount Price</th>
+                            <th className="text-right py-2 px-2 font-semibold">Stock</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {product.directColors.map((color) => (
+                            <tr key={color.id} className="border-b hover:bg-muted/50">
+                              <td className="py-2 px-2 font-medium">{color.name}</td>
+                              <td className="text-right py-2 px-2">{formatPrice(color.regularPrice || 0)}</td>
+                              <td className="text-right py-2 px-2 font-semibold">{formatPrice(color.discountPrice || 0)}</td>
+                              <td className="text-right py-2 px-2">{color.stockQuantity || 0}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </CardContent>
                 </Card>
               )}
@@ -468,11 +487,11 @@ export function ViewProductModal({
                                 <tbody>
                                   {network.defaultStorages.map((storage) => (
                                     <tr key={storage.id} className="border-b hover:bg-muted/50">
-                                      <td className="py-2 px-2">{storage.size}</td>
-                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regular || 0)}</td>
-                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discount || 0)}</td>
+                                      <td className="py-2 px-2">{storage.storageSize}</td>
+                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regularPrice || 0)}</td>
+                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discountPrice || 0)}</td>
                                       <td className="text-right py-2 px-2">{storage.price?.discountPercent || 0}%</td>
-                                      <td className="text-right py-2 px-2">{storage.stock || 0}</td>
+                                      <td className="text-right py-2 px-2">{storage.price?.stockQuantity || 0}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -497,7 +516,7 @@ export function ViewProductModal({
                       {product.regions.map((region) => (
                         <div key={region.id} className="border rounded-lg p-4 space-y-4">
                           <div className="flex items-center justify-between">
-                            <h4 className="font-semibold">{region.name}</h4>
+                            <h4 className="font-semibold">{region.regionName || region.name}</h4>
                             {region.isDefault && <Badge>Default</Badge>}
                           </div>
 
@@ -516,11 +535,11 @@ export function ViewProductModal({
                                 <tbody>
                                   {region.defaultStorages.map((storage) => (
                                     <tr key={storage.id} className="border-b hover:bg-muted/50">
-                                      <td className="py-2 px-2">{storage.size}</td>
-                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regular || 0)}</td>
-                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discount || 0)}</td>
+                                      <td className="py-2 px-2">{storage.storageSize}</td>
+                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regularPrice || 0)}</td>
+                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discountPrice || 0)}</td>
                                       <td className="text-right py-2 px-2">{storage.price?.discountPercent || 0}%</td>
-                                      <td className="text-right py-2 px-2">{storage.stock || 0}</td>
+                                      <td className="text-right py-2 px-2">{storage.price?.stockQuantity || 0}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -541,63 +560,42 @@ export function ViewProductModal({
               {product.directColors && product.directColors.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Colors</CardTitle>
+                    <CardTitle>Color Variants</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {product.directColors.map((color) => (
                         <div
                           key={color.id}
-                          className="border rounded-lg p-4 space-y-2"
+                          className="border rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow"
                         >
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h4 className="font-semibold">{color.name}</h4>
-                              {color.image && (
-                                <div className="mt-2 w-16 h-16">
-                                  <Image
-                                    src={color.image}
-                                    alt={color.name || "Color"}
-                                    width={64}
-                                    height={64}
-                                    className="object-cover rounded"
-                                  />
-                                </div>
-                              )}
+                          {color.colorImage && (
+                            <div className="w-full aspect-square overflow-hidden rounded-lg bg-muted">
+                              <Image
+                                src={color.colorImage}
+                                alt={color.name || "Color"}
+                                width={200}
+                                height={200}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                          </div>
-                          <div className="grid grid-cols-3 gap-4">
-                            {color.regularPrice !== undefined && (
-                              <div>
-                                <span className="text-xs text-muted-foreground">
-                                  Regular Price
-                                </span>
-                                <p className="font-semibold">
-                                  {formatPrice(color.regularPrice)}
-                                </p>
+                          )}
+                          <div>
+                            <h4 className="font-semibold text-sm">{color.name}</h4>
+                            <div className="mt-2 space-y-1 text-xs">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Regular:</span>
+                                <span className="font-medium">{formatPrice(color.regularPrice || 0)}</span>
                               </div>
-                            )}
-                            {color.discountPrice !== undefined &&
-                              color.discountPrice !== null && (
-                                <div>
-                                  <span className="text-xs text-muted-foreground">
-                                    Discount Price
-                                  </span>
-                                  <p className="font-semibold">
-                                    {formatPrice(color.discountPrice)}
-                                  </p>
-                                </div>
-                              )}
-                            {color.stockQuantity !== undefined && (
-                              <div>
-                                <span className="text-xs text-muted-foreground">
-                                  Stock
-                                </span>
-                                <p className="font-semibold">
-                                  {color.stockQuantity}
-                                </p>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Discount:</span>
+                                <span className="font-medium">{formatPrice(color.discountPrice || 0)}</span>
                               </div>
-                            )}
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Stock:</span>
+                                <span className="font-medium">{color.stockQuantity || 0}</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -610,7 +608,7 @@ export function ViewProductModal({
               {product.networks && product.networks.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Networks</CardTitle>
+                    <CardTitle>Network Variants</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
@@ -620,83 +618,93 @@ export function ViewProductModal({
                           className="border rounded-lg p-4 space-y-4"
                         >
                           <div className="flex items-center justify-between">
-                            <h4 className="font-semibold">{network.name}</h4>
+                            <h4 className="font-semibold">{network.networkType || network.name}</h4>
                             {network.isDefault && (
                               <Badge>Default</Badge>
                             )}
                           </div>
+
+                          {/* Colors Grid */}
+                          {network.colors && network.colors.length > 0 && (
+                            <div>
+                              <p className="text-sm font-semibold mb-3">
+                                Available Colors
+                              </p>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                                {network.colors.map((color) => (
+                                  <div
+                                    key={color.id}
+                                    className="border rounded-lg p-2 text-center hover:shadow-md transition-shadow"
+                                  >
+                                    {color.colorImage && (
+                                      <div className="w-full aspect-square mb-2 overflow-hidden rounded bg-muted">
+                                        <Image
+                                          src={color.colorImage}
+                                          alt={color.colorName || color.name || "Color"}
+                                          width={100}
+                                          height={100}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                    )}
+                                    <p className="text-xs font-medium">{color.colorName || color.name}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
 
                           {/* Storages */}
                           {network.defaultStorages &&
                             network.defaultStorages.length > 0 && (
                               <div>
                                 <p className="text-sm font-semibold mb-2">
-                                  Storages
+                                  Storage Options
                                 </p>
                                 <div className="space-y-2">
                                   {network.defaultStorages.map((storage) => (
                                     <div
                                       key={storage.id}
-                                      className="bg-muted p-2 rounded text-sm"
+                                      className="bg-muted p-3 rounded text-sm border"
                                     >
-                                      <div className="font-medium">
-                                        {storage.size}
+                                      <div className="font-medium mb-2">
+                                        {storage.storageSize}
                                       </div>
-                                      <div className="grid grid-cols-4 gap-2 mt-1 text-xs">
+                                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                         <div>
-                                          Regular:{" "}
-                                          {formatPrice(
-                                            storage.price?.regular || 0
-                                          )}
+                                          <span className="text-muted-foreground">Regular:</span>
+                                          <div className="font-semibold">
+                                            {formatPrice(
+                                              storage.price?.regularPrice || 0
+                                            )}
+                                          </div>
                                         </div>
                                         <div>
-                                          Discount:{" "}
-                                          {formatPrice(
-                                            storage.price?.discount || 0
-                                          )}
+                                          <span className="text-muted-foreground">Discount:</span>
+                                          <div className="font-semibold">
+                                            {formatPrice(
+                                              storage.price?.discountPrice || 0
+                                            )}
+                                          </div>
                                         </div>
                                         <div>
-                                          ({storage.price?.discountPercent}%)
+                                          <span className="text-muted-foreground">Percent:</span>
+                                          <div className="font-semibold">
+                                            {storage.price?.discountPercent || 0}%
+                                          </div>
                                         </div>
-                                        <div>Stock: {storage.stock || 0}</div>
+                                        <div>
+                                          <span className="text-muted-foreground">Stock:</span>
+                                          <div className="font-semibold">
+                                            {storage.price?.stockQuantity || 0}
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
                                   ))}
                                 </div>
                               </div>
                             )}
-
-                          {/* Colors */}
-                          {network.colors && network.colors.length > 0 && (
-                            <div>
-                              <p className="text-sm font-semibold mb-2">
-                                Colors
-                              </p>
-                              <div className="flex flex-wrap gap-3">
-                                {network.colors.map((color) => (
-                                  <div
-                                    key={color.id}
-                                    className="text-center"
-                                  >
-                                    {color.image && (
-                                      <div className="w-12 h-12 mb-1">
-                                        <Image
-                                          src={color.image}
-                                          alt={color.name || "Color"}
-                                          width={48}
-                                          height={48}
-                                          className="object-cover rounded"
-                                        />
-                                      </div>
-                                    )}
-                                    <span className="text-xs">
-                                      {color.name}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
                         </div>
                       ))}
                     </div>
@@ -708,7 +716,7 @@ export function ViewProductModal({
               {product.regions && product.regions.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Regions</CardTitle>
+                    <CardTitle>Region Variants</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
@@ -718,83 +726,93 @@ export function ViewProductModal({
                           className="border rounded-lg p-4 space-y-4"
                         >
                           <div className="flex items-center justify-between">
-                            <h4 className="font-semibold">{region.name}</h4>
+                            <h4 className="font-semibold">{region.regionName || region.name}</h4>
                             {region.isDefault && (
                               <Badge>Default</Badge>
                             )}
                           </div>
+
+                          {/* Colors Grid */}
+                          {region.colors && region.colors.length > 0 && (
+                            <div>
+                              <p className="text-sm font-semibold mb-3">
+                                Available Colors
+                              </p>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                                {region.colors.map((color) => (
+                                  <div
+                                    key={color.id}
+                                    className="border rounded-lg p-2 text-center hover:shadow-md transition-shadow"
+                                  >
+                                    {color.colorImage && (
+                                      <div className="w-full aspect-square mb-2 overflow-hidden rounded bg-muted">
+                                        <Image
+                                          src={color.colorImage}
+                                          alt={color.colorName || color.name || "Color"}
+                                          width={100}
+                                          height={100}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                    )}
+                                    <p className="text-xs font-medium">{color.colorName || color.name}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
 
                           {/* Storages */}
                           {region.defaultStorages &&
                             region.defaultStorages.length > 0 && (
                               <div>
                                 <p className="text-sm font-semibold mb-2">
-                                  Storages
+                                  Storage Options
                                 </p>
                                 <div className="space-y-2">
                                   {region.defaultStorages.map((storage) => (
                                     <div
                                       key={storage.id}
-                                      className="bg-muted p-2 rounded text-sm"
+                                      className="bg-muted p-3 rounded text-sm border"
                                     >
-                                      <div className="font-medium">
-                                        {storage.size}
+                                      <div className="font-medium mb-2">
+                                        {storage.storageSize}
                                       </div>
-                                      <div className="grid grid-cols-4 gap-2 mt-1 text-xs">
+                                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                         <div>
-                                          Regular:{" "}
-                                          {formatPrice(
-                                            storage.price?.regular || 0
-                                          )}
+                                          <span className="text-muted-foreground">Regular:</span>
+                                          <div className="font-semibold">
+                                            {formatPrice(
+                                              storage.price?.regularPrice || 0
+                                            )}
+                                          </div>
                                         </div>
                                         <div>
-                                          Discount:{" "}
-                                          {formatPrice(
-                                            storage.price?.discount || 0
-                                          )}
+                                          <span className="text-muted-foreground">Discount:</span>
+                                          <div className="font-semibold">
+                                            {formatPrice(
+                                              storage.price?.discountPrice || 0
+                                            )}
+                                          </div>
                                         </div>
                                         <div>
-                                          ({storage.price?.discountPercent}%)
+                                          <span className="text-muted-foreground">Percent:</span>
+                                          <div className="font-semibold">
+                                            {storage.price?.discountPercent || 0}%
+                                          </div>
                                         </div>
-                                        <div>Stock: {storage.stock || 0}</div>
+                                        <div>
+                                          <span className="text-muted-foreground">Stock:</span>
+                                          <div className="font-semibold">
+                                            {storage.price?.stockQuantity || 0}
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
                                   ))}
                                 </div>
                               </div>
                             )}
-
-                          {/* Colors */}
-                          {region.colors && region.colors.length > 0 && (
-                            <div>
-                              <p className="text-sm font-semibold mb-2">
-                                Colors
-                              </p>
-                              <div className="flex flex-wrap gap-3">
-                                {region.colors.map((color) => (
-                                  <div
-                                    key={color.id}
-                                    className="text-center"
-                                  >
-                                    {color.image && (
-                                      <div className="w-12 h-12 mb-1">
-                                        <Image
-                                          src={color.image}
-                                          alt={color.name || "Color"}
-                                          width={48}
-                                          height={48}
-                                          className="object-cover rounded"
-                                        />
-                                      </div>
-                                    )}
-                                    <span className="text-xs">
-                                      {color.name}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
                         </div>
                       ))}
                     </div>
@@ -888,31 +906,56 @@ export function ViewProductModal({
 
             {/* Inventory Tab */}
             <TabsContent value="inventory" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Stock Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-muted-foreground uppercase">
-                        Total Stock
-                      </label>
-                      <p className="mt-2 text-2xl font-bold">
-                        {product.totalStock || 0}
-                      </p>
+              {/* Basic Products - Color Stock */}
+              {product.directColors && product.directColors.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Stock by Color</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-2 px-2 font-semibold">Color</th>
+                            <th className="text-right py-2 px-2 font-semibold">Stock Quantity</th>
+                            <th className="text-center py-2 px-2 font-semibold">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {product.directColors.map((color) => {
+                            const stock = color.stockQuantity || 0;
+                            let status = 'In Stock';
+                            if (stock === 0) status = 'Out of Stock';
+                            else if (stock <= 5) status = 'Low Stock';
+
+                            return (
+                              <tr key={color.id} className="border-b hover:bg-muted/50">
+                                <td className="py-2 px-2 font-medium">{color.name}</td>
+                                <td className="text-right py-2 px-2 font-semibold">{stock}</td>
+                                <td className="text-center py-2 px-2">
+                                  <Badge
+                                    variant={status === 'Out of Stock' ? 'secondary' : 'default'}
+                                    className={
+                                      status === 'Out of Stock'
+                                        ? 'bg-red-500/10 text-red-600'
+                                        : status === 'Low Stock'
+                                        ? 'bg-yellow-500/10 text-yellow-600'
+                                        : 'bg-green-500/10 text-green-600'
+                                    }
+                                  >
+                                    {status}
+                                  </Badge>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
-                    <div>
-                      <label className="text-xs font-semibold text-muted-foreground uppercase">
-                        Low Stock Alert
-                      </label>
-                      <p className="mt-2 text-lg font-semibold">
-                        {product.lowStockAlert || "Not set"}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Network Inventory Details */}
               {product.networks && product.networks.length > 0 && (
@@ -942,7 +985,7 @@ export function ViewProductModal({
                                 </thead>
                                 <tbody>
                                   {network.defaultStorages.map((storage) => {
-                                    const stock = storage.stock || 0;
+                                    const stock = storage.price?.stockQuantity || 0;
                                     const lowStock = storage.price?.lowStockAlert || 5;
                                     let status = 'In Stock';
                                     if (stock === 0) status = 'Out of Stock';
@@ -950,11 +993,20 @@ export function ViewProductModal({
 
                                     return (
                                       <tr key={storage.id} className="border-b hover:bg-muted/50">
-                                        <td className="py-2 px-2">{storage.size}</td>
+                                        <td className="py-2 px-2">{storage.storageSize}</td>
                                         <td className="text-right py-2 px-2 font-semibold">{stock}</td>
                                         <td className="text-right py-2 px-2">{lowStock}</td>
                                         <td className="text-center py-2 px-2">
-                                          <Badge variant={stock > 0 ? 'default' : 'secondary'}>
+                                          <Badge
+                                            variant={status === 'Out of Stock' ? 'secondary' : 'default'}
+                                            className={
+                                              status === 'Out of Stock'
+                                                ? 'bg-red-500/10 text-red-600'
+                                                : status === 'Low Stock'
+                                                ? 'bg-yellow-500/10 text-yellow-600'
+                                                : 'bg-green-500/10 text-green-600'
+                                            }
+                                          >
                                             {status}
                                           </Badge>
                                         </td>
@@ -983,7 +1035,7 @@ export function ViewProductModal({
                       {product.regions.map((region) => (
                         <div key={region.id} className="border rounded-lg p-4 space-y-4">
                           <div className="flex items-center justify-between">
-                            <h4 className="font-semibold">{region.name}</h4>
+                            <h4 className="font-semibold">{region.regionName || region.name}</h4>
                             {region.isDefault && <Badge>Default</Badge>}
                           </div>
 
@@ -1000,7 +1052,7 @@ export function ViewProductModal({
                                 </thead>
                                 <tbody>
                                   {region.defaultStorages.map((storage) => {
-                                    const stock = storage.stock || 0;
+                                    const stock = storage.price?.stockQuantity || 0;
                                     const lowStock = storage.price?.lowStockAlert || 5;
                                     let status = 'In Stock';
                                     if (stock === 0) status = 'Out of Stock';
@@ -1008,11 +1060,20 @@ export function ViewProductModal({
 
                                     return (
                                       <tr key={storage.id} className="border-b hover:bg-muted/50">
-                                        <td className="py-2 px-2">{storage.size}</td>
+                                        <td className="py-2 px-2">{storage.storageSize}</td>
                                         <td className="text-right py-2 px-2 font-semibold">{stock}</td>
                                         <td className="text-right py-2 px-2">{lowStock}</td>
                                         <td className="text-center py-2 px-2">
-                                          <Badge variant={stock > 0 ? 'default' : 'secondary'}>
+                                          <Badge
+                                            variant={status === 'Out of Stock' ? 'secondary' : 'default'}
+                                            className={
+                                              status === 'Out of Stock'
+                                                ? 'bg-red-500/10 text-red-600'
+                                                : status === 'Low Stock'
+                                                ? 'bg-yellow-500/10 text-yellow-600'
+                                                : 'bg-green-500/10 text-green-600'
+                                            }
+                                          >
                                             {status}
                                           </Badge>
                                         </td>
