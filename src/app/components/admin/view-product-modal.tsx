@@ -372,7 +372,7 @@ export function ViewProductModal({
                         title={img.altText}
                       >
                         <Image
-                          src={img.url || "/placeholder.svg"}
+                          src={img.imageUrl || "/placeholder.svg"}
                           alt={img.altText || `Gallery ${idx + 1}`}
                           width={150}
                           height={150}
