@@ -42,14 +42,15 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const inWishlist = isInWishlist(product.id);
   const inCompare = isInCompare(product.id);
 
-  // Use basePrice as regular price, discountPrice as sale price
-  const regularPrice = product.basePrice || product.price || 0;
+  // Handle multiple price field possibilities from API
+  // Priority: discountPrice (sale) > price, regularPrice (base)
+  const regularPrice = product.basePrice || (product as any).regularPrice || product.price || 0;
   const salePrice = product.discountPrice || product.price || regularPrice;
-  const hasDiscount = regularPrice > 0 && salePrice < regularPrice;
+  const hasDiscount = regularPrice > 0 && salePrice > 0 && salePrice < regularPrice;
   const discount = hasDiscount
     ? calculateDiscount(regularPrice, salePrice)
-    : 0;
-  const isOutOfStock = product.stock === 0;
+    : product.discountPercent || 0;
+  const isOutOfStock = (product.stock || 0) === 0;
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
