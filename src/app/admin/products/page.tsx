@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import {EditProductModal} from '../../components/admin/edit-product-modal';
-import {ViewProductModal} from '../../components/admin/view-product-modal';
+import {ViewProductModalBasic} from '../../components/admin/view-product-modal-basic';
+import {ViewProductModalNetwork} from '../../components/admin/view-product-modal-network';
+import {ViewProductModalRegion} from '../../components/admin/view-product-modal-region';
 
 import {useState, useEffect, useRef} from 'react';
 import Link from 'next/link';
@@ -52,6 +53,7 @@ import {formatPrice} from '../../lib/utils/format';
 
 import productsService from '../../lib/api/services/products';
 import categoriesService from '../../lib/api/services/categories';
+import {EditProductModal} from '@/app/components/admin/edit-product-modal';
 
 // UI Product type for display
 type UIProduct = {
@@ -136,11 +138,14 @@ function AdminProductsPage() {
 
         const apiProducts = Array.isArray(res) ? res : res?.data || [];
         const total =
-          (typeof res === 'object' && 'data' in res && Array.isArray(res.data) && typeof res.data.length === 'number'
+          typeof res === 'object' &&
+          'data' in res &&
+          Array.isArray(res.data) &&
+          typeof res.data.length === 'number'
             ? res.data.length
             : Array.isArray(res)
             ? res.length
-            : apiProducts.length);
+            : apiProducts.length;
 
         // Find missing category IDs
         const missingCategoryIds = [
@@ -535,12 +540,28 @@ function AdminProductsPage() {
       </Card>
 
       {/* View Modal */}
-      <ViewProductModal
-        open={viewOpen}
-        onOpenChange={setViewOpen}
-        product={selectedProduct}
-        loading={viewLoading}
-      />
+      {(selectedProduct?.productType === 'network' || selectedProduct?.type === 'network') ? (
+        <ViewProductModalNetwork
+          open={viewOpen}
+          onOpenChange={setViewOpen}
+          product={selectedProduct}
+          loading={viewLoading}
+        />
+      ) : (selectedProduct?.productType === 'region' || selectedProduct?.type === 'region') ? (
+        <ViewProductModalRegion
+          open={viewOpen}
+          onOpenChange={setViewOpen}
+          product={selectedProduct}
+          loading={viewLoading}
+        />
+      ) : (
+        <ViewProductModalBasic
+          open={viewOpen}
+          onOpenChange={setViewOpen}
+          product={selectedProduct}
+          loading={viewLoading}
+        />
+      )}
 
       {/* Edit Modal */}
       <EditProductModal

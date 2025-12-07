@@ -279,6 +279,39 @@ export const productsService = {
     });
     return response.data;
   },
+
+  /**
+   * Update basic product
+   */
+  updateBasic: async (id: string, data: any): Promise<Product> => {
+    const endpoint = API_ENDPOINTS.PRODUCTS_UPDATE_BASIC.replace("{id}", id);
+    const response = await apiClient.patch<Product>(endpoint, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  /**
+   * Update network product
+   */
+  updateNetwork: async (id: string, data: any): Promise<Product> => {
+    const endpoint = API_ENDPOINTS.PRODUCTS_UPDATE_NETWORK.replace("{id}", id);
+    const response = await apiClient.patch<Product>(endpoint, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  /**
+   * Update region product
+   */
+  updateRegion: async (id: string, data: any): Promise<Product> => {
+    const endpoint = API_ENDPOINTS.PRODUCTS_UPDATE_REGION.replace("{id}", id);
+    const response = await apiClient.patch<Product>(endpoint, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
 }
 
 export default productsService
