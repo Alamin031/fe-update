@@ -174,8 +174,8 @@ export function ViewProductModal({
   open,
   onOpenChange,
   product,
+  loading = false,
 }: ViewProductModalProps) {
-  if (!product) return null;
 
   const getThumbnailImage = () => {
     const thumbnail = product.images?.find((img) => img.isThumbnail);
