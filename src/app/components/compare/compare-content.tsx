@@ -101,12 +101,20 @@ export function CompareContent() {
 
             {/* Price Section */}
             <div className="border-b border-border p-4">
-              <p className="text-center text-lg font-bold">{formatPrice(product.price)}</p>
-              {product.originalPrice && (
-                <p className="text-center text-xs text-muted-foreground line-through">
-                  {formatPrice(product.originalPrice)}
-                </p>
-              )}
+              {(() => {
+                const regularPrice = product.basePrice || (product as any).regularPrice || product.price || 0;
+                const salePrice = product.discountPrice || product.price || regularPrice;
+                return (
+                  <>
+                    <p className="text-center text-lg font-bold">{formatPrice(salePrice)}</p>
+                    {regularPrice > 0 && salePrice < regularPrice && (
+                      <p className="text-center text-xs text-muted-foreground line-through">
+                        {formatPrice(regularPrice)}
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Specifications */}
