@@ -180,7 +180,7 @@ export function ViewProductModal({
 
   const getThumbnailImage = () => {
     const thumbnail = product?.images?.find((img) => img.isThumbnail);
-    return thumbnail?.url || product?.images?.[0]?.url || "/placeholder.svg";
+    return thumbnail?.imageUrl || product?.images?.[0]?.imageUrl || "/placeholder.svg";
   };
 
   const getGalleryImages = () => {
