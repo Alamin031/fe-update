@@ -236,7 +236,8 @@ function AdminProductsPage() {
     try {
       setViewLoading(true);
       const fullProduct = await productsService.getById(product.id);
-      setSelectedProduct(fullProduct);
+      const transformedProduct = transformProductForModal(fullProduct);
+      setSelectedProduct(transformedProduct);
       setViewOpen(true);
     } catch (error) {
       console.error('Failed to fetch product details:', error);
