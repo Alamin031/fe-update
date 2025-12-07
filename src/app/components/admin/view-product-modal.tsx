@@ -437,6 +437,102 @@ export function ViewProductModal({
                   </CardContent>
                 </Card>
               )}
+
+              {/* Network Pricing Details */}
+              {product.networks && product.networks.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Network Pricing Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {product.networks.map((network) => (
+                        <div key={network.id} className="border rounded-lg p-4 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold">{network.name}</h4>
+                            {network.isDefault && <Badge>Default</Badge>}
+                          </div>
+
+                          {network.defaultStorages && network.defaultStorages.length > 0 && (
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm">
+                                <thead>
+                                  <tr className="border-b">
+                                    <th className="text-left py-2 px-2 font-semibold">Storage</th>
+                                    <th className="text-right py-2 px-2 font-semibold">Regular Price</th>
+                                    <th className="text-right py-2 px-2 font-semibold">Discount Price</th>
+                                    <th className="text-right py-2 px-2 font-semibold">Discount %</th>
+                                    <th className="text-right py-2 px-2 font-semibold">Stock</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {network.defaultStorages.map((storage) => (
+                                    <tr key={storage.id} className="border-b hover:bg-muted/50">
+                                      <td className="py-2 px-2">{storage.size}</td>
+                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regular || 0)}</td>
+                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discount || 0)}</td>
+                                      <td className="text-right py-2 px-2">{storage.price?.discountPercent || 0}%</td>
+                                      <td className="text-right py-2 px-2">{storage.stock || 0}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Region Pricing Details */}
+              {product.regions && product.regions.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Region Pricing Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {product.regions.map((region) => (
+                        <div key={region.id} className="border rounded-lg p-4 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold">{region.name}</h4>
+                            {region.isDefault && <Badge>Default</Badge>}
+                          </div>
+
+                          {region.defaultStorages && region.defaultStorages.length > 0 && (
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm">
+                                <thead>
+                                  <tr className="border-b">
+                                    <th className="text-left py-2 px-2 font-semibold">Storage</th>
+                                    <th className="text-right py-2 px-2 font-semibold">Regular Price</th>
+                                    <th className="text-right py-2 px-2 font-semibold">Discount Price</th>
+                                    <th className="text-right py-2 px-2 font-semibold">Discount %</th>
+                                    <th className="text-right py-2 px-2 font-semibold">Stock</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {region.defaultStorages.map((storage) => (
+                                    <tr key={storage.id} className="border-b hover:bg-muted/50">
+                                      <td className="py-2 px-2">{storage.size}</td>
+                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regular || 0)}</td>
+                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discount || 0)}</td>
+                                      <td className="text-right py-2 px-2">{storage.price?.discountPercent || 0}%</td>
+                                      <td className="text-right py-2 px-2">{storage.stock || 0}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
 
             {/* Variants Tab */}
