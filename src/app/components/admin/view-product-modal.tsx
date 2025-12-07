@@ -176,14 +176,15 @@ export function ViewProductModal({
   product,
   loading = false,
 }: ViewProductModalProps) {
+  if (!product && !loading) return null;
 
   const getThumbnailImage = () => {
-    const thumbnail = product.images?.find((img) => img.isThumbnail);
-    return thumbnail?.url || product.images?.[0]?.url || "/placeholder.svg";
+    const thumbnail = product?.images?.find((img) => img.isThumbnail);
+    return thumbnail?.url || product?.images?.[0]?.url || "/placeholder.svg";
   };
 
   const getGalleryImages = () => {
-    return product.images?.filter((img) => !img.isThumbnail) || [];
+    return product?.images?.filter((img) => !img.isThumbnail) || [];
   };
 
   const formatBoolean = (val: any) => {
@@ -196,15 +197,31 @@ export function ViewProductModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-2xl">{product.name}</DialogTitle>
-          <DialogDescription className="flex flex-wrap gap-4 text-xs pt-2">
-            <span>ID: {product.id}</span>
-            <span>SKU: {product.sku || "N/A"}</span>
-            <span>Type: {product.productType?.toUpperCase() || "N/A"}</span>
-          </DialogDescription>
+          <DialogTitle className="text-2xl">
+            {loading ? 'Loading...' : product?.name || 'Product'}
+          </DialogTitle>
+          {!loading && product && (
+            <DialogDescription className="flex flex-wrap gap-4 text-xs pt-2">
+              <span>ID: {product.id}</span>
+              <span>SKU: {product.sku || "N/A"}</span>
+              <span>Type: {product.productType?.toUpperCase() || "N/A"}</span>
+            </DialogDescription>
+          )}
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto">
+          {loading ? (
+            <div className="flex items-center justify-center h-96">
+              <div className="text-center">
+                <div className="h-8 w-8 border-4 border-muted border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
+                <p className="text-muted-foreground">Loading product details...</p>
+              </div>
+            </div>
+          ) : !product ? (
+            <div className="flex items-center justify-center h-96">
+              <p className="text-muted-foreground">No product data available</p>
+            </div>
+          ) : (
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -899,6 +916,7 @@ export function ViewProductModal({
               )}
             </TabsContent>
           </Tabs>
+          )}
         </div>
 
         <div className="flex gap-2 justify-end">
