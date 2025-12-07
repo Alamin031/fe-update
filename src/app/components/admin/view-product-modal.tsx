@@ -387,44 +387,6 @@ export function ViewProductModal({
 
             {/* Pricing Tab */}
             <TabsContent value="pricing" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Price Range</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-muted-foreground uppercase">
-                        Min Price
-                      </label>
-                      <p className="mt-2 text-xl font-bold">
-                        {product.priceRange?.min !== undefined
-                          ? formatPrice(product.priceRange.min)
-                          : "N/A"}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-muted-foreground uppercase">
-                        Max Price
-                      </label>
-                      <p className="mt-2 text-xl font-bold">
-                        {product.priceRange?.max !== undefined
-                          ? formatPrice(product.priceRange.max)
-                          : "N/A"}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-muted-foreground uppercase">
-                        Currency
-                      </label>
-                      <p className="mt-2 text-lg font-semibold">
-                        {product.priceRange?.currency || "BDT"}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               {product.minBookingPrice && (
                 <Card>
                   <CardHeader>
@@ -434,6 +396,39 @@ export function ViewProductModal({
                     <p className="text-2xl font-bold">
                       {formatPrice(Number(product.minBookingPrice))}
                     </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Basic Products - Direct Colors Pricing */}
+              {product.directColors && product.directColors.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Color Pricing</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-2 px-2 font-semibold">Color</th>
+                            <th className="text-right py-2 px-2 font-semibold">Regular Price</th>
+                            <th className="text-right py-2 px-2 font-semibold">Discount Price</th>
+                            <th className="text-right py-2 px-2 font-semibold">Stock</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {product.directColors.map((color) => (
+                            <tr key={color.id} className="border-b hover:bg-muted/50">
+                              <td className="py-2 px-2 font-medium">{color.name}</td>
+                              <td className="text-right py-2 px-2">{formatPrice(color.regularPrice || 0)}</td>
+                              <td className="text-right py-2 px-2 font-semibold">{formatPrice(color.discountPrice || 0)}</td>
+                              <td className="text-right py-2 px-2">{color.stockQuantity || 0}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </CardContent>
                 </Card>
               )}
@@ -468,11 +463,11 @@ export function ViewProductModal({
                                 <tbody>
                                   {network.defaultStorages.map((storage) => (
                                     <tr key={storage.id} className="border-b hover:bg-muted/50">
-                                      <td className="py-2 px-2">{storage.size}</td>
-                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regular || 0)}</td>
-                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discount || 0)}</td>
+                                      <td className="py-2 px-2">{storage.storageSize}</td>
+                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regularPrice || 0)}</td>
+                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discountPrice || 0)}</td>
                                       <td className="text-right py-2 px-2">{storage.price?.discountPercent || 0}%</td>
-                                      <td className="text-right py-2 px-2">{storage.stock || 0}</td>
+                                      <td className="text-right py-2 px-2">{storage.price?.stockQuantity || 0}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -516,11 +511,11 @@ export function ViewProductModal({
                                 <tbody>
                                   {region.defaultStorages.map((storage) => (
                                     <tr key={storage.id} className="border-b hover:bg-muted/50">
-                                      <td className="py-2 px-2">{storage.size}</td>
-                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regular || 0)}</td>
-                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discount || 0)}</td>
+                                      <td className="py-2 px-2">{storage.storageSize}</td>
+                                      <td className="text-right py-2 px-2">{formatPrice(storage.price?.regularPrice || 0)}</td>
+                                      <td className="text-right py-2 px-2 font-semibold">{formatPrice(storage.price?.discountPrice || 0)}</td>
                                       <td className="text-right py-2 px-2">{storage.price?.discountPercent || 0}%</td>
-                                      <td className="text-right py-2 px-2">{storage.stock || 0}</td>
+                                      <td className="text-right py-2 px-2">{storage.price?.stockQuantity || 0}</td>
                                     </tr>
                                   ))}
                                 </tbody>
