@@ -131,8 +131,8 @@ function AdminProductsPage() {
           pageSize,
         );
 
-        const apiProducts = Array.isArray(res) ? res : res?.data || [];
-        const total = res?.total || res?.count || apiProducts.length;
+        const apiProducts = Array.isArray(res) ? res : (res?.data || []);
+        const total = res?.total || (Array.isArray(res) ? res.length : apiProducts.length);
 
         // Find missing category IDs
         const missingCategoryIds = [
