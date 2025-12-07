@@ -31,6 +31,8 @@ export function transformProductForModal(product: any) {
         discount: storage.price?.discountPrice || storage.price?.discount,
         discountPercent: storage.price?.discountPercent,
         final: storage.price?.discountPrice || storage.price?.final,
+        stockQuantity: storage.price?.stockQuantity,
+        lowStockAlert: storage.price?.lowStockAlert,
       },
       stock: storage.price?.stockQuantity || storage.stock,
       inStock: (storage.price?.stockQuantity || storage.stock || 0) > 0,
