@@ -616,14 +616,14 @@ export function ViewProductModal({
                                       <div className="w-full aspect-square mb-2 overflow-hidden rounded bg-muted">
                                         <Image
                                           src={color.colorImage}
-                                          alt={color.name || "Color"}
+                                          alt={color.colorName || color.name || "Color"}
                                           width={100}
                                           height={100}
                                           className="w-full h-full object-cover"
                                         />
                                       </div>
                                     )}
-                                    <p className="text-xs font-medium">{color.name}</p>
+                                    <p className="text-xs font-medium">{color.colorName || color.name}</p>
                                   </div>
                                 ))}
                               </div>
@@ -724,14 +724,14 @@ export function ViewProductModal({
                                       <div className="w-full aspect-square mb-2 overflow-hidden rounded bg-muted">
                                         <Image
                                           src={color.colorImage}
-                                          alt={color.name || "Color"}
+                                          alt={color.colorName || color.name || "Color"}
                                           width={100}
                                           height={100}
                                           className="w-full h-full object-cover"
                                         />
                                       </div>
                                     )}
-                                    <p className="text-xs font-medium">{color.name}</p>
+                                    <p className="text-xs font-medium">{color.colorName || color.name}</p>
                                   </div>
                                 ))}
                               </div>
