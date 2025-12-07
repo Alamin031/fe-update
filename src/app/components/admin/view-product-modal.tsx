@@ -492,7 +492,7 @@ export function ViewProductModal({
                       {product.regions.map((region) => (
                         <div key={region.id} className="border rounded-lg p-4 space-y-4">
                           <div className="flex items-center justify-between">
-                            <h4 className="font-semibold">{region.name}</h4>
+                            <h4 className="font-semibold">{region.regionName || region.name}</h4>
                             {region.isDefault && <Badge>Default</Badge>}
                           </div>
 
@@ -1011,7 +1011,7 @@ export function ViewProductModal({
                       {product.regions.map((region) => (
                         <div key={region.id} className="border rounded-lg p-4 space-y-4">
                           <div className="flex items-center justify-between">
-                            <h4 className="font-semibold">{region.name}</h4>
+                            <h4 className="font-semibold">{region.regionName || region.name}</h4>
                             {region.isDefault && <Badge>Default</Badge>}
                           </div>
 
