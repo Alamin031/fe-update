@@ -692,7 +692,7 @@ export function ViewProductModal({
               {product.regions && product.regions.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Regions</CardTitle>
+                    <CardTitle>Region Variants</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
@@ -702,83 +702,93 @@ export function ViewProductModal({
                           className="border rounded-lg p-4 space-y-4"
                         >
                           <div className="flex items-center justify-between">
-                            <h4 className="font-semibold">{region.name}</h4>
+                            <h4 className="font-semibold">{region.regionName || region.name}</h4>
                             {region.isDefault && (
                               <Badge>Default</Badge>
                             )}
                           </div>
+
+                          {/* Colors Grid */}
+                          {region.colors && region.colors.length > 0 && (
+                            <div>
+                              <p className="text-sm font-semibold mb-3">
+                                Available Colors
+                              </p>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                                {region.colors.map((color) => (
+                                  <div
+                                    key={color.id}
+                                    className="border rounded-lg p-2 text-center hover:shadow-md transition-shadow"
+                                  >
+                                    {color.colorImage && (
+                                      <div className="w-full aspect-square mb-2 overflow-hidden rounded bg-muted">
+                                        <Image
+                                          src={color.colorImage}
+                                          alt={color.name || "Color"}
+                                          width={100}
+                                          height={100}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                    )}
+                                    <p className="text-xs font-medium">{color.name}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
 
                           {/* Storages */}
                           {region.defaultStorages &&
                             region.defaultStorages.length > 0 && (
                               <div>
                                 <p className="text-sm font-semibold mb-2">
-                                  Storages
+                                  Storage Options
                                 </p>
                                 <div className="space-y-2">
                                   {region.defaultStorages.map((storage) => (
                                     <div
                                       key={storage.id}
-                                      className="bg-muted p-2 rounded text-sm"
+                                      className="bg-muted p-3 rounded text-sm border"
                                     >
-                                      <div className="font-medium">
-                                        {storage.size}
+                                      <div className="font-medium mb-2">
+                                        {storage.storageSize}
                                       </div>
-                                      <div className="grid grid-cols-4 gap-2 mt-1 text-xs">
+                                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                         <div>
-                                          Regular:{" "}
-                                          {formatPrice(
-                                            storage.price?.regular || 0
-                                          )}
+                                          <span className="text-muted-foreground">Regular:</span>
+                                          <div className="font-semibold">
+                                            {formatPrice(
+                                              storage.price?.regularPrice || 0
+                                            )}
+                                          </div>
                                         </div>
                                         <div>
-                                          Discount:{" "}
-                                          {formatPrice(
-                                            storage.price?.discount || 0
-                                          )}
+                                          <span className="text-muted-foreground">Discount:</span>
+                                          <div className="font-semibold">
+                                            {formatPrice(
+                                              storage.price?.discountPrice || 0
+                                            )}
+                                          </div>
                                         </div>
                                         <div>
-                                          ({storage.price?.discountPercent}%)
+                                          <span className="text-muted-foreground">Percent:</span>
+                                          <div className="font-semibold">
+                                            {storage.price?.discountPercent || 0}%
+                                          </div>
                                         </div>
-                                        <div>Stock: {storage.stock || 0}</div>
+                                        <div>
+                                          <span className="text-muted-foreground">Stock:</span>
+                                          <div className="font-semibold">
+                                            {storage.price?.stockQuantity || 0}
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
                                   ))}
                                 </div>
                               </div>
                             )}
-
-                          {/* Colors */}
-                          {region.colors && region.colors.length > 0 && (
-                            <div>
-                              <p className="text-sm font-semibold mb-2">
-                                Colors
-                              </p>
-                              <div className="flex flex-wrap gap-3">
-                                {region.colors.map((color) => (
-                                  <div
-                                    key={color.id}
-                                    className="text-center"
-                                  >
-                                    {color.image && (
-                                      <div className="w-12 h-12 mb-1">
-                                        <Image
-                                          src={color.image}
-                                          alt={color.name || "Color"}
-                                          width={48}
-                                          height={48}
-                                          className="object-cover rounded"
-                                        />
-                                      </div>
-                                    )}
-                                    <span className="text-xs">
-                                      {color.name}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
                         </div>
                       ))}
                     </div>
