@@ -142,8 +142,9 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
     }
   }, [selectedStorage])
 
-  const carePlusPrice = carePlusSelected ? Math.round(priceData.discountPrice * 0.08) : 0
-  const totalPrice = priceData.discountPrice + carePlusPrice
+  const selectedPrice = selectedPriceType === 'regular' ? priceData.regularPrice : priceData.discountPrice
+  const carePlusPrice = carePlusSelected ? Math.round(selectedPrice * 0.08) : 0
+  const totalPrice = selectedPrice + carePlusPrice
   const isOutOfStock = !priceData.inStock
 
   // Initialize selections
