@@ -178,4 +178,5 @@ export {
   DialogTitle,
   DialogTrigger,
   VisuallyHiddenTitle,
+  SimpleDialogContent,
 }
