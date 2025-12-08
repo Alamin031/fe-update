@@ -328,10 +328,12 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
           <div className="text-xs text-muted-foreground mb-2">Purchase Points</div>
           <div className="text-sm font-bold">1000 Points</div>
         </div>
-        <div className="bg-muted/50 p-4 rounded-lg text-center">
-          <div className="text-xs text-muted-foreground mb-2">EMI Available</div>
-          <div className="text-sm font-bold">Details</div>
-        </div>
+        {rawProduct?.isEmi && (
+          <div className="bg-muted/50 p-4 rounded-lg text-center">
+            <div className="text-xs text-muted-foreground mb-2">EMI Available</div>
+            <div className="text-sm font-bold">View Options</div>
+          </div>
+        )}
       </div>
 
       {/* Pricing Cards */}
