@@ -188,6 +188,19 @@ export const API_ENDPOINTS = {
   HEROBANNER_UPDATE: '/herobanner/{id}',
   HEROBANNER_DELETE: '/herobanner/{id}',
 
+  HEROBANNER_BOTTOM_CREATE: '/herobanner/bottom',
+  HEROBANNER_BOTTOM_GET_ALL: '/herobanner/bottom',
+  HEROBANNER_BOTTOM_GET_ONE: '/herobanner/bottom/{id}',
+  HEROBANNER_BOTTOM_UPDATE: '/herobanner/bottom/{id}',
+  HEROBANNER_BOTTOM_DELETE: '/herobanner/bottom/{id}',
+
+  // Hero Banner Middle
+  HEROBANNER_MIDDLE_CREATE: '/herobanner/middle',
+  HEROBANNER_MIDDLE_GET_ALL: '/herobanner/middle',
+  HEROBANNER_MIDDLE_GET_ONE: '/herobanner/middle/{id}',
+  HEROBANNER_MIDDLE_UPDATE: '/herobanner/middle/{id}',
+  HEROBANNER_MIDDLE_DELETE: '/herobanner/middle/{id}',
+
   // EMI
   EMI_PLAN_CREATE: '/emi/plan',
   EMI_PLAN_UPDATE: '/emi/plan/{id}',

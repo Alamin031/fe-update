@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { HeroBanner } from "./components/home/hero-banner";
 import { CategorySlider } from "./components/home/category-slider";
 import { categoriesService } from "./lib/api/services/categories";
 import { ProductSection } from "./components/home/product-section";
@@ -11,6 +10,9 @@ import { homecategoriesService } from "./lib/api/services/homecategories";
 import { productsService } from "./lib/api/services/products";
 import type { Product } from "./types";
 import type { Homecategory } from "./lib/api/services/homecategories";
+import { HeroBanner } from "./components/home/hero-banner";
+import { BottomBanner } from "./components/home/bottom-banner";
+import { MiddleBanner } from "./components/home/middel-banner";
 
 export const dynamic = 'force-dynamic';
 
@@ -94,8 +96,29 @@ export default async function Page() {
           </section>
         )}
 
-        {/* Dynamic Homecategory Sections */}
-        {sortedHomecategories.map((hc) => (
+        {/* Dynamic Homecategory Sections (first 2) */}
+        {sortedHomecategories.slice(0, 2).map((hc) => (
+          <section key={hc.id} className="mx-auto w-full max-w-7xl px-4 py-8">
+            <ProductSection
+              title={hc.name}
+              subtitle={hc.description}
+              products={homecategoryProducts[hc.id]}
+              viewAllLink={
+                hc.productIds && hc.productIds.length > 0
+                  ? `/products?homecategory=${hc.id}`
+                  : undefined
+              }
+            />
+          </section>
+        ))}
+
+        {/* Middle Banner after first 2 homecategory sections */}
+        <section className="mx-auto w-full max-w-7xl px-4 py-6">
+          <MiddleBanner />
+        </section>
+
+        {/* Dynamic Homecategory Sections (remaining) */}
+        {sortedHomecategories.slice(2).map((hc) => (
           <section key={hc.id} className="mx-auto w-full max-w-7xl px-4 py-8">
             <ProductSection
               title={hc.name}
@@ -116,6 +139,11 @@ export default async function Page() {
             <BrandSlider brands={brands} />
           </section>
         )}
+
+        {/* Bottom Hero Banner before CTA Section */}
+        <section className="mx-auto w-full max-w-7xl px-4 py-6">
+          <BottomBanner />
+        </section>
 
         {/* Newsletter / CTA Section */}
         <section className="bg-muted">
