@@ -183,53 +183,62 @@ export default async function ProductPage({params}: ProductPageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-        <a href="/" className="hover:text-foreground">
-          Home
-        </a>
-        <span>/</span>
-        {product.category?.name && (
-          <>
-            <a
-              href={`/category/${product.category.slug}`}
-              className="hover:text-foreground">
-              {product.category.name}
-            </a>
-            <span>/</span>
-          </>
-        )}
-        <span className="text-foreground">{product.name}</span>
-      </nav>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
+        {/* Breadcrumb */}
+        <nav className="mb-8 flex items-center gap-2 text-sm text-muted-foreground">
+          <a href="/" className="transition-colors hover:text-foreground">
+            Home
+          </a>
+          <span className="text-muted-foreground/60">/</span>
+          {product.category?.name && (
+            <>
+              <a
+                href={`/category/${product.category.slug}`}
+                className="transition-colors hover:text-foreground">
+                {product.category.name}
+              </a>
+              <span className="text-muted-foreground/60">/</span>
+            </>
+          )}
+          <span className="text-foreground font-medium line-clamp-1">{product.name}</span>
+        </nav>
 
-      {/* Product Details */}
-      <div className="grid gap-8 lg:grid-cols-2">
-        <ProductGallery
-          images={product.images ?? []}
-          name={product.name ?? ''}
-          isEmi={!!apiProductAny.isEmi}
-          isCare={!!apiProductAny.isCare}
-        />
-        <ProductInfoRegion product={product} />
-      </div>
-
-      {/* Product Tabs */}
-      <div className="mt-12">
-        <ProductTabs product={product} />
-      </div>
-
-      {/* Related Products */}
-      {relatedProducts.length > 0 && (
-        <div className="mt-16">
-          <ProductSection
-            title="Related Products"
-            subtitle="You might also like"
-            products={relatedProducts}
-            viewAllLink={`/category/${product.category.slug}`}
-          />
+        {/* Product Details Grid */}
+        <div className="grid gap-8 lg:gap-12 lg:grid-cols-2 mb-12">
+          <div className="flex justify-center">
+            <ProductGallery
+              images={product.images ?? []}
+              name={product.name ?? ''}
+              isEmi={!!apiProductAny.isEmi}
+              isCare={!!apiProductAny.isCare}
+            />
+          </div>
+          <div className="flex items-start">
+            <ProductInfoRegion product={product} />
+          </div>
         </div>
-      )}
+
+        {/* Divider */}
+        <div className="border-t border-border/40 my-12" />
+
+        {/* Product Tabs */}
+        <div className="py-8">
+          <ProductTabs product={product} />
+        </div>
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-16">
+            <ProductSection
+              title="Related Products"
+              subtitle="You might also like"
+              products={relatedProducts}
+              viewAllLink={`/category/${product.category.slug}`}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
