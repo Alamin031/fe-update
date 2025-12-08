@@ -16,6 +16,7 @@ export interface EmiPlan {
   months: number;
   planName: string;
   interestRate: number;
+  bankName?: string;
 }
 
 // Request types

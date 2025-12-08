@@ -14,8 +14,10 @@ import {cn} from "@/app/lib/utils"
 import {CarePlusAddon} from "./care-plus-addon"
 import {NotifyProductDialog} from "./notify-product-dialog"
 import {EmiTable} from "./emi-table"
+import {EmiOptionsModal} from "./emi-options-modal"
 import {CarePlansDisplay} from "./care-plans-display"
 import {careService, type ProductCarePlan} from "@/app/lib/api/services/care"
+import {emiService, type EmiPlan} from "@/app/lib/api/services/emi"
 import type {Product} from "@/app/types"
 import Image from "next/image"
 
@@ -31,9 +33,13 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
   const [quantity, setQuantity] = useState(1)
   const [carePlusSelected, setCarePlusSelected] = useState(false)
   const [notifyDialogOpen, setNotifyDialogOpen] = useState(false)
+  const [emiModalOpen, setEmiModalOpen] = useState(false)
+  const [selectedPriceType, setSelectedPriceType] = useState<'offer' | 'regular'>('offer')
   const [carePlans, setCarePlans] = useState<ProductCarePlan[]>([])
   const [selectedCarePlanId, setSelectedCarePlanId] = useState<string>("")
   const [loadingCarePlans, setLoadingCarePlans] = useState(false)
+  const [emiPlans, setEmiPlans] = useState<EmiPlan[]>([])
+  const [loadingEmiPlans, setLoadingEmiPlans] = useState(false)
 
   // Region-based state
   const [selectedRegionId, setSelectedRegionId] = useState<string>('')
@@ -65,6 +71,26 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
     }
     fetchCarePlans()
   }, [product.id, rawProduct?.isCare])
+
+  // Fetch EMI plans if isEmi is true
+  useEffect(() => {
+    const fetchEmiPlans = async () => {
+      if (rawProduct?.isEmi) {
+        try {
+          setLoadingEmiPlans(true)
+          const plans = await emiService.getPlans()
+          console.log("Fetched EMI plans:", plans)
+          setEmiPlans(plans)
+        } catch (error) {
+          console.error("Error fetching EMI plans:", error)
+          setEmiPlans([])
+        } finally {
+          setLoadingEmiPlans(false)
+        }
+      }
+    }
+    fetchEmiPlans()
+  }, [rawProduct?.isEmi])
 
   const inWishlist = isInWishlist(product.id)
   const inCompare = isInCompare(product.id)
@@ -116,8 +142,9 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
     }
   }, [selectedStorage])
 
-  const carePlusPrice = carePlusSelected ? Math.round(priceData.discountPrice * 0.08) : 0
-  const totalPrice = priceData.discountPrice + carePlusPrice
+  const selectedPrice = selectedPriceType === 'regular' ? priceData.regularPrice : priceData.discountPrice
+  const carePlusPrice = carePlusSelected ? Math.round(selectedPrice * 0.08) : 0
+  const totalPrice = selectedPrice + carePlusPrice
   const isOutOfStock = !priceData.inStock
 
   // Initialize selections
@@ -150,6 +177,7 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
         colorName: selectedColor.name,
         storage: selectedStorage.id,
         storageName: selectedStorage.size,
+        priceType: selectedPriceType,
       })
     }
   }
@@ -329,24 +357,65 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
           <div className="text-sm font-bold">1000 Points</div>
         </div>
         {rawProduct?.isEmi && (
-          <div className="bg-muted/50 p-4 rounded-lg text-center">
+          <button
+            onClick={() => setEmiModalOpen(true)}
+            className="bg-muted/50 p-4 rounded-lg text-center hover:bg-muted transition-colors"
+          >
             <div className="text-xs text-muted-foreground mb-2">EMI Available</div>
-            <div className="text-sm font-bold">View Options</div>
-          </div>
+            <div className="text-sm font-bold text-foreground hover:text-foreground">View Options</div>
+          </button>
         )}
       </div>
 
-      {/* Pricing Cards */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-muted/50 p-4 rounded-lg border border-[oklch(0.8_0.1_45)]">
-          <div className="text-xs text-muted-foreground mb-1">Offer Price</div>
-          <div className="text-xl font-bold text-[oklch(0.55_0.2_25)]">{formatPrice(priceData.discountPrice)}</div>
-          <div className="text-xs text-muted-foreground mt-1">Cash/Card/MFS Payment</div>
-        </div>
-        <div className="bg-muted/50 p-4 rounded-lg border border-border">
-          <div className="text-xs text-muted-foreground mb-1">Regular Price</div>
-          <div className="text-xl font-bold">{formatPrice(priceData.regularPrice)}</div>
-          <div className="text-xs text-muted-foreground mt-1">EMI begin at BDT {Math.round(priceData.regularPrice / 12)}/month</div>
+      {/* Price Selection */}
+      <div className="space-y-3 bg-muted/30 p-4 rounded-lg">
+        <label className="text-sm font-bold uppercase tracking-wide">Select Price Type:</label>
+        <div className="grid grid-cols-2 gap-3">
+          {/* Offer Price Option */}
+          <button
+            onClick={() => setSelectedPriceType('offer')}
+            className={cn(
+              "p-4 rounded-lg border-2 text-left transition-all",
+              selectedPriceType === 'offer'
+                ? "border-[oklch(0.55_0.2_25)] bg-[oklch(0.55_0.2_25)]/5"
+                : "border-border hover:border-border/70",
+            )}
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="text-xs text-muted-foreground font-medium">Offer Price</div>
+              <input
+                type="radio"
+                checked={selectedPriceType === 'offer'}
+                onChange={() => setSelectedPriceType('offer')}
+                className="cursor-pointer"
+              />
+            </div>
+            <div className="text-xl font-bold text-[oklch(0.55_0.2_25)]">{formatPrice(priceData.discountPrice)}</div>
+            <div className="text-xs text-muted-foreground mt-2">Cash/Card/MFS Payment</div>
+          </button>
+
+          {/* Regular Price Option */}
+          <button
+            onClick={() => setSelectedPriceType('regular')}
+            className={cn(
+              "p-4 rounded-lg border-2 text-left transition-all",
+              selectedPriceType === 'regular'
+                ? "border-foreground bg-foreground/5"
+                : "border-border hover:border-border/70",
+            )}
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="text-xs text-muted-foreground font-medium">Regular Price</div>
+              <input
+                type="radio"
+                checked={selectedPriceType === 'regular'}
+                onChange={() => setSelectedPriceType('regular')}
+                className="cursor-pointer"
+              />
+            </div>
+            <div className="text-xl font-bold">{formatPrice(priceData.regularPrice)}</div>
+            <div className="text-xs text-muted-foreground mt-2">EMI begin at BDT {Math.round(priceData.regularPrice / 12)}/month</div>
+          </button>
         </div>
       </div>
 
@@ -416,16 +485,13 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
 
       <Separator className="my-4" />
 
-      {/* EMI Payment Table */}
-      {rawProduct?.isEmi && (
-        <div className="space-y-3 bg-muted/30 p-4 rounded-lg">
-          <h3 className="font-semibold flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
-            EMI Payment Options
-          </h3>
-          <EmiTable price={priceData.discountPrice} />
-        </div>
-      )}
+      {/* EMI Options Modal Trigger */}
+      <EmiOptionsModal
+        open={emiModalOpen}
+        onOpenChange={setEmiModalOpen}
+        plans={emiPlans}
+        price={priceData.regularPrice}
+      />
 
       {/* Care Plans */}
       {rawProduct?.isCare && (

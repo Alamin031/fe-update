@@ -144,6 +144,21 @@ export function getProductDisplayPrice(product: any): number {
 }
 
 /**
+ * Get product price based on selected price type from selectedVariants
+ * Used for cart items where user selected offer or regular price
+ */
+export function getProductPriceWithType(product: any, selectedVariants?: Record<string, string>): number {
+  const priceData = getDefaultProductPrice(product);
+  const priceType = selectedVariants?.priceType;
+
+  if (priceType === 'regular') {
+    return priceData.regularPrice;
+  }
+
+  return priceData.discountPrice;
+}
+
+/**
  * Check if product is out of stock
  */
 export function isProductOutOfStock(product: any): boolean {
