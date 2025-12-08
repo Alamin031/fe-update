@@ -3,7 +3,7 @@
 import type {Metadata} from 'next';
 import {productsService} from '../../../lib/api/services/products';
 import {ProductGallery} from '../../../components/product/product-gallery';
-import {ProductInfo} from '../../../components/product/product-info';
+import {ProductInfoRegion} from '../../../components/product/product-info-region';
 import {ProductTabs} from '../../../components/product/product-tabs';
 import {ProductSection} from '../../../components/home/product-section';
 import type {Product} from '../../../types';
@@ -19,7 +19,10 @@ export async function generateMetadata({
   try {
     const {slug} = await params;
     const product = await productsService.getBySlug(slug);
-    console.log('Fetched product for metadata:', product); // DEBUG
+
+    const images = product.images && Array.isArray(product.images)
+      ? product.images.map((img: any) => img.url || img)
+      : [];
 
     return {
       title: product.name,
@@ -27,11 +30,7 @@ export async function generateMetadata({
       openGraph: {
         title: product.name,
         description: product.description,
-        images: Array.isArray(product.image)
-          ? product.image
-          : product.image
-          ? [product.image]
-          : [],
+        images: images.slice(0, 3),
       },
     };
   } catch {
@@ -42,14 +41,17 @@ export async function generateMetadata({
   }
 }
 
-
 export default async function ProductPage({params}: ProductPageProps) {
   const {slug} = await params;
-  const apiProduct = await productsService.getBySlug(slug);
 
-  const category = apiProduct.category;
+  let apiProduct;
+  try {
+    apiProduct = await productsService.getBySlug(slug);
+  } catch (error) {
+    console.error('Product fetch error:', error);
+    notFound();
+  }
 
-  // Allow page to render even without category data - fallback values will be used
   if (!apiProduct || !apiProduct.slug || !apiProduct.name) {
     notFound();
   }
@@ -62,33 +64,43 @@ export default async function ProductPage({params}: ProductPageProps) {
     }
   };
 
-  // Map API product to local Product type
+  // Extract images from the new API format
+  const images = (() => {
+    if (apiProduct.images && Array.isArray(apiProduct.images)) {
+      return apiProduct.images.map((img: any) => img.url || img);
+    }
+    return [];
+  })();
+
+  // Extract specifications
+  const specifications = (() => {
+    if (apiProduct.specifications && Array.isArray(apiProduct.specifications)) {
+      return Object.fromEntries(apiProduct.specifications.map((s: any) => [s.key, s.value]));
+    }
+    if (typeof apiProduct.specifications === 'object' && apiProduct.specifications !== null) {
+      return apiProduct.specifications;
+    }
+    return {};
+  })();
+
+  // Get category from categories array
+  const category = apiProduct.categories?.[0] || apiProduct.category;
+
   const product: Product = {
     id: apiProduct.id,
     name: apiProduct.name ?? '',
     slug: apiProduct.slug ?? '',
     description: apiProduct.description ?? '',
     price: Number(apiProduct.price) || 0,
-    images: Array.isArray(apiProduct.image)
-      ? apiProduct.image
-      : parseJSON(apiProduct.image, []),
+    images: images,
     category: category
       ? {...category, slug: category.slug ?? ''}
       : {id: '', name: '', slug: '', createdAt: '', updatedAt: ''},
-    brand: apiProduct.brand ?? {id: '', name: '', slug: '', logo: ''},
+    brand: apiProduct.brands?.[0] || apiProduct.brand || {id: '', name: '', slug: '', logo: ''},
     variants: parseJSON(apiProduct.variants, []),
     highlights: parseJSON(apiProduct.highlights, []),
-    specifications: (() => {
-      const parsed = parseJSON(apiProduct.specifications, []);
-      if (Array.isArray(parsed)) {
-        return Object.fromEntries(parsed.map((s: any) => [s.key, s.value]));
-      }
-      if (typeof parsed === 'object' && parsed !== null) {
-        return parsed;
-      }
-      return {};
-    })(),
-    stock: Number(apiProduct.stock) || 0,
+    specifications: specifications,
+    stock: Number(apiProduct.stock) || Number(apiProduct.totalStock) || 0,
     sku: apiProduct.sku ?? '',
     warranty: apiProduct.warranty ?? '',
     rating: Number(apiProduct.rating) || 0,
@@ -99,11 +111,15 @@ export default async function ProductPage({params}: ProductPageProps) {
     updatedAt: apiProduct.updatedAt ?? '',
   };
 
+  // Attach raw API product for region-based rendering
+  (product as any).rawProduct = apiProduct;
+  (product as any).productType = apiProduct.productType;
+
   let relatedProducts: Product[] = [];
   try {
-    if (product.category?.id) {
+    if (category?.id) {
       const response = await productsService.getAll(
-        {categoryId: product.category.id},
+        {categoryId: category.id},
         1,
         10,
       );
@@ -115,7 +131,7 @@ export default async function ProductPage({params}: ProductPageProps) {
           slug: p.slug ?? '',
           description: p.description ?? '',
           price: typeof p.price === 'number' ? p.price : 0,
-          images: Array.isArray(p.image) ? p.image : [],
+          images: Array.isArray(p.images) ? p.images.map((img: any) => img.url || img) : Array.isArray(p.image) ? p.image : [],
           category: p.category
             ? {
                 ...p.category,
@@ -169,12 +185,16 @@ export default async function ProductPage({params}: ProductPageProps) {
           Home
         </a>
         <span>/</span>
-        <a
-          href={`/category/${product.category.slug}`}
-          className="hover:text-foreground">
-          {product.category.name}
-        </a>
-        <span>/</span>
+        {product.category?.name && (
+          <>
+            <a
+              href={`/category/${product.category.slug}`}
+              className="hover:text-foreground">
+              {product.category.name}
+            </a>
+            <span>/</span>
+          </>
+        )}
         <span className="text-foreground">{product.name}</span>
       </nav>
 
@@ -184,7 +204,7 @@ export default async function ProductPage({params}: ProductPageProps) {
           images={product.images ?? []}
           name={product.name ?? ''}
         />
-        <ProductInfo product={product} />
+        <ProductInfoRegion product={product} />
       </div>
 
       {/* Product Tabs */}
