@@ -1,6 +1,6 @@
 "use client"
 
-import {useState, useMemo} from "react"
+import {useState, useMemo, useEffect} from "react"
 import {useRouter} from "next/navigation"
 import {Heart, BarChart3, ShoppingCart, Share2, Shield, Truck, RotateCcw, Check, AlertCircle, ChevronDown} from "lucide-react"
 import {Button} from "../ui/button"
@@ -13,6 +13,9 @@ import {formatPrice} from "@/app/lib/utils/format"
 import {cn} from "@/app/lib/utils"
 import {CarePlusAddon} from "./care-plus-addon"
 import {NotifyProductDialog} from "./notify-product-dialog"
+import {EmiTable} from "./emi-table"
+import {CarePlansDisplay} from "./care-plans-display"
+import {careService, type ProductCarePlan} from "@/app/lib/api/services/care"
 import type {Product} from "@/app/types"
 import Image from "next/image"
 
@@ -28,6 +31,9 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
   const [quantity, setQuantity] = useState(1)
   const [carePlusSelected, setCarePlusSelected] = useState(false)
   const [notifyDialogOpen, setNotifyDialogOpen] = useState(false)
+  const [carePlans, setCarePlans] = useState<ProductCarePlan[]>([])
+  const [selectedCarePlanId, setSelectedCarePlanId] = useState<string>("")
+  const [loadingCarePlans, setLoadingCarePlans] = useState(false)
 
   // Region-based state
   const [selectedRegionId, setSelectedRegionId] = useState<string>('')
@@ -38,6 +44,27 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
   const addToCart = useCartStore((state) => state.addItem)
   const {addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist} = useWishlistStore()
   const {addItem: addToCompare, isInCompare} = useCompareStore()
+
+  // Fetch care plans if isCare is true
+  useEffect(() => {
+    const fetchCarePlans = async () => {
+      if (rawProduct?.isCare && product.id) {
+        try {
+          setLoadingCarePlans(true)
+          const plans = await careService.getByProduct(product.id)
+          setCarePlans(plans)
+          if (plans.length > 0) {
+            setSelectedCarePlanId(plans[0].id)
+          }
+        } catch (error) {
+          console.error("Error fetching care plans:", error)
+        } finally {
+          setLoadingCarePlans(false)
+        }
+      }
+    }
+    fetchCarePlans()
+  }, [product.id, rawProduct?.isCare])
 
   const inWishlist = isInWishlist(product.id)
   const inCompare = isInCompare(product.id)
@@ -301,10 +328,12 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
           <div className="text-xs text-muted-foreground mb-2">Purchase Points</div>
           <div className="text-sm font-bold">1000 Points</div>
         </div>
-        <div className="bg-muted/50 p-4 rounded-lg text-center">
-          <div className="text-xs text-muted-foreground mb-2">EMI Available</div>
-          <div className="text-sm font-bold">Details</div>
-        </div>
+        {rawProduct?.isEmi && (
+          <div className="bg-muted/50 p-4 rounded-lg text-center">
+            <div className="text-xs text-muted-foreground mb-2">EMI Available</div>
+            <div className="text-sm font-bold">View Options</div>
+          </div>
+        )}
       </div>
 
       {/* Pricing Cards */}
@@ -384,6 +413,36 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
           Notify About Product
         </Button>
       </div>
+
+      <Separator className="my-4" />
+
+      {/* EMI Payment Table */}
+      {rawProduct?.isEmi && (
+        <div className="space-y-3 bg-muted/30 p-4 rounded-lg">
+          <h3 className="font-semibold flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            EMI Payment Options
+          </h3>
+          <EmiTable price={priceData.discountPrice} />
+        </div>
+      )}
+
+      {/* Care Plans */}
+      {rawProduct?.isCare && (
+        <div className="space-y-3 bg-muted/30 p-4 rounded-lg">
+          {loadingCarePlans ? (
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground">Loading care plans...</p>
+            </div>
+          ) : (
+            <CarePlansDisplay
+              carePlans={carePlans}
+              selectedPlanId={selectedCarePlanId}
+              onSelectPlan={setSelectedCarePlanId}
+            />
+          )}
+        </div>
+      )}
 
       <Separator className="my-4" />
 

@@ -206,6 +206,8 @@ export interface Product {
   plugs?: string[];
   video?: string;
   emiAvailable?: boolean;
+  isEmi?: boolean;
+  isCare?: boolean;
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string[];
