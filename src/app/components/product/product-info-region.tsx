@@ -1,6 +1,6 @@
 "use client"
 
-import {useState, useMemo} from "react"
+import {useState, useMemo, useEffect} from "react"
 import {useRouter} from "next/navigation"
 import {Heart, BarChart3, ShoppingCart, Share2, Shield, Truck, RotateCcw, Check, AlertCircle, ChevronDown} from "lucide-react"
 import {Button} from "../ui/button"
@@ -13,6 +13,9 @@ import {formatPrice} from "@/app/lib/utils/format"
 import {cn} from "@/app/lib/utils"
 import {CarePlusAddon} from "./care-plus-addon"
 import {NotifyProductDialog} from "./notify-product-dialog"
+import {EmiTable} from "./emi-table"
+import {CarePlansDisplay} from "./care-plans-display"
+import {careService, type ProductCarePlan} from "@/app/lib/api/services/care"
 import type {Product} from "@/app/types"
 import Image from "next/image"
 
