@@ -35,6 +35,7 @@ export const productsService = {
       params: {
         offset,
         limit,
+        includeRelations: 'true', // Include nested regions, networks, directColors
         ...filters,
       },
     })

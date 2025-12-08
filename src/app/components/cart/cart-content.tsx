@@ -7,6 +7,7 @@ import { Button } from "../ui/button"
 import { Separator } from "../ui/separator"
 import { formatPrice } from "@/app/lib/utils/format"
 import { useCartStore } from "@/app/store/cart-store"
+import { getProductDisplayPrice } from "@/app/lib/utils/product"
 
 export function CartContent() {
   const { items, removeItem, updateQuantity, getTotal } = useCartStore()
@@ -100,7 +101,7 @@ export function CartContent() {
                       <Plus className="h-4 w-4" />
                     </button>
                   </div>
-                  <p className="font-semibold">{formatPrice(item.product.price * item.quantity)}</p>
+                  <p className="font-semibold">{formatPrice(getProductDisplayPrice(item.product) * item.quantity)}</p>
                 </div>
               </div>
             </div>

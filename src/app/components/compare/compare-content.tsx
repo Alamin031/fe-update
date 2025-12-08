@@ -8,6 +8,7 @@ import { Button } from "../ui/button"
 import { useCompareStore } from "@/app/store/compare-store"
 import { formatPrice } from "@/app/lib/utils/format"
 import { useCartStore } from "@/app/store/cart-store"
+import { getDefaultProductPrice } from "@/app/lib/utils/product"
 
 export function CompareContent() {
   const { items, removeItem, clearCompare } = useCompareStore()
@@ -102,14 +103,13 @@ export function CompareContent() {
             {/* Price Section */}
             <div className="border-b border-border p-4">
               {(() => {
-                const regularPrice = product.basePrice || (product as any).regularPrice || product.price || 0;
-                const salePrice = product.discountPrice || product.price || regularPrice;
+                const priceInfo = getDefaultProductPrice(product);
                 return (
                   <>
-                    <p className="text-center text-lg font-bold">{formatPrice(salePrice)}</p>
-                    {regularPrice > 0 && salePrice < regularPrice && (
+                    <p className="text-center text-lg font-bold">{formatPrice(priceInfo.discountPrice)}</p>
+                    {priceInfo.hasDiscount && (
                       <p className="text-center text-xs text-muted-foreground line-through">
-                        {formatPrice(regularPrice)}
+                        {formatPrice(priceInfo.regularPrice)}
                       </p>
                     )}
                   </>

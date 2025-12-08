@@ -13,10 +13,10 @@ import { useWishlistStore } from "@/app/store/wishlist-store";
 import { useCompareStore } from "@/app/store/compare-store";
 import {
   formatPrice,
-  calculateDiscount,
 } from "@/app/lib/utils/format";
 import { cn } from "@/app/lib/utils";
 import { Product } from "@/app/types";
+import { getDefaultProductPrice } from "@/app/lib/utils/product";
 
 interface ProductCardProps {
   product: Product;
@@ -42,15 +42,13 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const inWishlist = isInWishlist(product.id);
   const inCompare = isInCompare(product.id);
 
-  // Handle multiple price field possibilities from API
-  // Priority: discountPrice (sale) > price, regularPrice (base)
-  const regularPrice = product.basePrice || (product as any).regularPrice || product.price || 0;
-  const salePrice = product.discountPrice || product.price || regularPrice;
-  const hasDiscount = regularPrice > 0 && salePrice > 0 && salePrice < regularPrice;
-  const discount = hasDiscount
-    ? calculateDiscount(regularPrice, salePrice)
-    : product.discountPercent || 0;
-  const isOutOfStock = (product.stock || 0) === 0;
+  // Extract default variant prices based on product type
+  const priceInfo = getDefaultProductPrice(product);
+  const regularPrice = priceInfo.regularPrice;
+  const salePrice = priceInfo.discountPrice;
+  const hasDiscount = priceInfo.hasDiscount;
+  const discount = priceInfo.discount;
+  const isOutOfStock = priceInfo.stockQuantity === 0;
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();

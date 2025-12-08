@@ -9,6 +9,7 @@ import { useWishlistStore } from "../../../store/wishlist-store"
 import { useCartStore } from "../../../store/cart-store"
 import { formatPrice } from "../../../lib/utils/format"
 import { withProtectedRoute } from "../../../lib/auth/protected-route"
+import { getDefaultProductPrice } from "../../../lib/utils/product"
 
 function WishlistPage() {
   const { items, removeItem, clearWishlist } = useWishlistStore()
@@ -73,14 +74,13 @@ function WishlistPage() {
                   </Link>
                   <div className="mt-2 flex items-center gap-2">
                     {(() => {
-                      const regularPrice = item.basePrice || (item as any).regularPrice || item.price || 0;
-                      const salePrice = item.discountPrice || item.price || regularPrice;
+                      const priceInfo = getDefaultProductPrice(item);
                       return (
                         <>
-                          <span className="text-lg font-bold">{formatPrice(salePrice)}</span>
-                          {regularPrice > 0 && salePrice < regularPrice && (
+                          <span className="text-lg font-bold">{formatPrice(priceInfo.discountPrice)}</span>
+                          {priceInfo.hasDiscount && (
                             <span className="text-sm text-muted-foreground line-through">
-                              {formatPrice(regularPrice)}
+                              {formatPrice(priceInfo.regularPrice)}
                             </span>
                           )}
                         </>

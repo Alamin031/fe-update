@@ -190,9 +190,24 @@ export function EditProductModal({
         n.id === networkId
           ? {
               ...n,
-              defaultStorages: n.defaultStorages.map((s: any) =>
-                s.id === storageId ? {...s, [field]: value} : s
-              ),
+              defaultStorages: n.defaultStorages.map((s: any) => {
+                if (s.id === storageId) {
+                  const updated = {...s, [field]: value};
+                  
+                  // Auto-calculate discount price when discount percent or regular price changes
+                  if (field === 'discountPercent' || field === 'regularPrice') {
+                    const regularPrice = field === 'regularPrice' ? Number(value) : Number(s.regularPrice);
+                    const discountPercent = field === 'discountPercent' ? Number(value) : Number(s.discountPercent);
+                    
+                    if (regularPrice > 0 && discountPercent > 0) {
+                      updated.discountPrice = Math.round(regularPrice - (regularPrice * discountPercent / 100)).toString();
+                    }
+                  }
+                  
+                  return updated;
+                }
+                return s;
+              }),
             }
           : n
       )
@@ -362,9 +377,25 @@ export function EditProductModal({
                 c.id === colorId
                   ? {
                       ...c,
-                      storages: c.storages.map((s: any) =>
-                        s.id === storageId ? {...s, [field]: value} : s
-                      ),
+                      storages: c.storages.map((s: any) => {
+                        if (s.id === storageId) {
+                          const updated = {...s, [field]: value};
+                          
+                          // Auto-calculate discount price when discount percent or regular price changes
+                          if (field === 'discountPercent' || field === 'regularPrice') {
+                            const regularPrice = field === 'regularPrice' ? Number(value) : Number(s.regularPrice);
+                            const discountPercent = field === 'discountPercent' ? Number(value) : Number(s.discountPercent);
+                            
+                            if (regularPrice > 0 && discountPercent > 0) {
+                              const discountPrice = Math.round(regularPrice - (regularPrice * discountPercent / 100));
+                              updated.discountPrice = discountPrice.toString();
+                            }
+                          }
+                          
+                          return updated;
+                        }
+                        return s;
+                      }),
                     }
                   : c
               ),
@@ -438,9 +469,24 @@ export function EditProductModal({
         r.id === regionId
           ? {
               ...r,
-              defaultStorages: r.defaultStorages.map((s: any) =>
-                s.id === storageId ? {...s, [field]: value} : s
-              ),
+              defaultStorages: r.defaultStorages.map((s: any) => {
+                if (s.id === storageId) {
+                  const updated = {...s, [field]: value};
+                  
+                  // Auto-calculate discount price when discount percent or regular price changes
+                  if (field === 'discountPercent' || field === 'regularPrice') {
+                    const regularPrice = field === 'regularPrice' ? Number(value) : Number(s.regularPrice);
+                    const discountPercent = field === 'discountPercent' ? Number(value) : Number(s.discountPercent);
+                    
+                    if (regularPrice > 0 && discountPercent > 0) {
+                      updated.discountPrice = Math.round(regularPrice - (regularPrice * discountPercent / 100)).toString();
+                    }
+                  }
+                  
+                  return updated;
+                }
+                return s;
+              }),
             }
           : r
       )
@@ -610,9 +656,25 @@ export function EditProductModal({
                 c.id === colorId
                   ? {
                       ...c,
-                      storages: c.storages.map((s: any) =>
-                        s.id === storageId ? {...s, [field]: value} : s
-                      ),
+                      storages: c.storages.map((s: any) => {
+                        if (s.id === storageId) {
+                          const updated = {...s, [field]: value};
+                          
+                          // Auto-calculate discount price when discount percent or regular price changes
+                          if (field === 'discountPercent' || field === 'regularPrice') {
+                            const regularPrice = field === 'regularPrice' ? Number(value) : Number(s.regularPrice);
+                            const discountPercent = field === 'discountPercent' ? Number(value) : Number(s.discountPercent);
+                            
+                            if (regularPrice > 0 && discountPercent > 0) {
+                              const discountPrice = Math.round(regularPrice - (regularPrice * discountPercent / 100));
+                              updated.discountPrice = discountPrice.toString();
+                            }
+                          }
+                          
+                          return updated;
+                        }
+                        return s;
+                      }),
                     }
                   : c
               ),
@@ -896,7 +958,24 @@ export function EditProductModal({
   };
 
   const updateBasicColor = (colorId: string, field: string, value: any) => {
-    setBasicColors(prev => prev.map(c => (c.id === colorId ? {...c, [field]: value} : c)));
+    setBasicColors(prev => prev.map(c => {
+      if (c.id === colorId) {
+        const updated = {...c, [field]: value};
+        
+        // Auto-calculate discount price when discount percent or regular price changes
+        if (field === 'discountPercent' || field === 'regularPrice') {
+          const regularPrice = field === 'regularPrice' ? Number(value) : Number(c.regularPrice);
+          const discountPercent = field === 'discountPercent' ? Number(value) : Number(c.discountPercent);
+          
+          if (regularPrice > 0 && discountPercent > 0) {
+            updated.discountPrice = Math.round(regularPrice - (regularPrice * discountPercent / 100)).toString();
+          }
+        }
+        
+        return updated;
+      }
+      return c;
+    }));
   };
 
   const handleBasicColorImageUpload = (colorId: string, e: React.ChangeEvent<HTMLInputElement>) => {

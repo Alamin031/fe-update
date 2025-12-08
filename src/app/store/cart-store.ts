@@ -1,6 +1,8 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { CartItem, Product } from "../types"
+import { getProductDisplayPrice } from "../lib/utils/product"
+
 interface CartStore {
   items: CartItem[]
   addItem: (product: Product, quantity?: number, variants?: Record<string, string>) => void
@@ -49,7 +51,7 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => set({ items: [] }),
 
       getTotal: () => {
-        return get().items.reduce((total, item) => total + item.product.price * item.quantity, 0)
+        return get().items.reduce((total, item) => total + getProductDisplayPrice(item.product) * item.quantity, 0)
       },
 
       getItemCount: () => {

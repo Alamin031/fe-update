@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { ProductCard } from "../product/product-card";
 import { Product } from "@/app/types";
 import { cn } from "@/app/lib/utils";
+import { getProductDisplayPrice } from "@/app/lib/utils/product";
 
 interface CategoryProductsProps {
   products: Product[];
@@ -35,9 +36,9 @@ export function CategoryProducts({ products }: CategoryProductsProps) {
   const sortedProducts = [...products].sort((a, b) => {
     switch (sortBy) {
       case "price-low":
-        return (a.price ?? 0) - (b.price ?? 0);
+        return getProductDisplayPrice(a) - getProductDisplayPrice(b);
       case "price-high":
-        return (b.price ?? 0) - (a.price ?? 0);
+        return getProductDisplayPrice(b) - getProductDisplayPrice(a);
       case "popular":
         return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
       default:
