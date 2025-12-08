@@ -35,6 +35,8 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
   const [carePlans, setCarePlans] = useState<ProductCarePlan[]>([])
   const [selectedCarePlanId, setSelectedCarePlanId] = useState<string>("")
   const [loadingCarePlans, setLoadingCarePlans] = useState(false)
+  const [emiPlans, setEmiPlans] = useState<EmiPlan[]>([])
+  const [loadingEmiPlans, setLoadingEmiPlans] = useState(false)
 
   // Region-based state
   const [selectedRegionId, setSelectedRegionId] = useState<string>('')
