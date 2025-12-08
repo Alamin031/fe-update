@@ -278,9 +278,13 @@ export function Navbar() {
                   <span className="sr-only">Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] p-0">
-                <div className="flex h-full flex-col">
-                  <div className="flex items-center justify-between border-b border-border p-4">
+              <SheetContent side="right" className="w-full max-w-xs p-0 sm:max-w-sm">
+                {/* Visually hidden DialogTitle for accessibility */}
+                <span style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', border: 0 }} id="mobile-menu-title">
+                  Categories
+                </span>
+                <div className="flex h-full flex-col" aria-labelledby="mobile-menu-title">
+                  <div className="flex items-center justify-between border-b border-border p-4 bg-background sticky top-0 z-10">
                     <span className="text-lg font-semibold">Categories</span>
                     <SheetClose asChild>
                       <Button variant="ghost" size="icon">
@@ -288,25 +292,25 @@ export function Navbar() {
                       </Button>
                     </SheetClose>
                   </div>
-                  <nav className="flex-1 overflow-y-auto p-4">
-                    <div className="space-y-1">
+                  <nav className="flex-1 overflow-y-auto p-4 pb-0">
+                    <div className="space-y-2">
                       {categories.map((category) => (
                         <SheetClose key={category.slug} asChild>
                           <Link
                             href={`/category/${category.slug}`}
-                            className="block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                            className="block rounded-md px-4 py-3 text-base font-medium transition-colors hover:bg-accent active:bg-accent/70"
                           >
                             {category.name}
                           </Link>
                         </SheetClose>
                       ))}
                     </div>
-                    <div className="mt-6 border-t border-border pt-6">
-                      <div className="space-y-1">
+                    <div className="mt-8 border-t border-border pt-6">
+                      <div className="space-y-2">
                         <SheetClose asChild>
                           <Link
                             href="/wishlist"
-                            className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                            className="flex items-center justify-between rounded-md px-4 py-3 text-base font-medium transition-colors hover:bg-accent active:bg-accent/70"
                           >
                             Wishlist
                             {isHydrated && wishlistCount > 0 && <Badge variant="secondary">{wishlistCount}</Badge>}
@@ -315,7 +319,7 @@ export function Navbar() {
                         <SheetClose asChild>
                           <Link
                             href="/compare"
-                            className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                            className="flex items-center justify-between rounded-md px-4 py-3 text-base font-medium transition-colors hover:bg-accent active:bg-accent/70"
                           >
                             Compare
                             {isHydrated && compareCount > 0 && <Badge variant="secondary">{compareCount}</Badge>}
@@ -324,7 +328,7 @@ export function Navbar() {
                         <SheetClose asChild>
                           <Link
                             href="/track-order"
-                            className="block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                            className="block rounded-md px-4 py-3 text-base font-medium transition-colors hover:bg-accent active:bg-accent/70"
                           >
                             Track Order
                           </Link>
@@ -332,7 +336,7 @@ export function Navbar() {
                       </div>
                     </div>
                   </nav>
-                  <div className="border-t border-border p-4">
+                  <div className="border-t border-border p-4 bg-background sticky bottom-0 z-10">
                     {isAuthenticated ? (
                       <div className="space-y-2">
                         {user?.role !== "admin" && (
