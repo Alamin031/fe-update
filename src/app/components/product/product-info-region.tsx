@@ -192,16 +192,17 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
 
   // Price and stock calculation
   const priceData = useMemo(() => {
-    // For basic products, get price from selected color
     let regular = 0;
     let discount = 0;
     let stock = 0;
 
-    if (selectedColor && typeof selectedColor.regularPrice !== 'undefined') {
+    // Check if color has its own price data (not null and greater than 0)
+    if (selectedColor && selectedColor.regularPrice && selectedColor.regularPrice > 0) {
       regular = Number(selectedColor.regularPrice) || 0;
       discount = Number(selectedColor.discountPrice) || 0;
       stock = Number(selectedColor.stockQuantity) || 0;
     } else if (selectedStorage?.price) {
+      // Use storage price as fallback
       const price = selectedStorage.price;
       regular = Number(price.regular || price.regularPrice) || 0;
       discount = Number(price.discount || price.discountPrice || price.final) || 0;
