@@ -23,7 +23,29 @@ const PAGE_SIZE = 20
 export function ProductsListClient({
   initialProducts = [],
   totalProducts = 0,
+  selectedCategories = [],
+  selectedBrands = [],
+  allProducts = [],
 }: ProductsListClientProps) {
+  // Filter products based on selected categories and brands
+  const filteredProducts = useMemo(() => {
+    let filtered = allProducts.length > 0 ? allProducts : initialProducts
+
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((product) =>
+        selectedCategories.includes(product.category?.slug)
+      )
+    }
+
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter((product) =>
+        selectedBrands.includes(product.brand?.slug)
+      )
+    }
+
+    return filtered
+  }, [allProducts, initialProducts, selectedCategories, selectedBrands])
+
   const {
     currentPage,
     totalPages,
@@ -36,7 +58,7 @@ export function ProductsListClient({
     hasPrevPage,
   } = usePagination({
     pageSize: PAGE_SIZE,
-    totalItems: totalProducts,
+    totalItems: filteredProducts.length,
   })
 
   // Generate cache key based on current page
@@ -66,15 +88,12 @@ export function ProductsListClient({
     if (paginatedData?.data && paginatedData.data.length > 0) {
       return paginatedData.data.map(mapToAppProduct)
     }
-    return currentPage === 1 ? initialProducts.map(mapToAppProduct) : []
-  }, [paginatedData, initialProducts, currentPage])
+    return currentPage === 1 ? filteredProducts.map(mapToAppProduct) : []
+  }, [paginatedData, filteredProducts, currentPage])
 
   const displayTotalProducts = useMemo(() => {
-    if (paginatedData?.pagination?.total) {
-      return paginatedData.pagination.total
-    }
-    return totalProducts
-  }, [paginatedData, totalProducts])
+    return filteredProducts.length
+  }, [filteredProducts])
 
   const displayTotalPages = useMemo(() => {
     if (displayTotalProducts > 0) {
