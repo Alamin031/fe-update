@@ -22,11 +22,11 @@ export default function AuthLayout({
               <Image src="/image/logo.png" alt="Friend's Telecom" width={200} height={60} className="object-contain" />
             </Link>
             <div className="relative mb-8 aspect-square overflow-hidden rounded-2xl">
-              <Image src="/placeholder.svg?key=d4k9p" alt="Shopping illustration" fill className="object-cover" />
+              <Image src="/image/design.png" alt="Shopping illustration" fill className="object-cover" />
             </div>
-            <h2 className="mb-4 text-2xl font-bold">Shop the Latest Tech</h2>
+            <h2 className="mb-4 text-2xl font-bold">Buy the Latest Tech</h2>
             <p className="text-muted-foreground">
-              Get access to exclusive deals, track orders, and manage your wishlist.
+              Your trusted destination for Apple products and mobile devices in Dhaka.
             </p>
           </div>
         </div>
