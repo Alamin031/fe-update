@@ -56,6 +56,7 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
   const [loadingCarePlans, setLoadingCarePlans] = useState(false)
   const [emiPlans, setEmiPlans] = useState<EmiPlan[]>([])
   const [loadingEmiPlans, setLoadingEmiPlans] = useState(false)
+  const [isHydrated, setIsHydrated] = useState(false)
 
   // Region-based state
   const [selectedRegionId, setSelectedRegionId] = useState<string>('')
