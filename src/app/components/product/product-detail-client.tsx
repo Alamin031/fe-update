@@ -22,8 +22,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   // Determine if this is a network product
   const isNetworkProduct = rawProduct?.productType === "network"
+  const isBasicProduct = rawProduct?.productType === "basic"
+
   const networks = isNetworkProduct ? (rawProduct?.networks || []) : []
-  const regions = isNetworkProduct
+  let regions = isNetworkProduct
     ? networks.map((n: any) => ({
         id: n.id,
         name: n.networkType,
@@ -31,6 +33,34 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         defaultStorages: n.defaultStorages || [],
       }))
     : (rawProduct?.regions || [])
+
+  // For basic products, convert directColors to a default region structure
+  if (isBasicProduct && (!regions || regions.length === 0) && rawProduct?.directColors) {
+    regions = [{
+      id: "default",
+      name: "Default",
+      colors: rawProduct.directColors.map((color: any) => ({
+        id: color.id,
+        name: color.colorName,
+        colorName: color.colorName,
+        colorImage: color.colorImage,
+        image: color.colorImage,
+        regularPrice: color.regularPrice,
+        discountPrice: color.discountPrice,
+        stockQuantity: color.stockQuantity,
+      })),
+      defaultStorages: [{
+        id: "default-storage",
+        size: "Standard",
+        storageSize: "Standard",
+        price: {
+          regularPrice: rawProduct.directColors[0]?.regularPrice || 0,
+          discountPrice: rawProduct.directColors[0]?.discountPrice || 0,
+          stockQuantity: rawProduct.directColors[0]?.stockQuantity || 0,
+        }
+      }]
+    }]
+  }
 
   // Get first region and first color image
   useEffect(() => {
