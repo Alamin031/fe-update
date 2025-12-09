@@ -161,7 +161,7 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
     const price = selectedStorage.price
     const regular = Number(price.regular || price.regularPrice) || 0
     const discount = Number(price.discount || price.discountPrice || price.final) || 0
-    const stock = Number(selectedStorage.stock) || 0
+    const stock = Number(price.stockQuantity || selectedStorage.stock) || 0
 
     const hasDiscount = regular > 0 && discount > 0 && discount < regular
     const discountPercent = hasDiscount ? Math.round(((regular - discount) / regular) * 100) : 0
