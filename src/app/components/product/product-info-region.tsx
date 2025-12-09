@@ -25,14 +25,14 @@ import Image from "next/image"
 type Region = {
   id: string;
   name: string;
-  colors?: Array<{id: string; name: string; image?: string}>;
-  defaultStorages?: Array<{id: string; size: string; price: any; stock?: number}>;
+  colors?: Array<{id: string; name?: string; colorName?: string; image?: string; colorImage?: string; regularPrice?: number; discountPrice?: number; stockQuantity?: number}>;
+  defaultStorages?: Array<{id: string; size: string; storageSize?: string; price: any; stock?: number}>;
 };
 
 type Network = {
   id: string;
   networkType: string;
-  colors?: Array<{id: string; colorName: string; colorImage?: string}>;
+  colors?: Array<{id: string; colorName: string; colorImage?: string; regularPrice?: number; discountPrice?: number; stockQuantity?: number}>;
   defaultStorages?: Array<{id: string; storageSize: string; price: any; stock?: number}>;
 };
 
