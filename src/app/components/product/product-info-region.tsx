@@ -375,7 +375,7 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
       )}
 
       {/* Region/Network Selection */}
-      {regions.length > 0 && (
+      {regions.length > 0 && !isBasicProduct && (
         <div className="space-y-4">
           <label className="text-sm font-semibold uppercase tracking-wider text-foreground" suppressHydrationWarning>
             {isNetworkProduct ? 'Network' : 'Variant'}
@@ -407,7 +407,7 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
       )}
 
       {/* Storage Selection */}
-      {storages.length > 0 && (
+      {storages.length > 0 && !isBasicProduct && (
         <div className="space-y-4">
           <label className="text-sm font-semibold uppercase tracking-wider text-foreground">
             Storage
