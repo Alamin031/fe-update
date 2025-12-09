@@ -333,7 +333,7 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
       <Separator className="my-2" />
 
       {/* Color Selection */}
-      {colors.length > 0 && (
+      {selectedRegion && selectedRegion.colors && selectedRegion.colors.length > 0 && (
         <div className="space-y-4">
           <div>
             <label className="text-sm font-semibold uppercase tracking-wider text-foreground">
@@ -342,7 +342,7 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
             <p className="text-sm text-muted-foreground mt-1">{selectedColor?.name || selectedColor?.colorName || 'Select a color'}</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            {colors.map((color: any) => {
+            {selectedRegion.colors.map((color: any) => {
               const colorName = color?.name || color?.colorName;
               const colorImage = color?.image || color?.colorImage;
               return (
