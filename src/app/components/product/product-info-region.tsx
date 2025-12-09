@@ -376,7 +376,7 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
           </label>
           <div className="flex flex-wrap gap-2">
             {regions.map((region: any) => {
-              const regionName = region.name || region.networkType;
+              const regionName = (region.name || region.networkType || '').toString().trim();
               return (
               <button
                 key={region.id}
@@ -392,7 +392,7 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
                     : "border-border hover:border-foreground/30 hover:bg-muted/50",
                 )}
               >
-                {regionName?.trim()}
+                {regionName || 'Option'}
               </button>
             );
             })}
