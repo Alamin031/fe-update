@@ -14,7 +14,7 @@ import {formatPrice} from "@/app/lib/utils/format"
 import {cn} from "@/app/lib/utils"
 import {CarePlusAddon} from "./care-plus-addon"
 import {NotifyProductDialog} from "./notify-product-dialog"
-import {EmiTable} from "./emi-table"
+// import {EmiTable} from "./emi-table" // Unused
 import {EmiOptionsModal} from "./emi-options-modal"
 import {CarePlansDisplay} from "./care-plans-display"
 import {careService, type ProductCarePlan} from "@/app/lib/api/services/care"
@@ -122,8 +122,21 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
     ? networks.map((n: Network) => ({
         id: n.id,
         name: n.networkType,
-        colors: n.colors || [],
-        defaultStorages: n.defaultStorages || [],
+        colors: (n.colors || []).map((color) => ({
+          id: color.id,
+          name: color.colorName,
+          image: color.colorImage,
+          regularPrice: color.regularPrice,
+          discountPrice: color.discountPrice,
+          stockQuantity: color.stockQuantity,
+        })),
+        defaultStorages: (n.defaultStorages || []).map((storage) => ({
+          id: storage.id,
+          size: storage.storageSize,
+          storageSize: storage.storageSize,
+          price: storage.price,
+          stock: storage.stock,
+        })),
       }))
     : (rawProduct?.regions || []);
 
@@ -159,36 +172,44 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
     ? regions.find((r: Region) => r.id === selectedRegionId)
     : regions[0];
 
-  const colors: Array<{id: string; name: string; image?: string}> = selectedRegion?.colors || [];
+  const colors: Array<{id: string; name: string; image?: string; regularPrice?: number; discountPrice?: number; stockQuantity?: number}> =
+    (selectedRegion?.colors || []).map((color: any) => ({
+      id: color.id,
+      name: color.name || color.colorName || '',
+      image: color.image || color.colorImage,
+      regularPrice: color.regularPrice,
+      discountPrice: color.discountPrice,
+      stockQuantity: color.stockQuantity,
+    }));
   const selectedColor = selectedColorId
-    ? colors.find((c: {id: string; name: string; image?: string}) => c.id === selectedColorId)
+    ? colors.find((c) => c.id === selectedColorId)
     : colors[0];
 
   const storages: Array<{id: string; size: string; price: any; stock?: number}> = selectedRegion?.defaultStorages || [];
   const selectedStorage = selectedStorageId
-    ? storages.find((s: {id: string; size: string; price: any; stock?: number}) => s.id === selectedStorageId)
+    ? storages.find((s) => s.id === selectedStorageId)
     : storages[0];
 
   // Price and stock calculation
   const priceData = useMemo(() => {
     // For basic products, get price from selected color
-    let regular = 0
-    let discount = 0
-    let stock = 0
+    let regular = 0;
+    let discount = 0;
+    let stock = 0;
 
-    if (selectedColor?.regularPrice !== undefined) {
-      regular = Number(selectedColor.regularPrice) || 0
-      discount = Number(selectedColor.discountPrice) || 0
-      stock = Number(selectedColor.stockQuantity) || 0
+    if (selectedColor && typeof selectedColor.regularPrice !== 'undefined') {
+      regular = Number(selectedColor.regularPrice) || 0;
+      discount = Number(selectedColor.discountPrice) || 0;
+      stock = Number(selectedColor.stockQuantity) || 0;
     } else if (selectedStorage?.price) {
-      const price = selectedStorage.price
-      regular = Number(price.regular || price.regularPrice) || 0
-      discount = Number(price.discount || price.discountPrice || price.final) || 0
-      stock = Number(price.stockQuantity || selectedStorage.stock) || 0
+      const price = selectedStorage.price;
+      regular = Number(price.regular || price.regularPrice) || 0;
+      discount = Number(price.discount || price.discountPrice || price.final) || 0;
+      stock = Number(price.stockQuantity || selectedStorage.stock) || 0;
     }
 
-    const hasDiscount = regular > 0 && discount > 0 && discount < regular
-    const discountPercent = hasDiscount ? Math.round(((regular - discount) / regular) * 100) : 0
+    const hasDiscount = regular > 0 && discount > 0 && discount < regular;
+    const discountPercent = hasDiscount ? Math.round(((regular - discount) / regular) * 100) : 0;
 
     return {
       regularPrice: regular,
@@ -197,35 +218,34 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
       discount: discountPercent,
       stock,
       inStock: stock > 0,
-    }
-  }, [selectedColor, selectedStorage])
+    };
+  }, [selectedColor, selectedStorage]);
 
   const selectedPrice = selectedPriceType === 'regular' ? priceData.regularPrice : priceData.discountPrice
   const carePlusPrice = carePlusSelected ? Math.round(selectedPrice * 0.08) : 0
-  const totalPrice = selectedPrice + carePlusPrice
   const isOutOfStock = !priceData.inStock
 
   // Initialize selections
   useEffect(() => {
     if (!selectedRegionId && regions.length > 0) {
-      setSelectedRegionId(regions[0].id)
+      setSelectedRegionId(regions[0].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [regions])
+  }, [regions]);
 
   useEffect(() => {
     if (!selectedColorId && colors.length > 0) {
-      setSelectedColorId(colors[0].id)
+      setSelectedColorId(colors[0].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [colors])
+  }, [colors]);
 
   useEffect(() => {
     if (!selectedStorageId && storages.length > 0) {
-      setSelectedStorageId(storages[0].id)
+      setSelectedStorageId(storages[0].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storages])
+  }, [storages]);
 
   const handleAddToCart = () => {
     if (!isOutOfStock && selectedRegion && selectedColor && selectedStorage) {
@@ -363,7 +383,7 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
             <label className="text-sm font-semibold uppercase tracking-wider text-foreground">
               Color
             </label>
-            <p className="text-sm text-muted-foreground mt-1">{selectedColor?.name || selectedColor?.colorName || 'Select a color'}</p>
+            <p className="text-sm text-muted-foreground mt-1">{selectedColor?.name || 'Select a color'}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {selectedRegion.colors.map((color: any) => {
