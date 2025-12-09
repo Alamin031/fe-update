@@ -4,14 +4,15 @@
 import { useMemo } from "react"
 import { useSWRCache } from "@/app/hooks/use-swr-cache"
 import { usePagination } from "@/app/hooks/use-pagination"
-import { productsService } from "@/app/lib/api/services/products"
+import { categoriesService } from "@/app/lib/api/services/categories"
 import { CategoryProducts } from "@/app/components/category/category-products"
 import { Button } from "@/app/components/ui/button"
 import type { Product } from "@/app/types"
-import { ProductListResponse } from "@/app/lib/api/services"
+import type { CategoryProductsResponse } from "@/app/lib/api/types"
 
 interface CategoryProductsClientProps {
   categoryId: string
+  categorySlug: string
   initialProducts?: Product[]
   totalProducts?: number
 }
@@ -20,6 +21,7 @@ const PAGE_SIZE = 20
 
 export function CategoryProductsClient({
   categoryId,
+  categorySlug,
   initialProducts = [],
   totalProducts = 0,
 }: CategoryProductsClientProps) {
@@ -39,14 +41,15 @@ export function CategoryProductsClient({
   })
 
   // Generate cache key based on category and page
-  const cacheKey = `category_${categoryId}_page_${currentPage}`
+  const cacheKey = `category_${categorySlug}_page_${currentPage}`
 
-  // Fetch products for category and current page
-  const { data: paginatedData, isLoading, error } = useSWRCache<ProductListResponse>(
+  // Fetch products for category and current page using the dedicated category endpoint
+  const { data: paginatedData, isLoading, error } = useSWRCache<CategoryProductsResponse>(
     cacheKey,
     async () => {
-      const response = await productsService.getAll(
-        { categoryId },
+      const response = await categoriesService.getProducts(
+        categorySlug,
+        {},
         currentPage,
         PAGE_SIZE
       )
@@ -63,9 +66,9 @@ export function CategoryProductsClient({
   const products = useMemo(() => {
     const mapProduct = (product: any): Product => ({
       ...product,
-      images: product.images ?? [], // Ensure 'images' exists
+      images: product.images ?? [],
     })
-    if (paginatedData?.data && paginatedData.data.length > 0) {
+    if (paginatedData?.data && Array.isArray(paginatedData.data) && paginatedData.data.length > 0) {
       return paginatedData.data.map(mapProduct)
     }
     return currentPage === 1 ? initialProducts.map(mapProduct) : []
