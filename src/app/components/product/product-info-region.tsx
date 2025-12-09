@@ -340,19 +340,21 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
           )}
         </div>
 
-        {isOutOfStock ? (
-          <Badge variant="secondary" className="bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-400">
-            Out of Stock
-          </Badge>
-        ) : priceData.stock <= 10 ? (
-          <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-900/20 dark:text-amber-400">
-            Only {priceData.stock} left
-          </Badge>
-        ) : (
-          <Badge className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/20 dark:text-emerald-400">
-            <Check className="mr-1.5 h-3 w-3" /> In Stock
-          </Badge>
-        )}
+        <div suppressHydrationWarning>
+          {isOutOfStock ? (
+            <Badge variant="secondary" className="bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-400">
+              Out of Stock
+            </Badge>
+          ) : priceData.stock <= 10 ? (
+            <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-900/20 dark:text-amber-400">
+              Only {priceData.stock} left
+            </Badge>
+          ) : (
+            <Badge className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/20 dark:text-emerald-400">
+              <Check className="mr-1.5 h-3 w-3" /> In Stock
+            </Badge>
+          )}
+        </div>
       </div>
 
       <Separator className="my-2" />
