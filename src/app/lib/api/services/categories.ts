@@ -56,7 +56,11 @@ export const categoriesService = {
      */
     getProductsBySlug: async (slug: string): Promise<any[]> => {
       const endpoint = API_ENDPOINTS.CATEGORIES_PRODUCTS.replace('{slug}', slug);
-      const response = await apiClient.get(endpoint);
+      const response = await apiClient.get(endpoint, {
+        params: {
+          includeRelations: 'true',
+        },
+      });
       // If response.data is an array, return it; if it's an object with data, return data
       if (Array.isArray(response.data)) {
         return response.data;
@@ -143,6 +147,7 @@ export const categoriesService = {
       params: {
         page,
         limit,
+        includeRelations: 'true',
         ...filters,
       },
     });
