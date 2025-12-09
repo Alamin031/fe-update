@@ -75,7 +75,11 @@ export const productsService = {
    */
   getBySlug: async (slug: string): Promise<Product> => {
     const endpoint = API_ENDPOINTS.PRODUCTS_SLUG.replace('{slug}', slug);
-    const response = await apiClient.get<Product>(endpoint);
+    const response = await apiClient.get<Product>(endpoint, {
+      params: {
+        includeRelations: 'true', // Include nested regions, networks, directColors
+      },
+    });
     return response.data;
   },
 
