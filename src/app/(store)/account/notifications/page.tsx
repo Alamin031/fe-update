@@ -31,7 +31,7 @@ const notifications = [
     id: "3",
     type: "payment",
     title: "Payment Successful",
-    message: "Payment of ₹1,48,399 for order #ORD-2024-001 completed.",
+    message: "Payment of ৳1,48,399 for order #ORD-2024-001 completed.",
     time: "1 day ago",
     read: true,
     icon: CreditCard,

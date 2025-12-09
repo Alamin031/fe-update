@@ -44,7 +44,7 @@ export default function TermsPage() {
           <h2 className="mb-4 text-2xl font-semibold">4. Shipping and Delivery</h2>
           <ul className="list-disc space-y-2 pl-6 text-muted-foreground">
             <li>Delivery times are estimates and may vary based on location</li>
-            <li>Free shipping is available on orders above ₹999</li>
+            <li>Free shipping is available on orders above ৳999</li>
             <li>Risk of loss transfers to you upon delivery</li>
             <li>Someone must be available to receive the package</li>
           </ul>

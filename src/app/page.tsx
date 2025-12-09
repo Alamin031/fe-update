@@ -142,11 +142,6 @@ export default async function Page() {
           </LazySection>
         )}
 
-        {/* Bottom Hero Banner before CTA Section */}
-        <section className="mx-auto w-full max-w-7xl px-4 py-6">
-          <BottomBanner />
-        </section>
-
         {/* Newsletter / CTA Section */}
         <section className="bg-muted">
           <div className="mx-auto max-w-7xl px-4 py-16 text-center">

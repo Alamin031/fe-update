@@ -15,7 +15,7 @@ const transactions = [
 
 const coupons = [
   { code: "WELCOME10", discount: "10% off", validity: "Dec 31, 2024", minOrder: 999 },
-  { code: "FLAT500", discount: "₹500 off", validity: "Nov 30, 2024", minOrder: 4999 },
+  { code: "FLAT500", discount: "৳500 off", validity: "Nov 30, 2024", minOrder: 4999 },
 ]
 
 function WalletPage() {

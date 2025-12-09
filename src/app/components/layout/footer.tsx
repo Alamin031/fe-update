@@ -7,10 +7,6 @@ import {
   Mail,
   Phone,
   MapPin,
-  CreditCard,
-  Truck,
-  Shield,
-  Headphones,
 } from 'lucide-react';
 import {Input} from '../ui/input';
 import {Button} from '../ui/button';
@@ -43,37 +39,9 @@ const footerLinks = {
   ],
 };
 
-const features = [
-  {icon: Truck, title: 'Free Shipping', description: 'On orders over ৳5,000'},
-  {icon: Shield, title: 'Secure Payment', description: '100% secure checkout'},
-  {icon: CreditCard, title: 'Easy EMI', description: '0% interest available'},
-  {icon: Headphones, title: '24/7 Support', description: 'Dedicated support'},
-];
-
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-background">
-      {/* Features Bar */}
-      <div className="border-b border-border">
-        <div className="mx-auto max-w-7xl px-4 py-8">
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {features.map(feature => (
-              <div key={feature.title} className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                  <feature.icon className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">{feature.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
+    <footer className="border-t border-gray-800 bg-black text-white">
       {/* Main Footer */}
       <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-6">
@@ -81,7 +49,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2">
               <Image
-                src="/image/logo.png"
+                src="/image/logo1.png"
                 alt="Friend's Telecom"
                 width={140}
                 height={30}
@@ -89,7 +57,7 @@ export function Footer() {
                 priority
               />
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="mt-4 text-sm text-gray-400">
               Your trusted destination for Apple products and mobile devices in
               Dhaka.
             </p>
@@ -99,16 +67,16 @@ export function Footer() {
               <h4 className="text-sm font-semibold">
                 Subscribe to our newsletter
               </h4>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-xs text-gray-400">
                 Get updates on new products and exclusive deals.
               </p>
               <form className="mt-3 flex gap-2">
                 <Input
                   type="email"
                   placeholder="Enter your email"
-                  className="h-9"
+                  className="h-9 bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-gray-600"
                 />
-                <Button size="sm" className="h-9">
+                <Button size="sm" className="h-9 bg-white text-black hover:bg-gray-200">
                   Subscribe
                 </Button>
               </form>
@@ -118,14 +86,14 @@ export function Footer() {
             <div className="mt-6 flex gap-3">
               <a
                 href="https://www.facebook.com/FriendsTelecom2015"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-muted/80">
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-800 transition-colors hover:bg-gray-700">
                 <Facebook className="h-4 w-4" />
               </a>
 
               {/* TikTok */}
               <a
                 href="https://www.tiktok.com/@friendstelecom2015"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-muted/80"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-800 transition-colors hover:bg-gray-700"
                 aria-label="TikTok">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -139,12 +107,12 @@ export function Footer() {
 
               <a
                 href="https://www.instagram.com/friendstelecom2015/"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-muted/80">
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-800 transition-colors hover:bg-gray-700">
                 <Instagram className="h-4 w-4" />
               </a>
               <a
                 href="https://www.youtube.com/@friendstelecom2015"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-muted/80">
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-800 transition-colors hover:bg-gray-700">
                 <Youtube className="h-4 w-4" />
               </a>
             </div>
@@ -158,7 +126,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    className="text-sm text-gray-400 transition-colors hover:text-white">
                     {link.name}
                   </Link>
                 </li>
@@ -173,7 +141,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    className="text-sm text-gray-400 transition-colors hover:text-white">
                     {link.name}
                   </Link>
                 </li>
@@ -188,7 +156,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    className="text-sm text-gray-400 transition-colors hover:text-white">
                     {link.name}
                   </Link>
                 </li>
@@ -200,25 +168,25 @@ export function Footer() {
             <h4 className="text-sm font-semibold">Contact</h4>
             <ul className="mt-4 space-y-3">
               <li className="flex items-start gap-2">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                <span className="text-sm text-gray-400">
                   Bashundhara City Shopping Complex Basement 2, Shop 25, Dhaka,
                   Bangladesh
                 </span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-muted-foreground" />
+                <Phone className="h-4 w-4 text-gray-400" />
                 <a
                   href="tel:+8801234567890"
-                  className="text-sm text-muted-foreground hover:text-foreground">
+                  className="text-sm text-gray-400 hover:text-white">
                   +880 1343-159931
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-muted-foreground" />
+                <Mail className="h-4 w-4 text-gray-400" />
                 <a
                   href="mailto:support@Friend's Telecom.com"
-                  className="text-sm text-muted-foreground hover:text-foreground">
+                  className="text-sm text-gray-400 hover:text-white">
                   help.frtel@gmail.com
                 </a>
               </li>
@@ -228,10 +196,10 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-border">
+      <div className="border-t border-gray-800">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-400">
               © {new Date().getFullYear()} Friend&apos;s Telecom. All rights
               reserved.
             </p>
@@ -240,7 +208,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                  className="text-sm text-gray-400 transition-colors hover:text-white">
                   {link.name}
                 </Link>
               ))}

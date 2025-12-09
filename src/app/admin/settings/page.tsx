@@ -71,7 +71,7 @@ function AdminSettingsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="inr">INR (₹)</SelectItem>
+                      <SelectItem value="inr">INR (৳)</SelectItem>
                       <SelectItem value="usd">USD ($)</SelectItem>
                       <SelectItem value="eur">EUR (€)</SelectItem>
                     </SelectContent>
@@ -111,7 +111,7 @@ function AdminSettingsPage() {
                 <Switch defaultChecked />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="freeShippingThreshold">Free Shipping Threshold (₹)</Label>
+                <Label htmlFor="freeShippingThreshold">Free Shipping Threshold (৳)</Label>
                 <Input id="freeShippingThreshold" type="number" defaultValue="999" />
               </div>
               <Separator />
@@ -124,7 +124,7 @@ function AdminSettingsPage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
-                  <Label htmlFor="expressCharge">Express Delivery Charge (₹)</Label>
+                  <Label htmlFor="expressCharge">Express Delivery Charge (৳)</Label>
                   <Input id="expressCharge" type="number" defaultValue="99" />
                 </div>
                 <div className="grid gap-2">
@@ -165,7 +165,7 @@ function AdminSettingsPage() {
                 <Switch defaultChecked />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="codLimit">COD Order Limit (₹)</Label>
+                <Label htmlFor="codLimit">COD Order Limit (৳)</Label>
                 <Input id="codLimit" type="number" defaultValue="50000" />
               </div>
               <Button>Save Changes</Button>

@@ -18,7 +18,7 @@ const faqs = [
       },
       {
         q: "What are the shipping charges?",
-        a: "We offer free shipping on all orders above ₹999. For orders below ₹999, a flat shipping fee of ₹49 is applicable. Express delivery is available at an additional charge of ₹99.",
+        a: "We offer free shipping on all orders above ৳999. For orders below ৳999, a flat shipping fee of ৳49 is applicable. Express delivery is available at an additional charge of ৳99.",
       },
       {
         q: "How long does delivery take?",
@@ -56,7 +56,7 @@ const faqs = [
       },
       {
         q: "Is EMI available on all products?",
-        a: "No-cost EMI is available on select products above ₹3,000. You can view EMI options on the product page. EMI is available on credit cards from major banks.",
+        a: "No-cost EMI is available on select products above ৳3,000. You can view EMI options on the product page. EMI is available on credit cards from major banks.",
       },
       {
         q: "Is it safe to pay online?",

@@ -57,7 +57,7 @@ export default function ReturnPolicyPage() {
               <li>Customized or personalized items</li>
               <li>Products damaged due to misuse</li>
               <li>Items purchased during clearance sales</li>
-              <li>Consumables and accessories below ₹500</li>
+              <li>Consumables and accessories below ৳500</li>
             </ul>
           </div>
         </section>
