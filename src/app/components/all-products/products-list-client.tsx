@@ -13,6 +13,9 @@ import { ProductListResponse } from "@/app/lib/api"
 interface ProductsListClientProps {
   initialProducts?: Product[]
   totalProducts?: number
+  selectedCategories?: string[]
+  selectedBrands?: string[]
+  allProducts?: Product[]
 }
 
 const PAGE_SIZE = 20
