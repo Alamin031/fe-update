@@ -359,7 +359,7 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
       {/* Price Section */}
       <div className="space-y-4">
         <div className="flex items-baseline gap-3">
-          <div className="text-5xl font-bold tracking-tight">{formatPrice(priceData.discountPrice)}</div>
+          <div className="text-5xl font-bold tracking-tight">{formatPrice(priceData.hasDiscount ? priceData.discountPrice : priceData.regularPrice)}</div>
           {priceData.hasDiscount && (
             <>
               <div className="text-xl text-muted-foreground line-through">{formatPrice(priceData.regularPrice)}</div>
