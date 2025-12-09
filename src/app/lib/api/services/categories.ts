@@ -143,7 +143,6 @@ export const categoriesService = {
       params: {
         page,
         limit,
-        includeRelations: 'true',
         ...filters,
       },
     });
