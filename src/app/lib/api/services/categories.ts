@@ -18,7 +18,7 @@ function normalizeCategory(raw: ApiCategory): Category {
   return {
     id: String(raw.id),
     name: String(raw.name),
-    slug: String(raw.slug),
+    slug: raw.slug ? String(raw.slug) : "",
     createdAt: String(raw.createdAt),
     updatedAt: String(raw.updatedAt),
     ...(raw.image && { image: raw.image }),

@@ -30,7 +30,7 @@ type RawCategory = {
 export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const categoriesRaw = await categoriesService.getAll();
   const categories: Category[] = (
     categoriesRaw as unknown as RawCategory[]
@@ -73,7 +73,7 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: CategoryPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const categoriesRaw = await categoriesService.getAll();
   const categories: Category[] = (
     categoriesRaw as unknown as RawCategory[]
