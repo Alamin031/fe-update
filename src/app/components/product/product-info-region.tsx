@@ -142,21 +142,21 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
 
   // Price and stock calculation
   const priceData = useMemo(() => {
-    if (!selectedStorage?.price) {
-      return {
-        regularPrice: 0,
-        discountPrice: 0,
-        hasDiscount: false,
-        discount: 0,
-        stock: 0,
-        inStock: false,
-      }
-    }
+    // For basic products, get price from selected color
+    let regular = 0
+    let discount = 0
+    let stock = 0
 
-    const price = selectedStorage.price
-    const regular = Number(price.regular || price.regularPrice) || 0
-    const discount = Number(price.discount || price.discountPrice || price.final) || 0
-    const stock = Number(price.stockQuantity || selectedStorage.stock) || 0
+    if (selectedColor?.regularPrice !== undefined) {
+      regular = Number(selectedColor.regularPrice) || 0
+      discount = Number(selectedColor.discountPrice) || 0
+      stock = Number(selectedColor.stockQuantity) || 0
+    } else if (selectedStorage?.price) {
+      const price = selectedStorage.price
+      regular = Number(price.regular || price.regularPrice) || 0
+      discount = Number(price.discount || price.discountPrice || price.final) || 0
+      stock = Number(price.stockQuantity || selectedStorage.stock) || 0
+    }
 
     const hasDiscount = regular > 0 && discount > 0 && discount < regular
     const discountPercent = hasDiscount ? Math.round(((regular - discount) / regular) * 100) : 0
@@ -169,7 +169,7 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
       stock,
       inStock: stock > 0,
     }
-  }, [selectedStorage])
+  }, [selectedColor, selectedStorage])
 
   const selectedPrice = selectedPriceType === 'regular' ? priceData.regularPrice : priceData.discountPrice
   const carePlusPrice = carePlusSelected ? Math.round(selectedPrice * 0.08) : 0
