@@ -2,12 +2,14 @@
 import { CategorySlider } from "./components/home/category-slider";
 import { categoriesService } from "./lib/api/services/categories";
 import { ProductSection } from "./components/home/product-section";
+import { ProductSectionLazy } from "./components/home/product-section-lazy";
 import { BrandSlider } from "./components/home/brand-slider";
 import { brandsService } from "./lib/api/services/brands";
 import { Navbar } from "./components/layout/navbar";
 import { Footer } from "./components/layout/footer";
 import { homecategoriesService } from "./lib/api/services/homecategories";
 import { productsService } from "./lib/api/services/products";
+import { LazySection } from "./components/home/lazy-section";
 import type { Product } from "./types";
 import type { Homecategory } from "./lib/api/services/homecategories";
 import { HeroBanner } from "./components/home/hero-banner";
@@ -96,7 +98,7 @@ export default async function Page() {
           </section>
         )}
 
-        {/* Dynamic Homecategory Sections (first 2) */}
+        {/* Dynamic Homecategory Sections (first 2) - Eager loaded */}
         {sortedHomecategories.slice(0, 2).map((hc) => (
           <section key={hc.id} className="mx-auto w-full max-w-7xl px-4 py-8">
             <ProductSection
@@ -117,27 +119,27 @@ export default async function Page() {
           <MiddleBanner />
         </section>
 
-        {/* Dynamic Homecategory Sections (remaining) */}
+        {/* Dynamic Homecategory Sections (remaining) - Lazy loaded */}
         {sortedHomecategories.slice(2).map((hc) => (
-          <section key={hc.id} className="mx-auto w-full max-w-7xl px-4 py-8">
-            <ProductSection
+          <LazySection key={hc.id} className="mx-auto w-full max-w-7xl px-4 py-8">
+            <ProductSectionLazy
               title={hc.name}
               subtitle={hc.description}
-              products={homecategoryProducts[hc.id]}
+              productIds={hc.productIds}
               viewAllLink={
                 hc.productIds && hc.productIds.length > 0
                   ? `/products?homecategory=${hc.id}`
                   : undefined
               }
             />
-          </section>
+          </LazySection>
         ))}
 
-        {/* Show Brands section only if brands exist */}
+        {/* Show Brands section only if brands exist - Lazy loaded */}
         {brands.length > 0 && (
-          <section className="mx-auto w-full max-w-7xl px-4 py-12">
+          <LazySection className="mx-auto w-full max-w-7xl px-4 py-12">
             <BrandSlider brands={brands} />
-          </section>
+          </LazySection>
         )}
 
         {/* Bottom Hero Banner before CTA Section */}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
@@ -14,11 +14,31 @@ interface EmiOptionsModalProps {
   onOpenChange: (open: boolean) => void
   plans: EmiPlan[]
   price: number
+  isLoading?: boolean
+  onOpen?: () => Promise<void>
 }
 
-export function EmiOptionsModal({ open, onOpenChange, plans, price }: EmiOptionsModalProps) {
+export function EmiOptionsModal({
+  open,
+  onOpenChange,
+  plans,
+  price,
+  isLoading = false,
+  onOpen
+}: EmiOptionsModalProps) {
   const [amount, setAmount] = useState(price.toString())
   const [selectedBankId, setSelectedBankId] = useState<string>("")
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false)
+
+  // Fetch plans when modal opens
+  useEffect(() => {
+    if (open && onOpen && plans.length === 0) {
+      setIsLoadingPlans(true)
+      onOpen()
+        .catch((error) => console.error("Error loading EMI plans:", error))
+        .finally(() => setIsLoadingPlans(false))
+    }
+  }, [open, onOpen, plans.length])
 
   // Debug log
   if (open) {

@@ -6,6 +6,7 @@ import { brandsService } from "@/app/lib/api/services/brands";
 import { productsService } from "@/app/lib/api/services/products";
 import { AllProductsFilters } from "@/app/components/all-products/all-products-filters";
 import { CategoryProducts } from "@/app/components/category/category-products";
+import { ProductsListClient } from "@/app/components/all-products/products-list-client";
 import type { Category, Brand, Product } from "@/app/types/index";
 
 interface AllProductsPageProps {
@@ -186,7 +187,10 @@ export default async function Page({ searchParams }: AllProductsPageProps) {
 
         {/* Products Grid */}
         <main className="flex-1">
-          <CategoryProducts products={products} />
+          <ProductsListClient
+            initialProducts={products.slice(0, 20)}
+            totalProducts={products.length}
+          />
         </main>
       </div>
     </div>

@@ -15,7 +15,8 @@ import { cn } from "@/app/lib/utils";
 import { getProductDisplayPrice } from "@/app/lib/utils/product";
 
 interface CategoryProductsProps {
-  products: Product[];
+  products: Product[]
+  isLoading?: boolean
 }
 
 const sortOptions = [
@@ -25,7 +26,7 @@ const sortOptions = [
   { value: "popular", label: "Most Popular" },
 ];
 
-export function CategoryProducts({ products }: CategoryProductsProps) {
+export function CategoryProducts({ products, isLoading = false }: CategoryProductsProps) {
   const [sortBy, setSortBy] = useState<string>(sortOptions[0].value);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -125,9 +126,18 @@ export function CategoryProducts({ products }: CategoryProductsProps) {
             : "grid-cols-1"
         )}
       >
-        {paginatedProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {isLoading ? (
+          Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-80 bg-muted animate-pulse rounded-lg"
+            />
+          ))
+        ) : (
+          paginatedProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))
+        )}
       </div>
 
       {/* Empty State */}
