@@ -183,7 +183,7 @@ export default async function ProductPage({params}: ProductPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
       <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
         {/* Breadcrumb */}
         <nav className="mb-8 flex items-center gap-2 text-sm text-muted-foreground">

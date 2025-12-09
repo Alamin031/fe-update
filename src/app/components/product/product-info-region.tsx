@@ -207,7 +207,7 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
     <div className="flex flex-col space-y-8">
       {/* Header Actions */}
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex-1">
           {product.brand && (
             <a
               href={`/brand/${product.brand.slug}`}
@@ -217,11 +217,17 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
             </a>
           )}
           <h1 className="text-4xl font-bold tracking-tight mt-2 leading-tight">{product.name}</h1>
+          {rawProduct?.shortDescription && (
+            <div 
+              className="mt-3 text-sm text-muted-foreground leading-relaxed"
+              dangerouslySetInnerHTML={{__html: rawProduct.shortDescription}}
+            />
+          )}
         </div>
         <Button
           variant="ghost"
           size="icon"
-          className="h-10 w-10 rounded-full hover:bg-muted"
+          className="h-10 w-10 rounded-full hover:bg-muted shrink-0"
           onClick={handleWishlistToggle}
           aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
         >
@@ -405,7 +411,7 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
             >
               −
             </button>
-            <div className="min-w-[3rem] text-center font-semibold">{quantity}</div>
+            <div className="min-w-12 text-center font-semibold">{quantity}</div>
             <button
               onClick={() => setQuantity(Math.min(priceData.stock, quantity + 1))}
               className="px-4 py-2.5 text-lg font-semibold text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
