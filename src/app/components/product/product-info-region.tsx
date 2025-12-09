@@ -343,7 +343,12 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
               return (
                 <button
                   key={color?.id}
-                  onClick={() => setSelectedColorId(color?.id)}
+                  onClick={() => {
+                    setSelectedColorId(color?.id)
+                    if (onColorChange && colorImage) {
+                      onColorChange(colorImage)
+                    }
+                  }}
                   className={cn(
                     "flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-200",
                     selectedColorId === color?.id ? "ring-2 ring-foreground ring-offset-2" : "hover:ring-1 hover:ring-muted-foreground",
