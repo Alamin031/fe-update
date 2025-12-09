@@ -110,8 +110,27 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
   const inWishlist = isInWishlist(product.id)
   const inCompare = isInCompare(product.id)
 
-  // Region-based logic
-  const regions: Region[] = rawProduct?.regions || [];
+  // Region/Network-based logic
+  const isNetworkProduct = rawProduct?.productType === 'network';
+
+  const regions: Region[] = isNetworkProduct
+    ? (rawProduct?.networks || []).map((n: Network) => ({
+        id: n.id,
+        name: n.networkType,
+        colors: n.colors?.map((c: any) => ({
+          id: c.id,
+          name: c.colorName,
+          image: c.colorImage,
+        })) || [],
+        defaultStorages: n.defaultStorages?.map((s: any) => ({
+          id: s.id,
+          size: s.storageSize,
+          price: s.price,
+          stock: s.price?.stockQuantity || 0,
+        })) || [],
+      }))
+    : (rawProduct?.regions || []);
+
   const selectedRegion = selectedRegionId
     ? regions.find((r: Region) => r.id === selectedRegionId)
     : regions[0];
