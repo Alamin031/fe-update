@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { categoriesService } from "@/app/lib/api/services/categories";
-import { productsService } from "@/app/lib/api/services/products";
 import { CategoryFilters } from "@/app/components/category/category-filters";
-import { CategoryProducts } from "@/app/components/category/category-products";
+import { CategoryProductsClient } from "@/app/components/category/category-products-client";
 import { CategoryFAQ } from "@/app/components/category/category-faq";
 import type { Category, Product } from "@/app/types/index";
 
@@ -107,23 +106,24 @@ export default async function Page({ params }: CategoryPageProps) {
   if (!category) {
     notFound();
   }
-  // Fetch products for this category from API
+  // Fetch products for this category using the dedicated category endpoint
   let products: Product[] = [];
   try {
-    const res = await productsService.getAll({ categoryId: category.id }, 1, 100);
-    // Guard access to `items` at runtime and cast to Product[]
+    const res = await categoriesService.getProducts(slug, {}, 1, 100);
+    // The response should contain a data array with products
     if (
       res &&
       typeof res === "object" &&
-      Array.isArray((res as { items?: unknown[] }).items)
+      Array.isArray((res as { data?: unknown[] }).data)
     ) {
-      products = (res as { items?: unknown[] }).items as Product[];
+      products = (res as { data?: unknown[] }).data as Product[];
     } else if (Array.isArray(res)) {
       products = res as Product[];
     } else {
       products = [];
     }
-  } catch {
+  } catch (error) {
+    console.error(`Failed to fetch products for category ${slug}:`, error);
     products = [];
   }
   return (
@@ -157,13 +157,18 @@ export default async function Page({ params }: CategoryPageProps) {
 
         {/* Products Grid */}
         <main className="flex-1">
-          <CategoryProducts products={products} />
+          <CategoryProductsClient
+            categoryId={category.id}
+            categorySlug={slug}
+            initialProducts={products.slice(0, 20)}
+            totalProducts={products.length}
+          />
         </main>
       </div>
 
       {/* FAQ Section */}
       <div className="mt-16">
-        <CategoryFAQ categoryName={category?.name ?? slug} categorySlug={slug} />
+        <CategoryFAQ categoryId={category.id} />
       </div>
     </div>
   );

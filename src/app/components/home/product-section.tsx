@@ -12,6 +12,7 @@ interface ProductSectionProps {
   viewAllLink?: string
   badge?: string
   badgeColor?: string
+  isLoading?: boolean
 }
 
 export function ProductSection({
@@ -21,6 +22,7 @@ export function ProductSection({
   viewAllLink,
   badge,
   badgeColor = "bg-foreground",
+  isLoading = false,
 }: ProductSectionProps) {
   return (
     <section>
@@ -46,9 +48,15 @@ export function ProductSection({
         )}
       </div>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+          ))
+        ) : (
+          products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))
+        )}
       </div>
     </section>
   )

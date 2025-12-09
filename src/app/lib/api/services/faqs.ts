@@ -31,15 +31,15 @@ export const faqsService = {
   /**
    * Get FAQs by category
    */
-  getByCategory: async (category: string, page = 1, limit = 20): Promise<{ data: FAQ[]; pagination: unknown }> => {
+  getByCategory: async (category: string): Promise<FAQ[]> => {
     try {
-      const response = await apiClient.get<{ data: FAQ[]; pagination: unknown }>(API_ENDPOINTS.FAQS_GET_BY_CATEGORY || "/faqs/category", {
-        params: { category, page, limit },
+      const response = await apiClient.get<{ data: FAQ[] }>(API_ENDPOINTS.FAQS_GET_BY_CATEGORY || "/faqs/category", {
+        params: { category },
       })
-      return response.data
+      return response.data.data;
     } catch (error) {
       // Return empty FAQ list if endpoint fails - UI will show default FAQs
-      return { data: [], pagination: {} }
+      return [];
     }
   },
 

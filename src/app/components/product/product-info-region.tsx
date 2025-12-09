@@ -78,10 +78,10 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
     fetchCarePlans()
   }, [product.id, rawProduct?.isCare])
 
-  // Fetch EMI plans if isEmi is true
+  // Fetch EMI plans if isEmi is true (lazy loaded on scroll/interaction)
   useEffect(() => {
     const fetchEmiPlans = async () => {
-      if (rawProduct?.isEmi) {
+      if (rawProduct?.isEmi && emiPlans.length === 0) {
         try {
           setLoadingEmiPlans(true)
           const plans = await emiService.getPlans()
@@ -95,8 +95,9 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
         }
       }
     }
-    fetchEmiPlans()
-  }, [rawProduct?.isEmi])
+    // Only fetch when user opens EMI modal (not on page load)
+    // This is handled by onOpenChange in EmiTable
+  }, [rawProduct?.isEmi, emiPlans.length])
 
   const inWishlist = isInWishlist(product.id)
   const inCompare = isInCompare(product.id)
@@ -553,6 +554,21 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
         onOpenChange={setEmiModalOpen}
         plans={emiPlans}
         price={priceData.regularPrice}
+        isLoading={loadingEmiPlans}
+        onOpen={async () => {
+          if (emiPlans.length === 0 && rawProduct?.isEmi) {
+            try {
+              setLoadingEmiPlans(true)
+              const plans = await emiService.getPlans()
+              setEmiPlans(plans)
+            } catch (error) {
+              console.error("Error fetching EMI plans:", error)
+              setEmiPlans([])
+            } finally {
+              setLoadingEmiPlans(false)
+            }
+          }
+        }}
       />
 
       {/* Additional Actions */}

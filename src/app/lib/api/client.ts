@@ -2,7 +2,7 @@
 import { useAuthStore } from "@/app/store/auth-store";
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://friends-be-production.up.railway.app/api"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api"
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
