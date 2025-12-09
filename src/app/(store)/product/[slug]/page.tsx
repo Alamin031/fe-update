@@ -68,7 +68,10 @@ export default async function ProductPage({params}: ProductPageProps) {
   const apiProductAny = apiProduct as any;
   const images = (() => {
     if (apiProductAny.images && Array.isArray(apiProductAny.images)) {
-      return apiProductAny.images.map((img: any) => img.url || img);
+      return apiProductAny.images.map((img: any) => {
+        if (typeof img === 'string') return img;
+        return img.imageUrl || img.url || img;
+      });
     }
     return [];
   })();
