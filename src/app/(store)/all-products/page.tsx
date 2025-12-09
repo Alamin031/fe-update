@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { categoriesService } from "@/app/lib/api/services/categories";
-import { brandsService } from "@/app/lib/api/services/brands";
 import { productsService } from "@/app/lib/api/services/products";
 import { CategoryProducts } from "@/app/components/category/category-products";
 import { ProductsListClient } from "@/app/components/all-products/products-list-client";
