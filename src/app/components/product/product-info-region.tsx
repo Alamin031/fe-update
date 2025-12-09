@@ -372,7 +372,7 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
       {/* Region/Network Selection */}
       {regions.length > 1 && (
         <div className="space-y-4">
-          <label className="text-sm font-semibold uppercase tracking-wider text-foreground">
+          <label className="text-sm font-semibold uppercase tracking-wider text-foreground" suppressHydrationWarning>
             {isNetworkProduct ? 'Network' : 'Variant'}
           </label>
           <div className="flex flex-wrap gap-2">
