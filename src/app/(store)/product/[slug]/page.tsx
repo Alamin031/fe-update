@@ -87,12 +87,47 @@ export default async function ProductPage({params}: ProductPageProps) {
   // Get category from categories array
   const category = apiProductAny.categories?.[0] || apiProduct.category;
 
+  // Region product price/stock extraction
+  let price = Number(apiProduct.price) || 0;
+  let stock = Number(apiProduct.stock) || Number(apiProductAny.totalStock) || 0;
+  const regionPrices: any[] = [];
+  const regionStocks: any[] = [];
+  if (apiProduct.productType === 'region' && Array.isArray(apiProductAny.regions)) {
+    apiProductAny.regions.forEach((region: any) => {
+      if (Array.isArray(region.defaultStorages)) {
+        region.defaultStorages.forEach((storage: any) => {
+          if (storage.price) {
+            regionPrices.push({
+              regionName: region.regionName,
+              storageSize: storage.storageSize,
+              regularPrice: storage.price.regularPrice,
+              discountPrice: storage.price.discountPrice,
+              comparePrice: storage.price.comparePrice,
+            });
+            regionStocks.push({
+              regionName: region.regionName,
+              storageSize: storage.storageSize,
+              stockQuantity: storage.price.stockQuantity,
+            });
+          }
+        });
+      }
+    });
+    // Use first region's first storage as main price/stock fallback
+    if (regionPrices.length > 0) {
+      price = regionPrices[0].regularPrice || 0;
+    }
+    if (regionStocks.length > 0) {
+      stock = regionStocks[0].stockQuantity || 0;
+    }
+  }
+
   const product: Product = {
     id: apiProduct.id,
     name: apiProduct.name ?? '',
     slug: apiProduct.slug ?? '',
     description: apiProduct.description ?? '',
-    price: Number(apiProduct.price) || 0,
+    price,
     images: images,
     category: category
       ? {...category, slug: category.slug ?? ''}
@@ -101,7 +136,7 @@ export default async function ProductPage({params}: ProductPageProps) {
     variants: parseJSON(apiProduct.variants, []),
     highlights: parseJSON(apiProduct.highlights, []),
     specifications: specifications,
-    stock: Number(apiProduct.stock) || Number(apiProductAny.totalStock) || 0,
+    stock,
     sku: apiProduct.sku ?? '',
     warranty: apiProduct.warranty ?? '',
     rating: Number(apiProduct.rating) || 0,
@@ -111,6 +146,9 @@ export default async function ProductPage({params}: ProductPageProps) {
     createdAt: apiProduct.createdAt ?? '',
     updatedAt: apiProduct.updatedAt ?? '',
   };
+  // Attach region price/stock info for UI
+  (product as any).regionPrices = regionPrices;
+  (product as any).regionStocks = regionStocks;
 
   // Attach raw API product for region-based rendering
   (product as any).rawProduct = apiProduct;
