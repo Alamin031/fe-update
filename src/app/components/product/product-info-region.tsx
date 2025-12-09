@@ -118,6 +118,10 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
   // Get the network to access its colors and storages directly
   const networks = isNetworkProduct ? (rawProduct?.networks || []) : [];
 
+  if (isNetworkProduct) {
+    console.log('DEBUG: isNetworkProduct=true, networks=', networks, 'networkCount=', networks.length)
+  }
+
   let regions: Region[] = isNetworkProduct
     ? networks.map((n: Network) => ({
         id: n.id,
