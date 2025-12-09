@@ -187,7 +187,7 @@ export function ProductGallery({ images, name, isEmi, isCare, selectedColorImage
             {/* Image Container */}
             <div className="relative h-[70vh] w-full max-w-5xl">
               <Image
-                src={displayImages[selectedIndex] || "/placeholder.svg"}
+                src={mainImageUrl}
                 alt={`${name} - Image ${selectedIndex + 1}`}
                 fill
                 priority
