@@ -380,7 +380,9 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
             {isNetworkProduct ? 'Network' : 'Variant'}
           </label>
           <div className="flex flex-wrap gap-2">
-            {regions.map((region: Region) => (
+            {regions.map((region: any) => {
+              const regionName = region.name || (region as any).networkType || 'Option';
+              return (
               <button
                 key={region.id}
                 onClick={() => {
@@ -395,9 +397,10 @@ export function ProductInfoRegion({product}: ProductInfoRegionProps) {
                     : "border-border hover:border-foreground/30 hover:bg-muted/50",
                 )}
               >
-                {region.name}
+                {regionName}
               </button>
-            ))}
+            );
+            })}
           </div>
         </div>
       )}
