@@ -16,7 +16,6 @@ import {
   Edit,
   Trash2,
   Eye,
-  Copy,
 } from 'lucide-react';
 import {withProtectedRoute} from '../../lib/auth/protected-route';
 import {Card, CardContent} from '../../components/ui/card';
@@ -504,10 +503,6 @@ function AdminProductsPage() {
                                   onClick={() => handleEditClick(product)}>
                                   <Edit className="mr-2 h-4 w-4" />
                                   Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <Copy className="mr-2 h-4 w-4" />
-                                  Duplicate
                                 </DropdownMenuItem>
                               </>
                             )}
