@@ -92,23 +92,17 @@ export function CompareContent() {
               </button>
               <Link href={`/product/${product.slug}`}>
                 <div className="mb-3 h-32 w-32 overflow-hidden rounded-lg bg-muted">
-                  {Array.isArray(product.images) && product.images.length > 0 && product.images[0] ? (
-                    <Image
-                      src={product.images[0]}
-                      alt={product.name}
-                      width={128}
-                      height={128}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <Image
-                      src="/placeholder.svg?height=128&width=128"
-                      alt={product.name}
-                      width={128}
-                      height={128}
-                      className="h-full w-full object-cover"
-                    />
-                  )}
+                  <Image
+                    src={getProductImageUrl(
+                      Array.isArray(product.images) && product.images.length > 0
+                        ? product.images[0]
+                        : null
+                    )}
+                    alt={product.name}
+                    width={128}
+                    height={128}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
                 <p className="line-clamp-2 text-center text-sm font-medium hover:underline">
                   {product.name}
