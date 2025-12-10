@@ -539,19 +539,6 @@ export function ProductInfoRegion({
             />
           )}
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-10 w-10 rounded-full hover:bg-muted shrink-0"
-          onClick={handleWishlistToggle}
-          aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}>
-          <Heart
-            className={cn(
-              'h-5 w-5 transition-colors',
-              inWishlist && 'fill-red-500 text-red-500',
-            )}
-          />
-        </Button>
       </div>
 
       {/* Rating & Stock Status */}
@@ -623,7 +610,7 @@ export function ProductInfoRegion({
               <Badge
                 variant="secondary"
                 className="bg-red-100/80 text-red-700 dark:bg-red-900/30 dark:text-red-400 font-bold">
-                -{priceData.discount}%
+                {priceData.discount}%
               </Badge>
             </>
           )}

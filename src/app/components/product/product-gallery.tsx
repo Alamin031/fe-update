@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, ZoomIn, X } from "lucide-react"
 import { Button } from "../ui/button"
@@ -21,13 +21,21 @@ export function ProductGallery({ images, name, isEmi, isCare, selectedColorImage
   const [isZoomed, setIsZoomed] = useState(false)
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 })
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+  const [manuallySelectedIndex, setManuallySelectedIndex] = useState<number | null>(null)
 
   // Filter out empty strings from images
   const validImages = images.filter((img) => img && img !== "") || []
   const displayImages = validImages.length > 0 ? validImages : ["/placeholder.svg?height=600&width=600"]
 
-  // Use color image as the main image if available, otherwise use the first image
-  const mainImageUrl = (selectedColorImage && selectedColorImage !== "") ? selectedColorImage : (displayImages[selectedIndex] && displayImages[selectedIndex] !== "") ? displayImages[selectedIndex] : "/placeholder.svg"
+  // Use manually selected image if available, otherwise color image, otherwise selected index
+  const mainImageUrl =
+    (manuallySelectedIndex !== null && displayImages[manuallySelectedIndex])
+      ? displayImages[manuallySelectedIndex]
+      : (selectedColorImage && selectedColorImage !== "")
+        ? selectedColorImage
+        : (displayImages[selectedIndex] && displayImages[selectedIndex] !== "")
+          ? displayImages[selectedIndex]
+          : "/placeholder.svg"
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isZoomed) return
@@ -39,17 +47,32 @@ export function ProductGallery({ images, name, isEmi, isCare, selectedColorImage
 
   const nextImage = (e?: React.MouseEvent) => {
     e?.stopPropagation()
-    setSelectedIndex((prev) => (prev + 1) % displayImages.length)
+    const nextIdx = (selectedIndex + 1) % displayImages.length
+    setSelectedIndex(nextIdx)
+    setManuallySelectedIndex(nextIdx)
   }
 
   const prevImage = (e?: React.MouseEvent) => {
     e?.stopPropagation()
-    setSelectedIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length)
+    const prevIdx = (selectedIndex - 1 + displayImages.length) % displayImages.length
+    setSelectedIndex(prevIdx)
+    setManuallySelectedIndex(prevIdx)
+  }
+
+  const handleThumbnailClick = (index: number) => {
+    setSelectedIndex(index)
+    setManuallySelectedIndex(index)
   }
 
   const handleLightboxImageChange = (index: number) => {
     setSelectedIndex(index)
+    setManuallySelectedIndex(index)
   }
+
+  // Reset manually selected index when color changes
+  useEffect(() => {
+    setManuallySelectedIndex(null)
+  }, [selectedColorImage])
 
   return (
     <>
@@ -143,30 +166,28 @@ export function ProductGallery({ images, name, isEmi, isCare, selectedColorImage
 
         {/* Thumbnails */}
         {displayImages.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto pb-2 scroll-smooth">
-            <div className="flex gap-2 mx-auto">
-              {displayImages.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedIndex(index)}
-                  className={cn(
-                    "relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300 group hover:shadow-md",
-                    selectedIndex === index
-                      ? "border-foreground shadow-md scale-105"
-                      : "border-muted hover:border-foreground/30"
-                  )}
-                  aria-label={`View image ${index + 1}`}
-                  aria-current={selectedIndex === index}
-                >
-                  <Image
-                    src={image || "/placeholder.svg"}
-                    alt={`${name} - Thumbnail ${index + 1}`}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
-                </button>
-              ))}
-            </div>
+          <div className="flex gap-2 overflow-x-auto pb-2 scroll-smooth w-full">
+            {displayImages.map((image, index) => (
+              <button
+                key={index}
+                onClick={() => handleThumbnailClick(index)}
+                className={cn(
+                  "relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300 group hover:shadow-md",
+                  selectedIndex === index
+                    ? "border-foreground shadow-md scale-105"
+                    : "border-muted hover:border-foreground/30"
+                )}
+                aria-label={`View image ${index + 1}`}
+                aria-current={selectedIndex === index}
+              >
+                <Image
+                  src={image || "/placeholder.svg"}
+                  alt={`${name} - Thumbnail ${index + 1}`}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              </button>
+            ))}
           </div>
         )}
       </div>
