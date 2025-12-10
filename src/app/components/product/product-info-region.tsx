@@ -171,7 +171,7 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
       // Region type: use regions array
       return rawProduct.regions.map((r: any) => ({
         id: r.id,
-        name: r.name?.trim() || 'Region',
+        name: r.regionName?.trim() || r.name?.trim() || 'Region',
         colors: (r.colors || []).map((color: any) => ({
           id: color.id,
           name: color.colorName?.trim() || 'Color',
@@ -181,6 +181,9 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
           regularPrice: color.regularPrice,
           discountPrice: color.discountPrice,
           stockQuantity: color.stockQuantity,
+          hasStorage: color.hasStorage,
+          useDefaultStorages: color.useDefaultStorages,
+          storages: color.storages || [],
         })),
         defaultStorages: (r.defaultStorages || []).map((storage: any) => ({
           id: storage.id,
@@ -188,6 +191,7 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
           storageSize: storage.storageSize?.trim() || '',
           price: storage.price,
           stock: storage.stock,
+          isDefault: storage.isDefault,
         })),
       }));
     }
