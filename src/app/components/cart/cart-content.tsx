@@ -38,6 +38,18 @@ export function CartContent() {
   const shipping = subtotal > 5000 ? 0 : 120
   const total = subtotal + shipping
 
+  const handleProceedToCheckout = () => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Redirect to login with cart as the return URL
+      router.push('/login?from=/cart')
+      return
+    }
+
+    // If authenticated, redirect to checkout
+    router.push('/checkout')
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-3">
       {/* Cart Items */}
