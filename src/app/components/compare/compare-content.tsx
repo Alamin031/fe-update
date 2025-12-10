@@ -10,6 +10,16 @@ import { formatPrice } from "@/app/lib/utils/format"
 import { useCartStore } from "@/app/store/cart-store"
 import { getDefaultProductPrice } from "@/app/lib/utils/product"
 
+const getProductImageUrl = (image: any): string => {
+  if (!image || image === "") return "/placeholder.svg?height=128&width=128"
+  if (typeof image === "string") return image
+  if (typeof image === "object") {
+    const url = image.imageUrl || image.url || ""
+    return url && url !== "" ? url : "/placeholder.svg?height=128&width=128"
+  }
+  return "/placeholder.svg?height=128&width=128"
+}
+
 export function CompareContent() {
   const { items, removeItem, clearCompare } = useCompareStore()
   const addToCart = useCartStore((state) => state.addItem)
