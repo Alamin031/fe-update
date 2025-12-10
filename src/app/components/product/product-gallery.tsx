@@ -161,30 +161,28 @@ export function ProductGallery({ images, name, isEmi, isCare, selectedColorImage
 
         {/* Thumbnails */}
         {displayImages.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto pb-2 scroll-smooth">
-            <div className="flex gap-2 mx-auto">
-              {displayImages.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedIndex(index)}
-                  className={cn(
-                    "relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300 group hover:shadow-md",
-                    selectedIndex === index
-                      ? "border-foreground shadow-md scale-105"
-                      : "border-muted hover:border-foreground/30"
-                  )}
-                  aria-label={`View image ${index + 1}`}
-                  aria-current={selectedIndex === index}
-                >
-                  <Image
-                    src={image || "/placeholder.svg"}
-                    alt={`${name} - Thumbnail ${index + 1}`}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
-                </button>
-              ))}
-            </div>
+          <div className="flex gap-2 overflow-x-auto pb-2 scroll-smooth w-full">
+            {displayImages.map((image, index) => (
+              <button
+                key={index}
+                onClick={() => handleThumbnailClick(index)}
+                className={cn(
+                  "relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300 group hover:shadow-md",
+                  selectedIndex === index
+                    ? "border-foreground shadow-md scale-105"
+                    : "border-muted hover:border-foreground/30"
+                )}
+                aria-label={`View image ${index + 1}`}
+                aria-current={selectedIndex === index}
+              >
+                <Image
+                  src={image || "/placeholder.svg"}
+                  alt={`${name} - Thumbnail ${index + 1}`}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              </button>
+            ))}
           </div>
         )}
       </div>
