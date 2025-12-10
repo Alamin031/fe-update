@@ -45,10 +45,20 @@ export function CompareContent() {
     )
   }
 
-  const allSpecs = new Set<string>()
+  const allSpecs = new Map<string, number>()
   items.forEach((product) => {
-    Object.keys(product.specifications).forEach((key) => allSpecs.add(key))
+    if (Array.isArray(product.specifications)) {
+      product.specifications.forEach((spec: any) => {
+        const displayOrder = spec.displayOrder ?? 999
+        if (!allSpecs.has(spec.specKey)) {
+          allSpecs.set(spec.specKey, displayOrder)
+        }
+      })
+    }
   })
+  const sortedSpecKeys = Array.from(allSpecs.entries())
+    .sort(([, orderA], [, orderB]) => orderA - orderB)
+    .map(([key]) => key)
 
   return (
     <div>
