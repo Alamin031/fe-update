@@ -210,9 +210,23 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
   const colors = useMemo(() => {
     if (!selectedRegion) return [];
     return (selectedRegion.colors || []).map((color: any) => {
-      // Fix: prefer color.colorImage, fallback to color.image, and prefer color.colorName, fallback to color.name
-      const colorImage = color.colorImage || color.image || null;
+      // Extract color image - try multiple field names since API might return different formats
+      const colorImage = color.image || color.colorImage || color.colorImage || null;
       const colorName = color.colorName && color.colorName.trim() ? color.colorName.trim() : (color.name && color.name.trim() ? color.name.trim() : 'Color');
+
+      // Debug log for region products
+      if (typeof window !== 'undefined' && isNetworkProduct === false && isBasicProduct === false) {
+        console.log('Color Object:', {
+          id: color.id,
+          colorName,
+          hasImage: !!colorImage,
+          image: colorImage,
+          colorImageField: color.colorImage,
+          imageField: color.image,
+          allFields: Object.keys(color)
+        });
+      }
+
       return {
         id: color.id,
         name: colorName,
@@ -225,7 +239,7 @@ export function ProductInfoRegion({product, onColorChange}: ProductInfoRegionPro
         storages: color.storages || [],
       };
     });
-  }, [selectedRegion]);
+  }, [selectedRegion, isNetworkProduct, isBasicProduct]);
 
   // Get selected color
   const selectedColor = useMemo(() => {
