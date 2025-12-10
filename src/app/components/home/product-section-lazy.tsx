@@ -15,6 +15,7 @@ interface ProductSectionLazyProps {
   categoryId?: string
   brandId?: string
   limit?: number
+  products?: Product[] | undefined
 }
 
 export function ProductSectionLazy({
@@ -25,45 +26,42 @@ export function ProductSectionLazy({
   categoryId,
   brandId,
   limit = 10,
+  products: productsProp,
 }: ProductSectionLazyProps) {
-  // Generate unique cache key based on params
   const cacheKey = `products_section_${title
     .toLowerCase()
-    .replace(/\s+/g, "_")}_${productIds?.join(",") || categoryId || brandId || "all"}`
-
-  // Fetch products lazily
-  const { data: response, isLoading } = useSWRCache<{ data?: Product[] | Product[] }>(
+    .replace(/\s+/g, "_")}_${productIds?.join(",") || categoryId || brandId || "all"}`;
+  const { data: response, isLoading: swrLoading } = useSWRCache<{ data?: Product[] | Product[] }>(
     cacheKey,
     async () => {
-      let products: Product[] = []
-
+      let products: Product[] = [];
       if (productIds && productIds.length > 0) {
         try {
           const res = await productsService.getAll(
             { ids: productIds } as any,
             1,
             productIds.length
-          )
+          );
           products = Array.isArray((res as any).items)
             ? (res as any).items
             : Array.isArray((res as any).data)
             ? (res as any).data
             : Array.isArray(res)
             ? (res as Product[])
-            : []
+            : [];
         } catch {
           // Fallback: fetch all and filter
-          const allRes = await productsService.getAll({}, 1, 1000)
+          const allRes = await productsService.getAll({}, 1, 1000);
           const allProducts = Array.isArray((allRes as any).items)
             ? (allRes as any).items
             : Array.isArray((allRes as any).data)
             ? (allRes as any).data
             : Array.isArray(allRes)
             ? (allRes as Product[])
-            : []
+            : [];
           products = allProducts.filter((p: Product) =>
             productIds.includes(p.id)
-          )
+          );
         }
       } else if (categoryId || brandId) {
         const res = await productsService.getAll(
@@ -73,35 +71,34 @@ export function ProductSectionLazy({
           },
           1,
           limit
-        )
+        );
         products = Array.isArray((res as any).items)
           ? (res as any).items
           : Array.isArray((res as any).data)
           ? (res as any).data
           : Array.isArray(res)
           ? (res as Product[])
-          : []
+          : [];
       } else {
-        const res = await productsService.getAll({}, 1, limit)
+        const res = await productsService.getAll({}, 1, limit);
         products = Array.isArray((res as any).items)
           ? (res as any).items
           : Array.isArray((res as any).data)
           ? (res as any).data
           : Array.isArray(res)
           ? (res as Product[])
-          : []
+          : [];
       }
-
-      return { data: products }
+      return { data: products };
     },
     {
       ttl: 600000, // 10 minutes for home page sections
       revalidateOnMount: false, // Only load when visible
       revalidateOnFocus: false,
     }
-  )
-
-  const products = response?.data || []
+  );
+  const products = productsProp ?? response?.data ?? [];
+  const isLoading = productsProp ? false : swrLoading;
 
   return (
     <LazySection>
@@ -113,5 +110,5 @@ export function ProductSectionLazy({
         isLoading={isLoading}
       />
     </LazySection>
-  )
+  );
 }

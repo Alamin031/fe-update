@@ -7,7 +7,7 @@ export interface Product {
   originalPrice?: number
   comparePrice?: number
   stockQuantity?: number
-  images: string[]
+  images?: string[]
   category: Category
   brand: Brand
   variants: ProductVariant[]

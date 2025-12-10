@@ -1,18 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../config';
 
 // Types for Homecategory
 
-export interface Homecategory {
-  id: string;
-  name: string;
-  description?: string;
-  priority?: number;
-  categoryIds?: string[];
-  productIds?: string[];
-  createdAt: Date;
-  updatedAt: Date;
-}
+
 
 
 export interface CreateHomecategoryRequest {
@@ -34,26 +26,26 @@ export interface UpdateHomecategoryRequest {
 
 export const homecategoriesService = {
   // Create Homecategory
-  create: async (data: CreateHomecategoryRequest): Promise<Homecategory> => {
+  create: async (data: CreateHomecategoryRequest): Promise<any> => {
     const response = await apiClient.post(API_ENDPOINTS.HOMECATEGORY_CREATE, data);
     return response.data;
   },
 
   // Get all Homecategories
-  list: async (): Promise<Homecategory[]> => {
+  list: async (): Promise<any[]> => {
     const response = await apiClient.get(API_ENDPOINTS.HOMECATEGORY_LIST);
     return response.data;
   },
 
   // Get Homecategory by id
-  get: async (id: string): Promise<Homecategory> => {
+  get: async (id: string): Promise<any> => {
     const endpoint = API_ENDPOINTS.HOMECATEGORY_GET.replace('{id}', id);
     const response = await apiClient.get(endpoint);
     return response.data;
   },
 
   // Update Homecategory by id
-  update: async (id: string, data: UpdateHomecategoryRequest): Promise<Homecategory> => {
+  update: async (id: string, data: UpdateHomecategoryRequest): Promise<any> => {
     const endpoint = API_ENDPOINTS.HOMECATEGORY_UPDATE.replace('{id}', id);
     const response = await apiClient.patch(endpoint, data);
     return response.data;

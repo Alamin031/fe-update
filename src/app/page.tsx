@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CategorySlider } from "./components/home/category-slider";
 import { categoriesService } from "./lib/api/services/categories";
 import { ProductSectionLazy } from "./components/home/product-section-lazy";
@@ -7,10 +6,7 @@ import { brandsService } from "./lib/api/services/brands";
 import { Navbar } from "./components/layout/navbar";
 import { Footer } from "./components/layout/footer";
 import { homecategoriesService } from "./lib/api/services/homecategories";
-import { productsService } from "./lib/api/services/products";
 import { LazySection } from "./components/home/lazy-section";
-import type { Product } from "./types";
-import type { Homecategory } from "./lib/api/services/homecategories";
 import { HeroBanner } from "./components/home/hero-banner";
 import { BottomBanner } from "./components/home/bottom-banner";
 import { MiddleBanner } from "./components/home/middel-banner";
@@ -31,48 +27,13 @@ export default async function Page() {
   );
 
   // Fetch all homecategories and sort by priority
-  const homecategories: Homecategory[] = await homecategoriesService.list();
+  const homecategories = await homecategoriesService.list();
+  console.log('Fetched homecategories:', homecategories);
   const sortedHomecategories = [...homecategories].sort(
     (a, b) => (a.priority ?? 999) - (b.priority ?? 999)
   );
 
-  // Fetch products for each homecategory
-  const homecategoryProducts: Record<string, Product[]> = {};
-  for (const hc of sortedHomecategories) {
-    if (hc.productIds && hc.productIds.length > 0) {
-      try {
-        let products: Product[] = [];
-        let res: any = null;
-        try {
-          res = await productsService.getAll(
-            { ids: hc.productIds } as any,
-            1,
-            hc.productIds.length
-          );
-          products = Array.isArray(res.items)
-            ? res.items
-            : Array.isArray(res)
-            ? res
-            : [];
-        } catch {
-          res = await productsService.getAll({}, 1, 1000);
-          const allProducts = Array.isArray(res.items)
-            ? res.items
-            : Array.isArray(res)
-            ? res
-            : [];
-          products = allProducts.filter((p: Product) =>
-            hc.productIds!.includes(p.id)
-          );
-        }
-        homecategoryProducts[hc.id] = products;
-      } catch {
-        homecategoryProducts[hc.id] = [];
-      }
-    } else {
-      homecategoryProducts[hc.id] = [];
-    }
-  }
+  // Use products directly from homecategory response
 
   const flashSaleEndTime = new Date();
   flashSaleEndTime.setHours(flashSaleEndTime.getHours() + 24);
@@ -103,9 +64,9 @@ export default async function Page() {
               <ProductSectionLazy
                 title={hc.name}
                 subtitle={hc.description}
-                productIds={hc.productIds}
+                products={hc.products}
                 viewAllLink={
-                  hc.productIds && hc.productIds.length > 0
+                  hc.products && hc.products.length > 0
                     ? `/products?homecategory=${hc.id}`
                     : undefined
                 }
@@ -126,9 +87,9 @@ export default async function Page() {
               <ProductSectionLazy
                 title={hc.name}
                 subtitle={hc.description}
-                productIds={hc.productIds}
+                products={hc.products}
                 viewAllLink={
-                  hc.productIds && hc.productIds.length > 0
+                  hc.products && hc.products.length > 0
                     ? `/products?homecategory=${hc.id}`
                     : undefined
                 }
