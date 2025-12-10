@@ -77,10 +77,11 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
   // Extract image URL from product images array
   const getImageUrl = (img: any): string => {
-    if (!img) return "/placeholder.svg";
+    if (!img || img === "") return "/placeholder.svg";
     if (typeof img === "string") return img;
     if (typeof img === "object") {
-      return img.imageUrl || img.url || "/placeholder.svg";
+      const url = img.imageUrl || img.url || "";
+      return url && url !== "" ? url : "/placeholder.svg";
     }
     return "/placeholder.svg";
   };
