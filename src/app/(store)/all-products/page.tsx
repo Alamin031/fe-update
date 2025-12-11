@@ -139,6 +139,8 @@ export default async function Page({ searchParams }: AllProductsPageProps) {
             selectedCategories={selectedCategories}
             selectedBrands={selectedBrands}
             allProducts={products}
+            categories={categories}
+            brands={brands}
           />
         </main>
       </div>
