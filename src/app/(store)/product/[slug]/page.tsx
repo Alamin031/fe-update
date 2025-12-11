@@ -160,7 +160,6 @@ export default async function ProductPage({params}: ProductPageProps) {
     warranty: apiProduct.warranty ?? '',
     rating: Number(apiProduct.rating) || 0,
     reviewCount: Number(apiProduct.reviewCount) || 0,
-    ratingPoint: Number(apiProduct.ratingPoint) || 0,
     isFeatured: apiProduct.isFeatured,
     isNew: apiProduct.isNew,
     createdAt: apiProduct.createdAt ?? '',
