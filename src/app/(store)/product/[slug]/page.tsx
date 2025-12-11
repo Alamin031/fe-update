@@ -176,8 +176,8 @@ export default async function ProductPage({params}: ProductPageProps) {
   let relatedProducts: Product[] = [];
   try {
     if (category?.id) {
-      const response = await productsService.getAllByCategoryIds(
-        [category.id],
+      const response = await productsService.getAll(
+        { categoryIds: category.id },
         1,
         10,
       );
