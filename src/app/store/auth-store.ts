@@ -32,7 +32,12 @@ export const useAuthStore = create<AuthStore>()(
       },
       logout: () => {
         TokenManager.clearTokens()
-        set({ user: null, token: null, isAuthenticated: false })
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isInitialized: false
+        })
       },
       updateUser: (updates) => {
         const currentUser = get().user

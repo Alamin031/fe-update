@@ -15,79 +15,104 @@ export class AuthService {
    * Register a new user
    */
    async register(data: RegisterRequest): Promise<AuthResponse> {
-    const response = await apiClient.post<ApiResponse<AuthResponse>>(
-      API_ENDPOINTS.AUTH_REGISTER,
-      data
-    )
+    try {
+      const response = await apiClient.post<ApiResponse<AuthResponse>>(
+        API_ENDPOINTS.AUTH_REGISTER,
+        data
+      )
 
-    if (response.data.data) {
-      const { token, refreshToken } = response.data.data
-      TokenManager.setTokens(token, refreshToken)
+      if (response.data.data) {
+        const { token, refreshToken } = response.data.data
+        TokenManager.setTokens(token, refreshToken)
+      }
+
+      return response.data.data!
+    } catch (error) {
+      // Auto-clear on register error
+      TokenManager.clearTokens()
+      throw error
     }
-
-    return response.data.data!
   }
 
   /**
    * Login with email and password
    */
   async login(data: LoginRequest): Promise<AuthResponse> {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH_LOGIN, data);
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.AUTH_LOGIN, data);
 
-    // Handle both possible response shapes
-    const resData =
-      response.data?.data ??
-      (response.data && response.data.access_token && response.data.user
-        ? response.data
-        : undefined);
+      // Handle both possible response shapes
+      const resData =
+        response.data?.data ??
+        (response.data && response.data.access_token && response.data.user
+          ? response.data
+          : undefined);
 
-    if (resData) {
-      const { token, access_token, refreshToken } = resData;
-      TokenManager.setTokens(token ?? access_token, refreshToken);
-      return resData;
+      if (resData) {
+        const { token, access_token, refreshToken } = resData;
+        TokenManager.setTokens(token ?? access_token, refreshToken);
+        return resData;
+      }
+
+      throw new Error("Invalid login response from server");
+    } catch (error) {
+      // Auto-clear on login error
+      TokenManager.clearTokens();
+      throw error;
     }
-
-    throw new Error("Invalid login response from server");
   }
 
   /**
    * Login with social provider
    */
    async socialLogin(data: SocialLoginRequest): Promise<AuthResponse> {
-    const response = await apiClient.post<ApiResponse<AuthResponse>>(
-      API_ENDPOINTS.AUTH_SOCIAL_LOGIN,
-      data
-    )
+    try {
+      const response = await apiClient.post<ApiResponse<AuthResponse>>(
+        API_ENDPOINTS.AUTH_SOCIAL_LOGIN,
+        data
+      )
 
-    if (response.data.data) {
-      const { token, refreshToken } = response.data.data
-      TokenManager.setTokens(token, refreshToken)
+      if (response.data.data) {
+        const { token, refreshToken } = response.data.data
+        TokenManager.setTokens(token, refreshToken)
+      }
+
+      return response.data.data!
+    } catch (error) {
+      // Auto-clear on social login error
+      TokenManager.clearTokens()
+      throw error
     }
-
-    return response.data.data!
   }
 
   /**
    * Refresh access token
    */
    async refreshToken(): Promise<string> {
-    const refreshToken = TokenManager.getRefreshToken()
-    if (!refreshToken) {
-      throw new Error("No refresh token available")
+    try {
+      const refreshToken = TokenManager.getRefreshToken()
+      if (!refreshToken) {
+        TokenManager.clearTokens()
+        throw new Error("No refresh token available")
+      }
+
+      const response = await apiClient.post<ApiResponse<{ token: string; refreshToken?: string }>>(
+        API_ENDPOINTS.AUTH_REFRESH,
+        { refreshToken }
+      )
+
+      if (response.data.data) {
+        const { token, refreshToken: newRefreshToken } = response.data.data
+        TokenManager.setTokens(token, newRefreshToken || refreshToken)
+        return token
+      }
+
+      throw new Error("Failed to refresh token")
+    } catch (error) {
+      // Auto-clear on token refresh error
+      TokenManager.clearTokens()
+      throw error
     }
-
-    const response = await apiClient.post<ApiResponse<{ token: string; refreshToken?: string }>>(
-      API_ENDPOINTS.AUTH_REFRESH,
-      { refreshToken }
-    )
-
-    if (response.data.data) {
-      const { token, refreshToken: newRefreshToken } = response.data.data
-      TokenManager.setTokens(token, newRefreshToken || refreshToken)
-      return token
-    }
-
-    throw new Error("Failed to refresh token")
   }
 
   /**
@@ -96,6 +121,11 @@ export class AuthService {
    async logout(): Promise<void> {
     try {
       await apiClient.post(API_ENDPOINTS.AUTH_LOGOUT)
+    } catch (error) {
+      // Still clear tokens even if logout API fails
+      TokenManager.clearTokens()
+      console.error("Logout API error (but tokens cleared):", error)
+      throw error
     } finally {
       TokenManager.clearTokens()
     }

@@ -28,25 +28,43 @@ apiClient.interceptors.response.use(
   },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
-    if (error.response?.status === 401 && !originalRequest._retry) {
+
+    // Handle 401 (Unauthorized) and 403 (Forbidden) errors
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
       originalRequest._retry = true
+      try {
+        const authStore = useAuthStore.getState()
+        // Clear everything on auth error
+        authStore.logout()
+
+        if (typeof window !== "undefined") {
+          // Force hard reload to clear middleware cache and trigger auth checks
+          window.location.href = "/login?session-expired=true"
+        }
+      } catch (logoutError) {
+        const authStore = useAuthStore.getState()
+        authStore.logout()
+        if (typeof window !== "undefined") {
+          window.location.href = "/login?session-expired=true"
+        }
+        return Promise.reject(logoutError)
+      }
+    }
+
+    // Handle network errors and other API errors
+    if (error.message === "Network Error" || !error.response) {
+      console.error("Network or API error:", error)
+      // Still try to clear on network errors to be safe
       try {
         const authStore = useAuthStore.getState()
         if (authStore.token) {
           authStore.logout()
-          if (typeof window !== "undefined") {
-            window.location.href = "/auth/login"
-          }
         }
-      } catch (refreshError) {
-        const authStore = useAuthStore.getState()
-        authStore.logout()
-        if (typeof window !== "undefined") {
-          window.location.href = "/auth/login"
-        }
-        return Promise.reject(refreshError)
+      } catch (e) {
+        console.error("Error clearing auth on network error:", e)
       }
     }
+
     return Promise.reject(error)
   },
 )

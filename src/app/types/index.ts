@@ -27,6 +27,7 @@ export interface Product {
   warranty: string
   rating: number
   reviewCount: number
+  ratingPoint?: number
   isFeatured?: boolean
   isNew?: boolean
   createdAt: string

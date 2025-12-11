@@ -117,10 +117,12 @@ export async function middleware(request: NextRequest) {
   const isAuth = isAuthRoute(pathname)
   const isPublic = isPublicRoute(pathname)
   if (token && await isTokenExpired(token)) {
-    const response = NextResponse.redirect(new URL("/login", request.url))
+    const response = NextResponse.redirect(new URL("/login?token-expired=true", request.url))
     response.cookies.delete("access_token")
     response.cookies.delete("auth_token")
     response.cookies.delete("refresh_token")
+    // Clear localStorage as well
+    response.headers.set("Clear-Site-Data", '"cache", "cookies", "storage"')
     return response
   }
   if ((isAdmin || isUserProtected) && !token) {

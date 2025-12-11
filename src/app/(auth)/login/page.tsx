@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -55,6 +55,13 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Show notification if session expired
+  useEffect(() => {
+    if (searchParams.get("token-expired") || searchParams.get("session-expired")) {
+      toast.info("Your session has expired. Please log in again.");
+    }
+  }, [searchParams]);
   const fromParam = searchParams.get("from");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,6 +80,10 @@ export default function LoginPage() {
       const token = res.token ?? res.access_token;
       if (!token) throw new Error("No token received from API");
       login(userToStore, token);
+
+      // Hydrate to fetch fresh user data from API
+      await useAuthStore.getState().hydrate();
+
       toast.success("Login successful");
 
       if (fromParam && (fromParam.startsWith("/admin") || fromParam.startsWith("/account"))) {
@@ -105,10 +116,14 @@ export default function LoginPage() {
         };
       };
 
+      // Error during login - AuthService already cleared tokens
       const message =
         (error as ErrorResponse).response?.data?.error?.message ??
         (error instanceof Error ? error.message : "Invalid email or password");
       toast.error(message);
+
+      // Ensure storage is cleared on error
+      useAuthStore.getState().logout();
     } finally {
       setIsLoading(false);
     }
