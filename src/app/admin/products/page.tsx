@@ -373,6 +373,7 @@ function AdminProductsPage() {
                   ))}
                 </SelectContent>
               </Select>
+              {/*
               <Select defaultValue="all">
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Status" />
@@ -384,7 +385,9 @@ function AdminProductsPage() {
                   <SelectItem value="out">Out of Stock</SelectItem>
                 </SelectContent>
               </Select>
+              */}
             </div>
+            {/*
             <Button
               variant="outline"
               size="sm"
@@ -392,6 +395,7 @@ function AdminProductsPage() {
               <Filter className="h-4 w-4" />
               More Filters
             </Button>
+            */}
           </div>
 
           <div className="overflow-x-auto">
