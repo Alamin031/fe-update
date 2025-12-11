@@ -70,9 +70,8 @@ export function ProductsListClient({
     }
   )
 
-  // Get total products from API response
-  const totalProductsFromAPI = paginatedData?.pagination?.total ?? 0
-  const displayTotalProducts = totalProductsFromAPI || totalProducts
+  // Get total products from API response, fallback to prop value for initial hydration match
+  const displayTotalProducts = paginatedData?.pagination?.total ?? totalProducts ?? 0
 
   // Calculate pagination values
   const totalPages = displayTotalProducts > 0 ? Math.ceil(displayTotalProducts / PAGE_SIZE) : 0
