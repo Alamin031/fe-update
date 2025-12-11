@@ -32,22 +32,28 @@ export class AuthService {
    * Login with email and password
    */
   async login(data: LoginRequest): Promise<AuthResponse> {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH_LOGIN, data);
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.AUTH_LOGIN, data);
 
-    // Handle both possible response shapes
-    const resData =
-      response.data?.data ??
-      (response.data && response.data.access_token && response.data.user
-        ? response.data
-        : undefined);
+      // Handle both possible response shapes
+      const resData =
+        response.data?.data ??
+        (response.data && response.data.access_token && response.data.user
+          ? response.data
+          : undefined);
 
-    if (resData) {
-      const { token, access_token, refreshToken } = resData;
-      TokenManager.setTokens(token ?? access_token, refreshToken);
-      return resData;
+      if (resData) {
+        const { token, access_token, refreshToken } = resData;
+        TokenManager.setTokens(token ?? access_token, refreshToken);
+        return resData;
+      }
+
+      throw new Error("Invalid login response from server");
+    } catch (error) {
+      // Auto-clear on login error
+      TokenManager.clearTokens();
+      throw error;
     }
-
-    throw new Error("Invalid login response from server");
   }
 
   /**
