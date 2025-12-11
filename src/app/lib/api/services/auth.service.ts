@@ -102,6 +102,11 @@ export class AuthService {
    async logout(): Promise<void> {
     try {
       await apiClient.post(API_ENDPOINTS.AUTH_LOGOUT)
+    } catch (error) {
+      // Still clear tokens even if logout API fails
+      TokenManager.clearTokens()
+      console.error("Logout API error (but tokens cleared):", error)
+      throw error
     } finally {
       TokenManager.clearTokens()
     }
