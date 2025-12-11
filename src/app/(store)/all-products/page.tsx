@@ -153,11 +153,11 @@ export default async function Page({ searchParams }: AllProductsPageProps) {
         {/* Products Grid */}
         <main className="flex-1 min-w-0">
           <ProductsListClient
-            initialProducts={products.slice(0, 20)}
-            totalProducts={products.length}
+            initialProducts={filteredProducts.slice(0, 20)}
+            totalProducts={filteredProducts.length}
             selectedCategories={selectedCategories}
             selectedBrands={selectedBrands}
-            allProducts={products}
+            allProducts={filteredProducts}
             categories={categories}
             brands={brands}
           />
