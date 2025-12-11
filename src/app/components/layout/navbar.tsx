@@ -27,14 +27,19 @@ import { categoriesService } from "@/app/lib/api/services/categories"
 import { brandsService } from "@/app/lib/api/services/brands"
 import type { Category, Brand } from "@/app/types"
 
-export function Navbar() {
+interface NavbarProps {
+  initialCategories?: Category[]
+  initialBrands?: Brand[]
+}
+
+export function Navbar({ initialCategories, initialBrands }: NavbarProps = {}) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
-  const [brands, setBrands] = useState<Brand[]>([])
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true)
-  const [isLoadingBrands, setIsLoadingBrands] = useState(true)
+  const [categories, setCategories] = useState<Category[]>(initialCategories ?? [])
+  const [brands, setBrands] = useState<Brand[]>(initialBrands ?? [])
+  const [isLoadingCategories, setIsLoadingCategories] = useState(!initialCategories)
+  const [isLoadingBrands, setIsLoadingBrands] = useState(!initialBrands)
   const [isHydrated, setIsHydrated] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
@@ -57,6 +62,11 @@ export function Navbar() {
   }, [])
 
   useEffect(() => {
+    // Skip fetching if initial categories were provided
+    if (initialCategories) {
+      return
+    }
+
     async function fetchCategories() {
       try {
         setIsLoadingCategories(true)
@@ -74,9 +84,14 @@ export function Navbar() {
       }
     }
     fetchCategories()
-  }, [])
+  }, [initialCategories])
 
   useEffect(() => {
+    // Skip fetching if initial brands were provided
+    if (initialBrands) {
+      return
+    }
+
     async function fetchBrands() {
       try {
         setIsLoadingBrands(true)
@@ -90,7 +105,7 @@ export function Navbar() {
       }
     }
     fetchBrands()
-  }, [])
+  }, [initialBrands])
 
   const handleLogout = () => {
     logout()
