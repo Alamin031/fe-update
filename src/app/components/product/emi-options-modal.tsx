@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
-import { Ban } from "lucide-react"
+import { X } from "lucide-react"
 import { Input } from "../ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
 import { formatPrice } from "@/app/lib/utils/format"
@@ -46,10 +46,6 @@ export function EmiOptionsModal({
     }
   }, [open, onOpen, plans.length])
 
-  // Debug log
-  if (open) {
-  }
-
   // Group plans by bank
   const plansByBank = useMemo(() => {
     const grouped: Record<string, { bankName: string; plans: EmiPlan[] }> = {}
@@ -79,68 +75,93 @@ export function EmiOptionsModal({
   const selectedBankData = plansByBank[selectedBank]
   const bankPlans = selectedBankData?.plans || []
 
-  // Always use regular price for EMI calculation
-  const regularPrice = price
+  // Calculate actual amount for EMI based on input
+  const emiAmount = parseFloat(amount) || price
 
   const calculateEmi = (principal: number, monthCount: number, rate: number = 0) => {
-    if (rate === 0) {
-      return Math.ceil(principal / monthCount)
+    // Simple interest calculation: Principal + (Principal * Rate% * Months) / Months
+    const totalInterest = (principal * rate) / 100
+    const totalAmount = principal + (totalInterest * monthCount)
+    return totalAmount / monthCount
+  }
+
+  // Get initials for bank badge
+  const getBankInitials = (bankName: string) => {
+    const words = bankName.split(/\s+/).filter(w => w.length > 0)
+    if (words.length > 0) {
+      return words[0].charAt(0).toUpperCase()
     }
-    const monthlyRate = rate / 100 / 12
-    const numerator = principal * monthlyRate * Math.pow(1 + monthlyRate, monthCount)
-    const denominator = Math.pow(1 + monthlyRate, monthCount) - 1
-    return Math.ceil(numerator / denominator)
+    return "B"
+  }
+
+  // Generate consistent color for bank badge
+  const getBankBgColor = (index: number) => {
+    const colors = [
+      "bg-red-500",
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-yellow-500",
+      "bg-pink-500",
+    ]
+    return colors[index % colors.length]
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Ban className="h-6 w-6 text-[oklch(0.75_0.15_45)]" />
-            <DialogTitle>EMI Options</DialogTitle>
-          </div>
-          <a href="#" className="text-sm font-medium text-[oklch(0.75_0.15_45)]">
-            EMI FAQ
-          </a>
+      <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto p-6 gap-6">
+        <DialogHeader className="flex flex-row items-center justify-between pr-6">
+          <DialogTitle className="text-2xl font-bold">EMI Options</DialogTitle>
+          <button
+            onClick={() => onOpenChange(false)}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Bank Selection */}
-          <div className="border-r border-border pr-6">
-            <h3 className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-4">
-              Bank Name
-            </h3>
-            <div className="space-y-2 overflow-y-auto max-h-96">
-              {bankIds.map((bankId) => (
-                <button
-                  key={bankId}
-                  onClick={() => setSelectedBankId(bankId)}
-                  className={cn(
-                    "w-full text-left px-4 py-3 rounded-lg font-medium transition-all text-sm",
-                    selectedBank === bankId
-                      ? "bg-black text-white"
-                      : "hover:bg-muted"
-                  )}
-                >
-                  {plansByBank[bankId].bankName}
-                </button>
-              ))}
+          <div className="lg:col-span-1">
+            <div className="flex flex-col h-full">
+              <div className="space-y-2 overflow-y-auto max-h-96">
+                {bankIds.map((bankId, index) => (
+                  <button
+                    key={bankId}
+                    onClick={() => setSelectedBankId(bankId)}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all text-sm text-left",
+                      selectedBank === bankId
+                        ? "bg-muted border-2 border-foreground"
+                        : "hover:bg-muted/50 border-2 border-transparent"
+                    )}
+                  >
+                    <div className={cn(
+                      "h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0",
+                      getBankBgColor(index)
+                    )}>
+                      {getBankInitials(plansByBank[bankId].bankName)}
+                    </div>
+                    <span className="truncate">{plansByBank[bankId].bankName}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Amount and Plans */}
-          <div className="col-span-1 md:col-span-2">
+          <div className="lg:col-span-3">
             {/* Amount Input */}
             <div className="mb-6">
-              <label className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-2 block">
-                Amount
+              <label className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-3 block">
+                Enter Amount
               </label>
               <Input
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="text-lg font-semibold"
+                className="text-lg font-semibold p-3 rounded-lg border border-border"
+                placeholder={formatPrice(price)}
               />
             </div>
 
@@ -148,41 +169,43 @@ export function EmiOptionsModal({
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-left font-bold">Plan (Monthly)</TableHead>
-                    <TableHead className="text-left font-bold">EMI</TableHead>
-                    <TableHead className="text-left font-bold">Effective Cost</TableHead>
+                  <TableRow className="border-b-2 border-border">
+                    <TableHead className="text-left font-bold text-foreground">Plan (Monthly)</TableHead>
+                    <TableHead className="text-left font-bold text-foreground">EMI</TableHead>
+                    <TableHead className="text-left font-bold text-foreground">Charge</TableHead>
+                    <TableHead className="text-left font-bold text-foreground">Effective Cost</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {bankPlans.length > 0 ? (
                     bankPlans.map((plan) => {
-                      // Always use regular price for EMI calculation
-                      const emiAmount = calculateEmi(regularPrice, plan.months, plan.interestRate)
-                      const totalCost = emiAmount * plan.months
-                      const totalInterest = totalCost - regularPrice
-                      const chargePercent = (totalInterest / regularPrice * 100).toFixed(2)
+                      const monthlyEmi = calculateEmi(emiAmount, plan.months, plan.interestRate)
+                      const totalCost = monthlyEmi * plan.months
 
                       return (
-                        <TableRow key={plan.id} className="bg-muted/50">
-                          <TableCell className="font-medium">{plan.months}</TableCell>
-                          <TableCell>
+                        <TableRow key={plan.id} className="border-b border-border hover:bg-muted/30">
+                          <TableCell className="font-medium py-4">{plan.months}</TableCell>
+                          <TableCell className="py-4">
                             <div className="text-[oklch(0.75_0.15_45)] font-semibold">
-                              {formatPrice(emiAmount)}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              (EMI Charge {chargePercent}%)
+                              {formatPrice(monthlyEmi)}
                             </div>
                           </TableCell>
-                          <TableCell className="text-[oklch(0.75_0.15_45)] font-semibold">
-                            {formatPrice(totalCost)}
+                          <TableCell className="py-4">
+                            <div className="text-foreground font-medium">
+                              {plan.interestRate}%
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-4">
+                            <div className="text-[oklch(0.75_0.15_45)] font-semibold">
+                              {formatPrice(totalCost)}
+                            </div>
                           </TableCell>
                         </TableRow>
                       )
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                         No EMI plans available for this bank
                       </TableCell>
                     </TableRow>

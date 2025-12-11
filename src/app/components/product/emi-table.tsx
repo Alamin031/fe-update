@@ -13,13 +13,10 @@ interface EmiTableProps {
 
 export function EmiTable({ price, plans, months = [3, 6, 9, 12, 18, 24], interestRate = 0 }: EmiTableProps) {
   const calculateEmi = (principal: number, monthCount: number, rate: number = 0) => {
-    if (rate === 0) {
-      return Math.ceil(principal / monthCount)
-    }
-    const monthlyRate = rate / 100 / 12
-    const numerator = principal * monthlyRate * Math.pow(1 + monthlyRate, monthCount)
-    const denominator = Math.pow(1 + monthlyRate, monthCount) - 1
-    return Math.ceil(numerator / denominator)
+    // Simple interest calculation: Principal + (Principal * Rate% * Months) / Months
+    const totalInterest = (principal * rate) / 100
+    const totalAmount = principal + (totalInterest * monthCount)
+    return totalAmount / monthCount
   }
 
   // Use plans if provided, otherwise fall back to months array

@@ -3,7 +3,7 @@ export function formatPrice(price: number): string {
     style: "currency",
     currency: "BDT",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   })
     .format(price)
     .replace("BDT", "৳")
@@ -19,7 +19,7 @@ export function formatPriceParts(price: number): { symbol: string; amount: strin
     style: "currency",
     currency: "BDT",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   })
 
   // formatToParts gives us parts like [{type: "currency", value: "BDT"}, {type:"literal",...}, {type:"integer",...}, ...]
@@ -41,7 +41,7 @@ export function formatPriceParts(price: number): { symbol: string; amount: strin
 }
 
 export function formatEMI(price: number, months = 12): string {
-  const emi = Math.ceil(price / months)
+  const emi = price / months
   return `${formatPrice(emi)}/month`
 }
 

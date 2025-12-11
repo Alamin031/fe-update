@@ -957,7 +957,7 @@ export function ProductInfoRegion({
           open={emiModalOpen}
           onOpenChange={setEmiModalOpen}
           plans={emiPlans}
-          price={selectedPrice}
+          price={priceData.regularPrice}
         />
       )}
       {/* Notify Product Dialog */}

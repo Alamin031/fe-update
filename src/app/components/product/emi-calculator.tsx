@@ -24,8 +24,9 @@ export function EMICalculator({ price, onClose }: EMICalculatorProps) {
   const [selectedMonths, setSelectedMonths] = useState(12)
   const selectedOption = emiOptions.find((o) => o.months === selectedMonths) || emiOptions[3]
 
-  const totalWithInterest = price * (1 + selectedOption.interest / 100)
-  const monthlyEMI = Math.ceil(totalWithInterest / selectedOption.months)
+  const totalInterest = (price * selectedOption.interest) / 100
+  const totalWithInterest = price + (totalInterest * selectedOption.months)
+  const monthlyEMI = totalWithInterest / selectedOption.months
 
   return (
     <div className="mt-4 rounded-xl border border-border bg-card p-6">
@@ -64,12 +65,12 @@ export function EMICalculator({ price, onClose }: EMICalculatorProps) {
         </div>
         <div className="mt-2 flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Total Amount</span>
-          <span className="font-medium">{formatPrice(Math.ceil(totalWithInterest))}</span>
+          <span className="font-medium">{formatPrice(totalWithInterest)}</span>
         </div>
         {selectedOption.interest > 0 && (
           <div className="mt-1 flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Interest ({selectedOption.interest}%)</span>
-            <span className="font-medium">{formatPrice(Math.ceil(totalWithInterest - price))}</span>
+            <span className="font-medium">{formatPrice(totalWithInterest - price)}</span>
           </div>
         )}
         {selectedOption.interest === 0 && (
