@@ -15,17 +15,23 @@ export class AuthService {
    * Register a new user
    */
    async register(data: RegisterRequest): Promise<AuthResponse> {
-    const response = await apiClient.post<ApiResponse<AuthResponse>>(
-      API_ENDPOINTS.AUTH_REGISTER,
-      data
-    )
+    try {
+      const response = await apiClient.post<ApiResponse<AuthResponse>>(
+        API_ENDPOINTS.AUTH_REGISTER,
+        data
+      )
 
-    if (response.data.data) {
-      const { token, refreshToken } = response.data.data
-      TokenManager.setTokens(token, refreshToken)
+      if (response.data.data) {
+        const { token, refreshToken } = response.data.data
+        TokenManager.setTokens(token, refreshToken)
+      }
+
+      return response.data.data!
+    } catch (error) {
+      // Auto-clear on register error
+      TokenManager.clearTokens()
+      throw error
     }
-
-    return response.data.data!
   }
 
   /**
