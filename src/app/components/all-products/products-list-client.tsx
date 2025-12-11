@@ -16,6 +16,8 @@ interface ProductsListClientProps {
   selectedCategories?: string[]
   selectedBrands?: string[]
   allProducts?: Product[]
+  categories?: any[]
+  brands?: any[]
 }
 
 const PAGE_SIZE = 20
