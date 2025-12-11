@@ -969,20 +969,16 @@ export function ProductInfoRegion({
         />
       )}
       {/* Notify Product Dialog */}
-      {notifyDialogOpen && (
-        <NotifyProductDialog
-          open={notifyDialogOpen}
-          onOpenChange={setNotifyDialogOpen}
-          product={product}
-        />
-      )}
+      <NotifyProductDialog
+        open={notifyDialogOpen}
+        onOpenChange={setNotifyDialogOpen}
+        product={product}
+      />
       {/* Company Deal Modal */}
-      {companyDealModalOpen && (
-        <CompanyDealModal
-          open={companyDealModalOpen}
-          onOpenChange={setCompanyDealModalOpen}
-        />
-      )}
+      <CompanyDealModal
+        open={companyDealModalOpen}
+        onOpenChange={setCompanyDealModalOpen}
+      />
     </div>
   );
 }
