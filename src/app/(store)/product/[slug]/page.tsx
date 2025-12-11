@@ -177,7 +177,7 @@ export default async function ProductPage({params}: ProductPageProps) {
   try {
     if (category?.id) {
       const response = await productsService.getAll(
-        { categoryIds: category.id },
+        { categoryIds: [category.id].join(',') },
         1,
         10,
       );
