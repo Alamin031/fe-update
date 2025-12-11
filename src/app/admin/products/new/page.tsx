@@ -44,6 +44,8 @@ function NewProductPage() {
   const [productCode, setProductCode] = useState('');
   const [sku, setSku] = useState('');
   const [warranty, setWarranty] = useState('');
+  const [delivery, setDelivery] = useState('');
+  const [easyReturns, setEasyReturns] = useState('');
 
   // Category and Brand
   const [categories, setCategories] = useState<{id: string; name: string}[]>(
@@ -1040,6 +1042,8 @@ function NewProductPage() {
     setProductCode('');
     setSku('');
     setWarranty('');
+    setDelivery('');
+    setEasyReturns('');
     setSelectedCategories([]);
     setSelectedBrands([]);
     setIsActive(true);
@@ -1140,6 +1144,8 @@ function NewProductPage() {
         isOfficial,
         freeShipping,
         isEmi,
+        delivery: delivery || undefined,
+        easyReturns: easyReturns || undefined,
         rewardPoints: rewardPoints ? Number(rewardPoints) : undefined,
         minBookingPrice: minBookingPrice ? Number(minBookingPrice) : undefined,
         ratingPoint: ratingPoint ? Number(ratingPoint) : undefined,
@@ -1776,6 +1782,25 @@ function NewProductPage() {
                     value={warranty}
                     onChange={e => setWarranty(e.target.value)}
                     placeholder="e.g., 1 year"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Delivery</Label>
+                  <Input
+                    value={delivery}
+                    onChange={e => setDelivery(e.target.value)}
+                    placeholder="e.g., 2-3 business days"
+                  />
+                </div>
+                <div>
+                  <Label>Easy Returns</Label>
+                  <Input
+                    value={easyReturns}
+                    onChange={e => setEasyReturns(e.target.value)}
+                    placeholder="e.g., 7 days return policy"
                   />
                 </div>
               </div>
