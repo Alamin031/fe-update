@@ -83,7 +83,7 @@ export function AllProductsFilters({
     router.push(newUrl, { scroll: false });
   }, [activeCategories, activeBrands, router]);
 
-  const hasActiveFilters = activeCategories.length > 0 || activeBrands.length > 0;
+  const hasActiveFilters = activeCategories.length > 0;
 
   const FilterContent = () => (
     <div className="space-y-6">
@@ -181,7 +181,7 @@ export function AllProductsFilters({
               Filters
               {hasActiveFilters && (
                 <span className="rounded-full bg-foreground px-2 py-0.5 text-xs text-background">
-                  {activeCategories.length + activeBrands.length}
+                  {activeCategories.length}
                 </span>
               )}
             </Button>
