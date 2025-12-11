@@ -87,10 +87,17 @@ export function ProductsListClient({
       images: product.images ?? [],
     })
 
+    // Use fetched data if available and has items
     if (paginatedData?.data && paginatedData.data.length > 0) {
       return paginatedData.data.map(mapToAppProduct)
     }
-    return currentPage === 1 ? initialProducts.map(mapToAppProduct) : []
+
+    // Fallback to initial products on first page
+    if (currentPage === 1 && initialProducts.length > 0) {
+      return initialProducts.map(mapToAppProduct)
+    }
+
+    return []
   }, [paginatedData, initialProducts, currentPage])
 
   const handleNextPage = () => {
