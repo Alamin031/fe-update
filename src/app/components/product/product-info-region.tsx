@@ -30,6 +30,7 @@ import {NotifyProductDialog} from './notify-product-dialog';
 import {CompanyDealModal} from './company-deal-modal';
 import {careService, type ProductCarePlan} from '@/app/lib/api/services/care';
 import {emiService, type EmiPlan} from '@/app/lib/api/services/emi';
+import {productNotifyService} from '@/app/lib/api/services/notify';
 import type {Product} from '@/app/types';
 
 type Region = {
