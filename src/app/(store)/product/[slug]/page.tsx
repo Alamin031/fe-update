@@ -184,11 +184,17 @@ export default async function ProductPage({params}: ProductPageProps) {
   let relatedProducts: Product[] = [];
   try {
     if (category?.id) {
+      console.log('DEBUG - Fetching related products for categoryId:', category.id);
       const response = await productsService.getAll(
         {categoryId: category.id},
         1,
         10,
       );
+      console.log('DEBUG - Related products response:', {
+        totalCount: (response.data || []).length,
+        categoryId: category.id,
+        firstProductCategory: (response.data?.[0] as any)?.category?.name,
+      });
       relatedProducts = (response.data || [])
         .filter(p => p.id !== product.id && typeof p.slug === 'string')
         .map(p => {
