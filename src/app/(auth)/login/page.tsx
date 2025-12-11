@@ -73,6 +73,10 @@ export default function LoginPage() {
       const token = res.token ?? res.access_token;
       if (!token) throw new Error("No token received from API");
       login(userToStore, token);
+
+      // Hydrate to fetch fresh user data from API
+      await useAuthStore.getState().hydrate();
+
       toast.success("Login successful");
 
       if (fromParam && (fromParam.startsWith("/admin") || fromParam.startsWith("/account"))) {
