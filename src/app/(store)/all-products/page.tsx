@@ -104,14 +104,30 @@ export default async function Page({ searchParams }: AllProductsPageProps) {
       selectedCategories.length === 0 ||
       selectedCategories.some((categorySlug) => {
         const category = categories.find((c) => c.slug === categorySlug);
-        return category && product.categoryId === category.id;
+        if (!category) return false;
+
+        // Handle both categoryId (singular) and categoryIds (plural array)
+        const productCategoryId = (product as any).categoryId;
+        const productCategoryIds = (product as any).categoryIds as string[] | undefined;
+
+        if (productCategoryId === category.id) return true;
+        if (productCategoryIds && productCategoryIds.includes(category.id)) return true;
+        return false;
       });
 
     const matchesBrand =
       selectedBrands.length === 0 ||
       selectedBrands.some((brandSlug) => {
         const brand = brands.find((b) => b.slug === brandSlug);
-        return brand && product.brandId === brand.id;
+        if (!brand) return false;
+
+        // Handle both brandId (singular) and brandIds (plural array)
+        const productBrandId = (product as any).brandId;
+        const productBrandIds = (product as any).brandIds as string[] | undefined;
+
+        if (productBrandId === brand.id) return true;
+        if (productBrandIds && productBrandIds.includes(brand.id)) return true;
+        return false;
       });
 
     return matchesCategory && matchesBrand;
