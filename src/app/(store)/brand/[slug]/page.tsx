@@ -32,13 +32,19 @@ export default async function BrandPage({params}: BrandPageProps) {
   let brand: Brand | null = null;
   let products: Product[] = [];
   try {
-    brand = await brandsService.getBySlug(slug);
-    const res = await brandsService.getProducts(slug, 1, 100);
-    // Adjust the property access below to match your actual BrandProductsResponse type
-    if (Array.isArray(res)) {
-      products = res as Product[];
-    } else if (res && Array.isArray((res as any).products)) {
-      products = (res as any).products as Product[];
+    // Parallelize API calls for better performance
+    const [brandData, productsRes] = await Promise.all([
+      brandsService.getBySlug(slug),
+      brandsService.getProducts(slug, 1, 100).catch(() => null),
+    ]);
+
+    brand = brandData;
+
+    // Process products response
+    if (Array.isArray(productsRes)) {
+      products = productsRes as Product[];
+    } else if (productsRes && Array.isArray((productsRes as any).products)) {
+      products = (productsRes as any).products as Product[];
     }
   } catch {
     notFound();
