@@ -184,8 +184,6 @@ export function EmiOptionsModal({
                     bankPlans.map((plan) => {
                       const monthlyEmi = calculateEmi(emiAmount, plan.months, plan.interestRate)
                       const totalCost = monthlyEmi * plan.months
-                      const totalInterest = totalCost - emiAmount
-                      const chargePercent = emiAmount > 0 ? ((totalInterest / emiAmount) * 100).toFixed(2) : "0.00"
 
                       return (
                         <TableRow key={plan.id} className="border-b border-border hover:bg-muted/30">
@@ -197,7 +195,7 @@ export function EmiOptionsModal({
                           </TableCell>
                           <TableCell className="py-4">
                             <div className="text-foreground font-medium">
-                              {chargePercent}%
+                              {plan.interestRate}%
                             </div>
                           </TableCell>
                           <TableCell className="py-4">
