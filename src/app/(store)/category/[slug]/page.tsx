@@ -75,7 +75,13 @@ export async function generateMetadata({
 
 export default async function Page({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const categoriesRaw = await categoriesService.getAll();
+
+  // Parallelize API calls for better performance
+  const [categoriesRaw, productsRaw] = await Promise.all([
+    categoriesService.getAll(),
+    productsService.getAll({}, 1, 1000).catch(() => null),
+  ]);
+
   const categories: Category[] = (
     categoriesRaw as unknown as RawCategory[]
   ).map((c: RawCategory) => ({
@@ -107,21 +113,17 @@ export default async function Page({ params }: CategoryPageProps) {
   if (!category) {
     notFound();
   }
-  // Fetch all products with full details
+
+  // Process products
   let products: Product[] = [];
-  try {
-    const allRes = await productsService.getAll({}, 1, 1000);
+  if (productsRaw && typeof productsRaw === "object") {
     let allProducts: Product[] = [];
-    if (allRes && typeof allRes === "object") {
-      if (Array.isArray((allRes as { data?: unknown[] }).data)) {
-        allProducts = (allRes as { data?: unknown[] }).data as Product[];
-      } else if (Array.isArray((allRes as { items?: unknown[] }).items)) {
-        allProducts = (allRes as { items?: unknown[] }).items as Product[];
-      } else if (Array.isArray(allRes)) {
-        allProducts = allRes as Product[];
-      }
-    } else if (Array.isArray(allRes)) {
-      allProducts = allRes as Product[];
+    if (Array.isArray((productsRaw as { data?: unknown[] }).data)) {
+      allProducts = (productsRaw as { data?: unknown[] }).data as Product[];
+    } else if (Array.isArray((productsRaw as { items?: unknown[] }).items)) {
+      allProducts = (productsRaw as { items?: unknown[] }).items as Product[];
+    } else if (Array.isArray(productsRaw)) {
+      allProducts = productsRaw as Product[];
     }
 
     // Filter products for this category
@@ -131,8 +133,8 @@ export default async function Page({ params }: CategoryPageProps) {
       }
       return p.categoryId === category.id;
     });
-  } catch {
-    products = [];
+  } else if (Array.isArray(productsRaw)) {
+    products = productsRaw as Product[];
   }
 
   return (
