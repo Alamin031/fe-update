@@ -19,41 +19,31 @@ export function BrandSlider({ brands }: BrandSliderProps) {
         Shop by Brand
       </h2>
 
-      <div
-        ref={containerRef}
-        className="overflow-hidden"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        // allow touch to pause on mobile
-        onTouchStart={() => setIsPaused(true)}
-        onTouchEnd={() => setIsPaused(false)}
-      >
-        <div className="flex gap-4 min-w-max items-stretch px-2">
-          {Array(4).fill(0).flatMap((_, i) =>
-            safeBrands.map((brand) => (
-              <Link
-                key={`${brand.slug}-dup${i}`}
-                href={`/brand/${brand.slug}`}
-                aria-label={`Shop ${brand.name}`}
-                className="group relative flex shrink-0 items-center justify-center rounded-xl border border-border bg-card p-3 transition-transform duration-200 hover:scale-105 hover:shadow-lg"
-                style={{ width: "200px", height: "72px" }}
-              >
-                <div className="flex h-full w-full items-center justify-center">
-                  <div
-                    className="w-full h-full"
-                    style={{ aspectRatio: "1920/600", position: "relative" }}
-                  >
-                    <Image
-                      src={brand.logo || "/placeholder.svg"}
-                      alt={brand.name}
-                      fill
-                      className="object-contain opacity-95 transition-opacity duration-200 group-hover:opacity-100 rounded"
-                    />
-                  </div>
+      <div className="overflow-x-auto">
+        <div className="flex gap-4 justify-center items-stretch px-4 pb-2">
+          {safeBrands.map((brand) => (
+            <Link
+              key={brand.slug}
+              href={`/brand/${brand.slug}`}
+              aria-label={`Shop ${brand.name}`}
+              className="group relative flex shrink-0 items-center justify-center rounded-xl border border-border bg-card p-3 transition-transform duration-200 hover:scale-105 hover:shadow-lg"
+              style={{ width: "200px", height: "72px" }}
+            >
+              <div className="flex h-full w-full items-center justify-center">
+                <div
+                  className="w-full h-full"
+                  style={{ aspectRatio: "1920/600", position: "relative" }}
+                >
+                  <Image
+                    src={brand.logo || "/placeholder.svg"}
+                    alt={brand.name}
+                    fill
+                    className="object-contain opacity-95 transition-opacity duration-200 group-hover:opacity-100 rounded"
+                  />
                 </div>
-              </Link>
-            ))
-          )}
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
