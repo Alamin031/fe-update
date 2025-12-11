@@ -191,9 +191,13 @@ export default async function ProductPage({params}: ProductPageProps) {
         10,
       );
       console.log('DEBUG - Related products response:', {
+        hasData: !!response.data,
         totalCount: (response.data || []).length,
         categoryId: category.id,
+        firstProductId: (response.data?.[0] as any)?.id,
+        firstProductName: (response.data?.[0] as any)?.name,
         firstProductCategory: (response.data?.[0] as any)?.category?.name,
+        firstProductCategoryId: (response.data?.[0] as any)?.category?.id,
       });
       relatedProducts = (response.data || [])
         .filter(p => p.id !== product.id && typeof p.slug === 'string')
