@@ -34,6 +34,26 @@ export const productsService = {
     return response.data;
   },
 
+  //get all products by category ids
+  getAllByCategoryIds: async (
+    categoryIds: string[],
+    page = 1,
+    limit = 20,
+  ): Promise<ProductListResponse> => {
+    const offset = (page - 1) * limit;
+    const response = await apiClient.get<ProductListResponse>(
+      API_ENDPOINTS.PRODUCTS_GET,
+      {
+        params: {
+          offset,
+          limit,
+          categoryIds: categoryIds.join(','),
+        },
+      },
+    );
+    return response.data;
+  },
+
   /**
    * Get all products with optional filters
    */
