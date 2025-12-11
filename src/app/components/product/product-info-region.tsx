@@ -138,6 +138,11 @@ export function ProductInfoRegion({
   const {addItem: addToCompare, isInCompare} = useCompareStore();
   const user = useAuthStore(state => state.user);
 
+  // Set hydration flag after mount
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   // Fetch care plans if isCare is true
   useEffect(() => {
     const fetchCarePlans = async () => {
