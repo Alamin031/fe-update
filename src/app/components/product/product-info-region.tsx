@@ -134,6 +134,7 @@ export function ProductInfoRegion({
     isInWishlist,
   } = useWishlistStore();
   const {addItem: addToCompare, isInCompare} = useCompareStore();
+  const user = useAuthStore(state => state.user);
 
   // Fetch care plans if isCare is true
   useEffect(() => {
