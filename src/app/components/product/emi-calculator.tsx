@@ -24,8 +24,9 @@ export function EMICalculator({ price, onClose }: EMICalculatorProps) {
   const [selectedMonths, setSelectedMonths] = useState(12)
   const selectedOption = emiOptions.find((o) => o.months === selectedMonths) || emiOptions[3]
 
-  const totalWithInterest = price * (1 + selectedOption.interest / 100)
-  const monthlyEMI = Math.ceil(totalWithInterest / selectedOption.months)
+  const totalInterest = (price * selectedOption.interest) / 100
+  const totalWithInterest = price + (totalInterest * selectedOption.months)
+  const monthlyEMI = totalWithInterest / selectedOption.months
 
   return (
     <div className="mt-4 rounded-xl border border-border bg-card p-6">
