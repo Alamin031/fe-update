@@ -101,14 +101,12 @@ export function ProductSectionLazy({
   const isLoading = productsProp ? false : swrLoading;
 
   return (
-    <LazySection>
-      <ProductSection
-        title={title}
-        subtitle={subtitle}
-        products={products}
-        viewAllLink={viewAllLink}
-        isLoading={isLoading}
-      />
-    </LazySection>
+    <ProductSection
+      title={title}
+      subtitle={subtitle}
+      products={products}
+      viewAllLink={viewAllLink}
+      isLoading={isLoading}
+    />
   );
 }
