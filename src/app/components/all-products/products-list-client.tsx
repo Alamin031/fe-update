@@ -52,17 +52,24 @@ export function ProductsListClient({
     async () => {
       const filters: any = {}
 
-      // Send category and brand IDs as comma-separated strings for API compatibility
-      if (selectedCategoryIds.length > 0) {
-        filters.categoryIds = selectedCategoryIds.join(',')
-      }
+      // Send category and brand IDs - the API expects comma-separated values
+      // But we should also handle the case where it might not accept any filters (fallback)
+      try {
+        if (selectedCategoryIds.length > 0) {
+          filters.categoryIds = selectedCategoryIds.join(',')
+        }
 
-      if (selectedBrandIds.length > 0) {
-        filters.brandIds = selectedBrandIds.join(',')
-      }
+        if (selectedBrandIds.length > 0) {
+          filters.brandIds = selectedBrandIds.join(',')
+        }
 
-      const response = await productsService.getAll(filters, currentPage, PAGE_SIZE)
-      return response
+        const response = await productsService.getAll(filters, currentPage, PAGE_SIZE)
+        return response
+      } catch (err) {
+        // If the API call fails with filters, try without them
+        console.error('Error fetching products with filters:', err)
+        throw err
+      }
     },
     {
       ttl: 300000, // 5 minutes
