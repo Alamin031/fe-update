@@ -181,10 +181,6 @@ export default async function ProductPage({params}: ProductPageProps) {
         1,
         10,
       );
-      console.log('DEBUG - Related products API response:', {
-        totalCount: (response.data || []).length,
-        firstProduct: (response.data?.[0] as any),
-      });
       relatedProducts = (response.data || [])
         .filter(p => p.id !== product.id && typeof p.slug === 'string')
         .map(p => {
