@@ -910,17 +910,30 @@ export function EditProductModal({
       if (type === 'basic') {
         if (product.directColors) {
           setBasicColors(
-            product.directColors.map((c: any) => ({
-              ...c,
-              id: c.id || `color-${Date.now()}-${Math.random()}`,
-              colorName: c.colorName || c.name,
-              colorImage: c.colorImage || c.image,
-              regularPrice: c.regularPrice?.toString() || '',
-              discountPrice: c.discountPrice?.toString() || '',
-              discountPercent: c.discountPercent?.toString() || '',
-              stockQuantity: c.stockQuantity?.toString() || '',
-              isDefault: c.isDefault || false,
-            })),
+            product.directColors.map((c: any) => {
+              const regularPrice = c.regularPrice ? Number(c.regularPrice) : 0;
+              const discountPrice = c.discountPrice ? Number(c.discountPrice) : 0;
+              let discountPercent = c.discountPercent ? Number(c.discountPercent) : 0;
+
+              // Calculate discount percent if missing but we have both prices
+              if (discountPercent === 0 && regularPrice > 0 && discountPrice > 0) {
+                discountPercent = Math.round(
+                  ((regularPrice - discountPrice) / regularPrice) * 100,
+                );
+              }
+
+              return {
+                ...c,
+                id: c.id || `color-${Date.now()}-${Math.random()}`,
+                colorName: c.colorName || c.name,
+                colorImage: c.colorImage || c.image,
+                regularPrice: regularPrice.toString(),
+                discountPrice: discountPrice.toString(),
+                discountPercent: discountPercent.toString(),
+                stockQuantity: c.stockQuantity?.toString() || '',
+                isDefault: c.isDefault || false,
+              };
+            }),
           );
         } else {
           setBasicColors([]);
