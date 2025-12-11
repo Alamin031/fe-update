@@ -960,14 +960,12 @@ export function ProductInfoRegion({
         </div>
       )}
       {/* EMI Options Modal */}
-      {emiModalOpen && (
-        <EmiOptionsModal
-          open={emiModalOpen}
-          onOpenChange={setEmiModalOpen}
-          plans={emiPlans}
-          price={priceData.regularPrice}
-        />
-      )}
+      <EmiOptionsModal
+        open={emiModalOpen}
+        onOpenChange={setEmiModalOpen}
+        plans={emiPlans}
+        price={priceData.regularPrice}
+      />
       {/* Notify Product Dialog */}
       <NotifyProductDialog
         open={notifyDialogOpen}
