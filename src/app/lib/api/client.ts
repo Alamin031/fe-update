@@ -32,17 +32,16 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true
       try {
         const authStore = useAuthStore.getState()
-        if (authStore.token) {
-          authStore.logout()
-          if (typeof window !== "undefined") {
-            window.location.href = "/auth/login"
-          }
+        authStore.logout()
+        if (typeof window !== "undefined") {
+          // Force hard reload to clear middleware cache and trigger auth checks
+          window.location.href = "/login?session-expired=true"
         }
       } catch (refreshError) {
         const authStore = useAuthStore.getState()
         authStore.logout()
         if (typeof window !== "undefined") {
-          window.location.href = "/auth/login"
+          window.location.href = "/login?session-expired=true"
         }
         return Promise.reject(refreshError)
       }
