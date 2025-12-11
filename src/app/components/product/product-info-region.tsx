@@ -22,7 +22,7 @@ import {useCartStore} from '@/app/store/cart-store';
 import {useAuthStore} from '@/app/store/auth-store';
 import {useWishlistStore} from '@/app/store/wishlist-store';
 import {useCompareStore} from '@/app/store/compare-store';
-import {formatPrice} from '@/app/lib/utils/format';
+import {formatPrice, formatPriceParts} from '@/app/lib/utils/format';
 import {cn} from '@/app/lib/utils';
 import {EmiOptionsModal} from './emi-options-modal';
 import {CarePlansDisplay} from './care-plans-display';
@@ -517,7 +517,7 @@ export function ProductInfoRegion({
   }, [selectedRegion, selectedColor, selectedStorage, colors, storages]);
 
   return (
-    <div className="flex flex-col space-y-8">
+    <div className="flex flex-col space-y-5">
       {/* Header Actions */}
       <div className="flex items-center justify-between">
         <div className="flex-1">
@@ -543,9 +543,9 @@ export function ProductInfoRegion({
 
       {/* Rating & Stock Status */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 text-sm text-foreground">
           {(product.ratingPoint && product.ratingPoint > 0) || (product.rating > 0) ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className="flex gap-1">
                 {Array.from({length: 5}).map((_, i) => {
                   const ratingValue = product.ratingPoint || product.rating;
@@ -564,13 +564,9 @@ export function ProductInfoRegion({
                   );
                 })}
               </div>
-              <span className="text-sm font-medium">
-                {(product.ratingPoint || product.rating).toFixed(1)}
-              </span>
+              <span className="font-semibold">{(product.ratingPoint || product.rating).toFixed(1)}</span>
               {product.reviewCount > 0 && (
-                <span className="text-xs text-muted-foreground">
-                  ({product.reviewCount})
-                </span>
+                <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
               )}
             </div>
           ) : null}
@@ -579,194 +575,201 @@ export function ProductInfoRegion({
         <div suppressHydrationWarning />
       </div>
 
-      <Separator className="mb-2" />
-
       {/* Price Section */}
-      <div className="space-y-4">
-        <div className="flex items-baseline gap-3">
-          <div className="text-5xl font-bold tracking-tight">
-            {formatPrice(
-              priceData.hasDiscount
-                ? priceData.discountPrice
-                : priceData.regularPrice,
-            )}
-          </div>
+      <div className="space-y-3 rounded-2xl border border-border/80 bg-white/60 dark:bg-background/60 p-4 shadow-sm">
+        <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Price</div>
+        <div className="flex items-end gap-4 flex-wrap">
+          {(() => {
+            const displayPrice = priceData.hasDiscount
+              ? priceData.discountPrice
+              : priceData.regularPrice;
+            const {symbol, amount} = formatPriceParts(displayPrice);
+            return (
+              <span className="flex items-baseline gap-2">
+                <span className="text-5xl font-black leading-none text-foreground tracking-tight">{symbol}</span>
+                <span className="text-5xl font-bold leading-none text-foreground tracking-tight">{amount}</span>
+              </span>
+            );
+          })()}
           {priceData.hasDiscount && (
-            <>
-              <div className="text-xl text-muted-foreground line-through">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="text-base text-muted-foreground line-through">
                 {formatPrice(priceData.regularPrice)}
               </div>
               <Badge
                 variant="secondary"
-                className="bg-red-100/80 text-red-700 dark:bg-red-900/30 dark:text-red-400 font-bold">
+                className="bg-red-100/80 text-red-700 dark:bg-red-900/30 dark:text-red-400 font-semibold px-2 py-1 text-xs rounded-md">
                 {priceData.discount}%
               </Badge>
-            </>
+            </div>
           )}
         </div>
         {priceData.hasDiscount && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground pt-1">
             Save {formatPrice(priceData.regularPrice - priceData.discountPrice)}
           </p>
         )}
       </div>
 
-      <Separator className="my-2" />
-
-      {/* Region/Network Selection */}
-      {regions.length > 1 && !isBasicProduct && (
-        <div className="space-y-4">
-          <label
-            className="text-sm font-semibold uppercase tracking-wider text-foreground"
-            suppressHydrationWarning>
-            {isNetworkProduct ? 'NETWORK' : 'VARIANT'}
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {regions.map(region => {
-              const regionName =
-                region.name && region.name.trim() ? region.name.trim() : '';
-              return (
-                <button
-                  key={region.id}
-                  onClick={() => {
-                    setSelectedRegionId(region.id);
-                    setSelectedColorId('');
-                    setSelectedStorageId('');
-                  }}
-                  className={cn(
-                    'px-4 py-2.5 rounded-lg border-2 text-sm font-medium transition-all duration-200',
-                    selectedRegionId === region.id
-                      ? 'border-foreground bg-foreground text-background'
-                      : 'border-border hover:border-foreground/30 hover:bg-muted/50',
-                  )}>
-                  {regionName || 'Option'}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Color Selection */}
-      {colors.length > 0 && (
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-semibold uppercase tracking-wider text-foreground">
-              COLOR
-            </label>
-            <p className="text-sm text-muted-foreground mt-1">
-              {selectedColor?.name || 'Select a color'}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {colors.map(color => (
-              <button
-                key={color.id}
-                onClick={() => {
-                  setSelectedColorId(color.id);
-                  if (onColorChange) {
-                    onColorChange(color.image || null);
-                  }
-                }}
-                className={cn(
-                  'flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-200',
-                  selectedColorId === color.id
-                    ? 'ring-2 ring-foreground ring-offset-2'
-                    : 'hover:ring-1 hover:ring-muted-foreground',
-                )}
-                title={color.name}>
-                {color.image ? (
-                  <div className="h-16 w-16 overflow-hidden rounded-lg bg-muted border border-border">
-                    <img
-                      src={color.image}
-                      alt={color.name}
-                      className="h-full w-full object-cover"
-                      onError={e => {
-                        e.currentTarget.src = '/placeholder-color.png';
+      {/* Selections Card */}
+      {(regions.length > 1 && !isBasicProduct) || colors.length > 0 || (storages.length > 0 && colors.some(c => c.hasStorage === true)) ? (
+        <div className="space-y-4 rounded-2xl border border-border/80 bg-white/60 dark:bg-background/60 p-4 shadow-sm">
+          {/* Region/Network Selection */}
+          {regions.length > 1 && !isBasicProduct && (
+            <div className="space-y-3">
+              <label
+                className="text-sm font-semibold uppercase tracking-wider text-foreground"
+                suppressHydrationWarning>
+                {isNetworkProduct ? 'NETWORK' : 'VARIANT'}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {regions.map(region => {
+                  const regionName =
+                    region.name && region.name.trim() ? region.name.trim() : '';
+                  return (
+                    <button
+                      key={region.id}
+                      onClick={() => {
+                        setSelectedRegionId(region.id);
+                        setSelectedColorId('');
+                        setSelectedStorageId('');
                       }}
-                    />
-                  </div>
-                ) : (
-                  <div className="h-16 w-16 rounded-lg bg-muted border border-border flex items-center justify-center">
-                    <span className="text-xs text-muted-foreground">
-                      No Image
+                      className={cn(
+                        'px-4 py-2.5 rounded-lg border-2 text-sm font-medium transition-all duration-200',
+                        selectedRegionId === region.id
+                          ? 'border-foreground bg-foreground text-background'
+                          : 'border-border hover:border-foreground/30 hover:bg-muted/50',
+                      )}>
+                      {regionName || 'Option'}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Color Selection */}
+          {colors.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <label className="text-sm font-semibold uppercase tracking-wider text-foreground">
+                    COLOR
+                  </label>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {selectedColor?.name || 'Select a color'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {colors.map(color => (
+                  <button
+                    key={color.id}
+                    onClick={() => {
+                      setSelectedColorId(color.id);
+                      if (onColorChange) {
+                        onColorChange(color.image || null);
+                      }
+                    }}
+                    className={cn(
+                      'flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-200',
+                      selectedColorId === color.id
+                        ? 'ring-2 ring-foreground ring-offset-2'
+                        : 'hover:ring-1 hover:ring-muted-foreground',
+                    )}
+                    title={color.name}>
+                    {color.image ? (
+                      <div className="h-16 w-16 overflow-hidden rounded-lg bg-muted border border-border">
+                        <img
+                          src={color.image}
+                          alt={color.name}
+                          className="h-full w-full object-cover"
+                          onError={e => {
+                            e.currentTarget.src = '/placeholder-color.png';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-16 w-16 rounded-lg bg-muted border border-border flex items-center justify-center">
+                        <span className="text-xs text-muted-foreground">
+                          No Image
+                        </span>
+                      </div>
+                    )}
+                    <span className="text-xs font-medium text-center max-w-[70px] truncate">
+                      {color.name}
                     </span>
-                  </div>
-                )}
-                <span className="text-xs font-medium text-center max-w-[70px] truncate">
-                  {color.name}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-      {/* Storage Selection */}
-      {storages.length > 0 && colors.some(c => c.hasStorage === true) && (
-        <div className="space-y-4">
-          <label className="text-sm font-semibold uppercase tracking-wider text-foreground">
-            STORAGE
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {storages.map((storage: any) => {
-              const storageSize =
-                storage.size && typeof storage.size === 'string'
-                  ? storage.size.trim()
-                  : 'Storage';
-              const price = storage.price;
-              const regularPrice = price?.regularPrice || 0;
-              const discountPrice = price?.discountPrice || 0;
-              const hasDiscount =
-                regularPrice > 0 &&
-                discountPrice > 0 &&
-                discountPrice < regularPrice;
-              return (
-                <button
-                  key={storage.id}
-                  onClick={() => setSelectedStorageId(storage.id)}
-                  className={cn(
-                    'px-4 py-2.5 rounded-lg border-2 text-left transition-all duration-200 min-w-[120px]',
-                    selectedStorageId === storage.id
-                      ? 'border-foreground bg-foreground text-background'
-                      : 'border-border hover:border-foreground/30 hover:bg-muted/50',
-                  )}>
-                  <div className="font-medium">{storageSize}</div>
-                  {hasDiscount ? (
-                    <>
-                      <div className="text-sm font-bold">
-                        {formatPrice(discountPrice)}
-                      </div>
-                      <div className="text-xs text-muted-foreground line-through">
-                        {formatPrice(regularPrice)}
-                      </div>
-                    </>
-                  ) : regularPrice > 0 ? (
-                    <div className="text-sm font-bold">
-                      {formatPrice(regularPrice)}
-                    </div>
-                  ) : null}
-                  {typeof storage.stock === 'number' && (
-                    <div className="text-xs mt-1">
-                      {storage.stock <= 10
-                        ? `Only ${storage.stock} left`
-                        : 'In stock'}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+          {/* Storage Selection */}
+          {storages.length > 0 && colors.some(c => c.hasStorage === true) && (
+            <div className="space-y-3">
+              <label className="text-sm font-semibold uppercase tracking-wider text-foreground">
+                STORAGE
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {storages.map((storage: any) => {
+                  const storageSize =
+                    storage.size && typeof storage.size === 'string'
+                      ? storage.size.trim()
+                      : 'Storage';
+                  const price = storage.price;
+                  const regularPrice = price?.regularPrice || 0;
+                  const discountPrice = price?.discountPrice || 0;
+                  const hasDiscount =
+                    regularPrice > 0 &&
+                    discountPrice > 0 &&
+                    discountPrice < regularPrice;
+                  return (
+                    <button
+                      key={storage.id}
+                      onClick={() => setSelectedStorageId(storage.id)}
+                      className={cn(
+                        'px-4 py-2.5 rounded-lg border-2 text-left transition-all duration-200 min-w-[120px]',
+                        selectedStorageId === storage.id
+                          ? 'border-foreground bg-foreground text-background'
+                          : 'border-border hover:border-foreground/30 hover:bg-muted/50',
+                      )}>
+                      <div className="font-medium">{storageSize}</div>
+                      {hasDiscount ? (
+                        <>
+                          <div className="text-sm font-bold">
+                            {formatPrice(discountPrice)}
+                          </div>
+                          <div className="text-xs text-muted-foreground line-through">
+                            {formatPrice(regularPrice)}
+                          </div>
+                        </>
+                      ) : regularPrice > 0 ? (
+                        <div className="text-sm font-bold">
+                          {formatPrice(regularPrice)}
+                        </div>
+                      ) : null}
+                      {typeof storage.stock === 'number' && (
+                        <div className="text-xs mt-1">
+                          {storage.stock <= 10
+                            ? `Only ${storage.stock} left`
+                            : 'In stock'}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-
-      <Separator className="my-2" />
+      ) : null}
 
       {/* Quantity Selector & Action Buttons */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-3">
+      <div className="space-y-3 rounded-2xl border border-border/80 bg-white/60 dark:bg-background/60 p-4 shadow-sm">
+        <div className="flex items-center gap-3 flex-wrap">
           {/* Quantity Control */}
-          <div className="flex items-center border border-border rounded-lg">
+          <div className="flex items-center border border-border rounded-xl shadow-sm bg-white/80">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
               className="px-4 py-2.5 text-lg font-semibold text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
@@ -817,10 +820,9 @@ export function ProductInfoRegion({
             <Button
               variant="greentransparent"
               size="icon"
-              className="h-11 w-20 rounded-lg"
+              className="h-11 px-5 rounded-lg"
               onClick={() => setEmiModalOpen(true)}
-              aria-label="Show EMI Options"
-            >
+              aria-label="Show EMI Options">
               <span className="text-emerald-600 font-semibold">EMI</span>
             </Button>
           )}
@@ -852,7 +854,7 @@ export function ProductInfoRegion({
 
       {/* Delivery & Support Info */}
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="flex gap-3 rounded-xl border border-border p-4 hover:bg-muted/50 transition-colors">
+        <div className="flex gap-3 rounded-xl border border-border p-3.5 hover:bg-muted/40 transition-colors bg-white/60 shadow-sm">
           <Truck className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -863,7 +865,7 @@ export function ProductInfoRegion({
             </p>
           </div>
         </div>
-        <div className="flex gap-3 rounded-xl border border-border p-4 hover:bg-muted/50 transition-colors">
+        <div className="flex gap-3 rounded-xl border border-border p-3.5 hover:bg-muted/40 transition-colors bg-white/60 shadow-sm">
           <RotateCcw className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -874,7 +876,7 @@ export function ProductInfoRegion({
             </p>
           </div>
         </div>
-        <div className="flex gap-3 rounded-xl border border-border p-4 hover:bg-muted/50 transition-colors">
+        <div className="flex gap-3 rounded-xl border border-border p-3.5 hover:bg-muted/40 transition-colors bg-white/60 shadow-sm">
           <Shield className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -887,11 +889,9 @@ export function ProductInfoRegion({
         </div>
       </div>
 
-      <Separator className="my-2" />
-
       {/* Price Type Selection */}
       {priceData.hasDiscount && (
-        <div className="space-y-3">
+        <div className="space-y-3 rounded-2xl border border-border/80 bg-white/60 dark:bg-background/60 p-4 shadow-sm">
           <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Payment Options
           </label>
@@ -939,8 +939,6 @@ export function ProductInfoRegion({
           </div>
         </div>
       )}
-
-      <Separator className="my-2" />
 
       {/* Care Plans Display */}
       {carePlans.length > 0 && (
