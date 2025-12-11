@@ -24,7 +24,7 @@ export function BrandSlider({ brands }: BrandSliderProps) {
 
     let rafId: number | null = null;
     let lastTime = performance.now();
-    const speed = 50; // pixels per second
+    const speed = 150; // pixels per second
 
     const step = (now: number) => {
       const delta = now - lastTime;
