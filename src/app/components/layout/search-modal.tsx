@@ -83,6 +83,14 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     }
   }
 
+  const handleProductClick = (product: any) => {
+    if (product.slug) {
+      router.push(`/product/${product.slug}`)
+      onClose()
+      setQuery("")
+    }
+  }
+
   if (!isOpen) return null
 
   return (
