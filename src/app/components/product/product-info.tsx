@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 import {
   Heart,
-  BarChart3,
+  ArrowLeftRight,
   ShoppingCart,
   Share2,
   Shield,
@@ -109,7 +109,7 @@ export function ProductInfo({product}: ProductInfoProps) {
           size="sm"
           className="gap-2 text-muted-foreground hover:text-foreground"
           onClick={handleAddToCompareAndNavigate}>
-          <BarChart3 className="h-4 w-4" />
+          <ArrowLeftRight className="h-4 w-4" />
           Add to Compare
         </Button>
       </div>
@@ -289,7 +289,7 @@ export function ProductInfo({product}: ProductInfoProps) {
             inCompare && 'border-foreground bg-foreground text-background',
           )}
           onClick={() => addToCompare(product)}>
-          <BarChart3 className="h-5 w-5" />
+          <ArrowLeftRight className="h-5 w-5" />
         </Button>
       </div>
 

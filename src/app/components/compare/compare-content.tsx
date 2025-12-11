@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { X, BarChart3, ArrowRight, Search } from "lucide-react"
+import { X, ArrowLeftRight, ArrowRight, Search } from "lucide-react"
 import { Button } from "../ui/button"
 import { useCompareStore } from "@/app/store/compare-store"
 import { formatPrice } from "@/app/lib/utils/format"
@@ -29,7 +29,7 @@ export function CompareContent() {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-          <BarChart3 className="h-10 w-10 text-muted-foreground" />
+          <ArrowLeftRight className="h-10 w-10 text-muted-foreground" />
         </div>
         <h2 className="text-xl font-semibold">No products to compare</h2>
         <p className="mt-2 text-muted-foreground">

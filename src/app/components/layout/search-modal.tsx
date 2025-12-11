@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { productsService } from "@/app/lib/api/services/products"
 import { useRouter } from "next/navigation"
 import { Search, X, Clock, TrendingUp, ArrowRight } from "lucide-react"
 import { Button } from "../ui/button"
@@ -16,8 +18,37 @@ interface SearchModalProps {
 
 export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [query, setQuery] = useState("")
+  const [results, setResults] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+  useEffect(() => {
+    let active = true;
+    if (query.trim().length > 0) {
+      productsService.search(query.trim()).then((res) => {
+        if (active) {
+          setLoading(true);
+          setResults(res.data || []);
+          setLoading(false);
+        }
+      }).catch(() => {
+        if (active) {
+          setLoading(true);
+          setResults([]);
+          setLoading(false);
+        }
+      });
+    } else {
+      // Instead of calling setState synchronously, reset state in a microtask
+      Promise.resolve().then(() => {
+        if (active) {
+          setResults([]);
+          setLoading(false);
+        }
+      });
+    }
+    return () => { active = false; };
+  }, [query]);
 
   useEffect(() => {
     if (isOpen) {
@@ -129,13 +160,28 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
               </>
             ) : (
               <div className="space-y-1">
-                <button
-                  onClick={() => handleSearch(query)}
-                  className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-accent"
-                >
-                  <span className="font-medium">Search for &quot;{query}&quot;</span>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                </button>
+                {loading ? (
+                  <div className="p-3 text-center text-muted-foreground">Searching...</div>
+                ) : results.length > 0 ? (
+                  results.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => handleSearch(product.name)}
+                      className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-accent"
+                    >
+                      <span className="font-medium">{product.name}</span>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  ))
+                ) : (
+                  <button
+                    onClick={() => handleSearch(query)}
+                    className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-accent"
+                  >
+                    <span className="font-medium">Search for &quot;{query}&quot;</span>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                )}
               </div>
             )}
           </div>

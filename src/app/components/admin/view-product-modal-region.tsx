@@ -101,6 +101,7 @@ interface Product {
     specKey?: string;
     specValue?: string;
   }>;
+  ratingPoint?: number | string;
 }
 
 interface ViewProductModalRegionProps {
@@ -224,6 +225,10 @@ export function ViewProductModalRegion({
                   <div>
                     <label className="text-xs font-semibold text-muted-foreground uppercase">Reward Points</label>
                     <p className="mt-1 text-sm">{product.rewardPoints || "N/A"}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase">Rating Point</label>
+                    <p className="mt-1 text-sm">{product.ratingPoint !== undefined ? product.ratingPoint : "N/A"}</p>
                   </div>
                 </div>
               </div>

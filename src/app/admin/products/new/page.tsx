@@ -44,6 +44,8 @@ function NewProductPage() {
   const [productCode, setProductCode] = useState('');
   const [sku, setSku] = useState('');
   const [warranty, setWarranty] = useState('');
+  const [delivery, setDelivery] = useState('');
+  const [easyReturns, setEasyReturns] = useState('');
 
   // Category and Brand
   const [categories, setCategories] = useState<{id: string; name: string}[]>(
@@ -237,6 +239,7 @@ function NewProductPage() {
   ]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ratingPoint, setRatingPoint] = useState('');
 
   // Fetch categories and brands
   useEffect(() => {
@@ -1039,6 +1042,8 @@ function NewProductPage() {
     setProductCode('');
     setSku('');
     setWarranty('');
+    setDelivery('');
+    setEasyReturns('');
     setSelectedCategories([]);
     setSelectedBrands([]);
     setIsActive(true);
@@ -1139,8 +1144,11 @@ function NewProductPage() {
         isOfficial,
         freeShipping,
         isEmi,
+        delivery: delivery || undefined,
+        easyReturns: easyReturns || undefined,
         rewardPoints: rewardPoints ? Number(rewardPoints) : undefined,
         minBookingPrice: minBookingPrice ? Number(minBookingPrice) : undefined,
+        ratingPoint: ratingPoint ? Number(ratingPoint) : undefined,
         seoTitle: seoTitle || undefined,
         seoDescription: seoDescription || undefined,
         seoKeywords: seoKeywords
@@ -1584,8 +1592,12 @@ function NewProductPage() {
           <ArrowLeft className="h-4 w-4" />
           Back to Products
         </Link>
-        <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Add New Product</h1>
-        <p className="mt-3 text-base text-gray-600">Create and configure a new product listing for your store</p>
+        <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+          Add New Product
+        </h1>
+        <p className="mt-3 text-base text-gray-600">
+          Create and configure a new product listing for your store
+        </p>
       </div>
 
       <Tabs
@@ -1596,9 +1608,21 @@ function NewProductPage() {
         }}
         className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-8 bg-gray-100 p-1 rounded-lg">
-          <TabsTrigger value="basic" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Basic Product</TabsTrigger>
-          <TabsTrigger value="network" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Network Product</TabsTrigger>
-          <TabsTrigger value="region" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Region Product</TabsTrigger>
+          <TabsTrigger
+            value="basic"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            Basic Product
+          </TabsTrigger>
+          <TabsTrigger
+            value="network"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            Network Product
+          </TabsTrigger>
+          <TabsTrigger
+            value="region"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            Region Product
+          </TabsTrigger>
         </TabsList>
 
         <form
@@ -1612,7 +1636,9 @@ function NewProductPage() {
           className="space-y-6 pt-6">
           <Card className="shadow-sm border-gray-200">
             <CardHeader className="border-b bg-gray-50/50">
-              <CardTitle className="text-xl font-semibold text-gray-900">Basic Information</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Basic Information
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div className="grid grid-cols-2 gap-4">
@@ -1663,7 +1689,9 @@ function NewProductPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium text-gray-900">Category *</Label>
+                  <Label className="text-sm font-medium text-gray-900">
+                    Category *
+                  </Label>
                   <div className="mt-2 rounded-lg border-2 border-gray-200 bg-white p-4 max-h-48 overflow-y-auto shadow-sm hover:border-gray-300 transition-colors">
                     {categories.length > 0 ? (
                       <div className="space-y-2">
@@ -1695,7 +1723,9 @@ function NewProductPage() {
                   )}
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-900">Brand *</Label>
+                  <Label className="text-sm font-medium text-gray-900">
+                    Brand *
+                  </Label>
                   <div className="mt-2 rounded-lg border-2 border-gray-200 bg-white p-4 max-h-48 overflow-y-auto shadow-sm hover:border-gray-300 transition-colors">
                     {brands.length > 0 ? (
                       <div className="space-y-2">
@@ -1755,12 +1785,33 @@ function NewProductPage() {
                   />
                 </div>
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Delivery</Label>
+                  <Input
+                    value={delivery}
+                    onChange={e => setDelivery(e.target.value)}
+                    placeholder="e.g., 2-3 business days"
+                  />
+                </div>
+                <div>
+                  <Label>Easy Returns</Label>
+                  <Input
+                    value={easyReturns}
+                    onChange={e => setEasyReturns(e.target.value)}
+                    placeholder="e.g., 7 days return policy"
+                  />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
           <Card className="shadow-sm border-gray-200">
             <CardHeader className="border-b bg-gray-50/50">
-              <CardTitle className="text-xl font-semibold text-gray-900">Product Status</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Product Status
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="grid grid-cols-2 gap-4">
@@ -1826,11 +1877,15 @@ function NewProductPage() {
 
           <Card className="shadow-sm border-gray-200">
             <CardHeader className="border-b bg-gray-50/50">
-              <CardTitle className="text-xl font-semibold text-gray-900">Media</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Media
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div>
-                <Label className="text-sm font-medium text-gray-900">Thumbnail Image</Label>
+                <Label className="text-sm font-medium text-gray-900">
+                  Thumbnail Image
+                </Label>
                 <div className="mt-2 rounded-lg border-2 border-dashed border-gray-300 p-8 hover:border-gray-400 transition-all bg-gray-50/50">
                   {thumbnailPreview ? (
                     <div className="relative inline-block">
@@ -1864,7 +1919,9 @@ function NewProductPage() {
               </div>
 
               <div>
-                <Label className="text-sm font-medium text-gray-900">Gallery Images</Label>
+                <Label className="text-sm font-medium text-gray-900">
+                  Gallery Images
+                </Label>
                 <div className="mt-2 rounded-lg border-2 border-dashed border-gray-300 p-8 hover:border-gray-400 transition-all bg-gray-50/50">
                   {galleryImagePreviews.length > 0 ? (
                     <div className="grid grid-cols-4 gap-4">
@@ -1916,7 +1973,9 @@ function NewProductPage() {
 
           <Card className="shadow-sm border-gray-200">
             <CardHeader className="border-b bg-gray-50/50">
-              <CardTitle className="text-xl font-semibold text-gray-900">SEO Settings</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                SEO Settings
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div>
@@ -1963,7 +2022,9 @@ function NewProductPage() {
 
           <Card className="shadow-sm border-gray-200">
             <CardHeader className="border-b bg-gray-50/50">
-              <CardTitle className="text-xl font-semibold text-gray-900">Specifications</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Specifications
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               {specifications.map((spec, idx) => (
@@ -2002,7 +2063,9 @@ function NewProductPage() {
 
           <Card className="shadow-sm border-gray-200">
             <CardHeader className="border-b bg-gray-50/50">
-              <CardTitle className="text-xl font-semibold text-gray-900">Additional Info</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Additional Info
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="grid grid-cols-2 gap-4">
@@ -2026,6 +2089,19 @@ function NewProductPage() {
                     placeholder="0"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="ratingPoint">Rating Point</Label>
+                  <Input
+                    id="ratingPoint"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={ratingPoint}
+                    onChange={e => setRatingPoint(e.target.value)}
+                    placeholder="0-5"
+                  />
+                </div>
               </div>
               <div>
                 <Label htmlFor="tags">Tags (comma-separated)</Label>
@@ -2042,7 +2118,9 @@ function NewProductPage() {
           <TabsContent value="basic" className="space-y-6">
             <Card className="shadow-sm border-gray-200">
               <CardHeader className="border-b bg-gray-50/50">
-                <CardTitle className="text-xl font-semibold text-gray-900">Colors & Pricing</CardTitle>
+                <CardTitle className="text-xl font-semibold text-gray-900">
+                  Colors & Pricing
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
                 {basicColors.map((color, idx) => (
@@ -2243,7 +2321,9 @@ function NewProductPage() {
           <TabsContent value="network" className="space-y-6">
             <Card className="shadow-sm border-gray-200">
               <CardHeader className="border-b bg-gray-50/50">
-                <CardTitle className="text-xl font-semibold text-gray-900">Networks & Colors</CardTitle>
+                <CardTitle className="text-xl font-semibold text-gray-900">
+                  Networks & Colors
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
                 {networks.map(network => (
@@ -2475,9 +2555,7 @@ function NewProductPage() {
                     )}
 
                     <div className="space-y-3">
-                      <Label className="block font-semibold">
-                        Colors
-                      </Label>
+                      <Label className="block font-semibold">Colors</Label>
                       {network.colors.map(color => (
                         <div
                           key={color.id}
@@ -2928,7 +3006,9 @@ function NewProductPage() {
           <TabsContent value="region" className="space-y-6">
             <Card className="shadow-sm border-gray-200">
               <CardHeader className="border-b bg-gray-50/50">
-                <CardTitle className="text-xl font-semibold text-gray-900">Regions</CardTitle>
+                <CardTitle className="text-xl font-semibold text-gray-900">
+                  Regions
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
                 {regions.map(region => (

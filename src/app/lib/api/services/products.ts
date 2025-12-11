@@ -26,7 +26,7 @@ export const productsService = {
           offset,
           limit,
           fields:
-            'id,name,sku,categoryId,price,stockQuantity,isActive,lowStockAlert,images,productType,totalStock',
+            'id,name,sku,categoryIds,price,stockQuantity,isActive,lowStockAlert,images,productType,totalStock,slug,productCode',
           ...filters,
         },
       },

@@ -7,7 +7,7 @@ import {useState, useMemo, useEffect} from 'react';
 import {useRouter} from 'next/navigation';
 import {
   Heart,
-  BarChart3,
+  ArrowLeftRight,
   Ban,
   ShoppingCart,
   Shield,
@@ -783,7 +783,7 @@ export function ProductInfoRegion({
 
           {/* Wishlist & Compare Buttons */}
           <Button
-            variant="outline"
+            variant="redtransparent"
             size="icon"
             className="h-11 w-11 rounded-lg"
             onClick={handleWishlistToggle}
@@ -798,25 +798,25 @@ export function ProductInfoRegion({
             />
           </Button>
           <Button
-            variant="outline"
+            variant="orangetransparent"
             size="icon"
             className="h-11 w-11 rounded-lg"
             onClick={() => addToCompare(product)}
             aria-label="Add to compare">
-            <BarChart3
+            <ArrowLeftRight
               className={cn('h-5 w-5', inCompare && 'text-blue-600')}
             />
           </Button>
           {/* EMI Button: Only show if isEmi is true */}
           {Boolean(rawProduct?.isEmi) && (
             <Button
-              variant="outline"
+              variant="greentransparent"
               size="icon"
-              className="h-11 w-11 rounded-lg"
+              className="h-11 w-20 rounded-lg"
               onClick={() => setEmiModalOpen(true)}
               aria-label="Show EMI Options"
             >
-              <Ban className="h-5 w-5 text-emerald-600" />
+              <span className="text-emerald-600 font-semibold">EMI</span>
             </Button>
           )}
         </div>
@@ -836,7 +836,7 @@ export function ProductInfoRegion({
 
         {/* Buy Now Button */}
         <Button
-          variant="secondary"
+          variant="buyNow"
           size="lg"
           className="w-full h-12 text-base font-semibold rounded-lg"
           disabled={isOutOfStock}

@@ -133,6 +133,7 @@ export function EditProductModal({
 
   // Regions
   const [regions, setRegions] = useState<any[]>([]);
+  const [ratingPoint, setRatingPoint] = useState(product?.ratingPoint || '');
 
   // Network helper functions
   const addNetwork = () => {
@@ -1319,6 +1320,7 @@ export function EditProductModal({
         isPreOrder: !!isPreOrder,
         isOfficial: !!isOfficial,
         freeShipping: !!freeShipping,
+        ratingPoint: ratingPoint ? Number(ratingPoint) : undefined,
         isEmi: !!isEmi,
         isCare: !!isCare,
         delivery: delivery || undefined,
@@ -2957,6 +2959,19 @@ export function EditProductModal({
                     type="number"
                     value={minBookingPrice}
                     onChange={e => setMinBookingPrice(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="ratingPoint">Rating Point</Label>
+                  <Input
+                    id="ratingPoint"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={ratingPoint}
+                    onChange={e => setRatingPoint(e.target.value)}
+                    placeholder="0-5"
                   />
                 </div>
               </div>

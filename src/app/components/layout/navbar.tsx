@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Search, ShoppingCart, Heart, User, Menu, X, ChevronDown, BarChart3, Phone, MapPin } from "lucide-react"
+import { Search, ShoppingCart, Heart, User, Menu, X, ChevronDown, ArrowLeftRight, Phone, MapPin } from "lucide-react"
 import { Button } from "../ui/button"
 import { Badge } from "../ui/badge"
 import {
@@ -190,7 +190,7 @@ export function Navbar() {
             {/* Compare */}
             <Link href="/compare" className="hidden sm:inline-flex">
               <Button variant="ghost" size="icon" className="relative">
-                <BarChart3 className="h-5 w-5" />
+                <ArrowLeftRight className="h-5 w-5" />
                 {isHydrated && compareCount > 0 && (
                   <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs">{compareCount}</Badge>
                 )}
