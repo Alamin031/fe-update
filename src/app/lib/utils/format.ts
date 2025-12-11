@@ -19,7 +19,7 @@ export function formatPriceParts(price: number): { symbol: string; amount: strin
     style: "currency",
     currency: "BDT",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   })
 
   // formatToParts gives us parts like [{type: "currency", value: "BDT"}, {type:"literal",...}, {type:"integer",...}, ...]
