@@ -568,12 +568,12 @@ export function EditorJSWrapper({
         }
 
         :global(.dark .editor-js-container .ce-editor) {
-          background-color: rgb(15, 23, 42) !important;
+          background-color: white !important;
         }
 
         :global(.dark .editor-js-container .ce-editor__redactor) {
-          background-color: rgb(15, 23, 42) !important;
-          color: rgb(226, 232, 240);
+          background-color: white !important;
+          color: rgb(30, 41, 59);
         }
 
         :global(.dark .editor-js-container .ce-code) {
