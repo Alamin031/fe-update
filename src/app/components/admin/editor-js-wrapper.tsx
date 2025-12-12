@@ -365,12 +365,12 @@ export function EditorJSWrapper({
 
         :global(.editor-js-container .ce-code) {
           font-family: 'Fira Code', 'Courier New', monospace;
-          background-color: rgb(30, 41, 59);
-          color: rgb(226, 232, 240);
+          background-color: rgb(248, 250, 252);
+          color: rgb(30, 41, 59);
           padding: 1rem;
           border-radius: 0.5rem;
           overflow-x: auto;
-          border: 1px solid rgb(71, 85, 105);
+          border: 1px solid rgb(203, 213, 225);
           font-size: 0.875rem;
           line-height: 1.6;
           margin: 1rem 0;
