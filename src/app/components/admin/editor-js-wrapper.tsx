@@ -261,8 +261,9 @@ export function EditorJSWrapper({
 
       {/* Editor Container */}
       <div
-        className="editor-container bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden transition-shadow hover:shadow-sm"
+        className="editor-container bg-white border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden transition-shadow hover:shadow-sm"
         style={{
+          backgroundColor: 'white',
           boxShadow: isReady ? 'none' : '0 0 0 1px rgba(0,0,0,0.1)',
         }}
       >
