@@ -31,11 +31,38 @@ export function BlogForm({ initialData, isEditing = false }: BlogFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [editorData, setEditorData] = useState<OutputData>(() => {
+    if (initialData?.content) {
+      try {
+        return JSON.parse(typeof initialData.content === 'string' ? initialData.content : JSON.stringify(initialData.content));
+      } catch {
+        // Fallback if content is not valid JSON
+        return {
+          blocks: [
+            {
+              id: 'initial',
+              type: 'paragraph',
+              data: {
+                text: initialData.content || '',
+              },
+            },
+          ],
+          version: '2.28.2',
+          time: Date.now(),
+        };
+      }
+    }
+    return {
+      blocks: [],
+      version: '2.28.2',
+      time: Date.now(),
+    };
+  });
+
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     slug: initialData?.slug || '',
     excerpt: initialData?.excerpt || '',
-    content: initialData?.content || '',
     publishedAt: initialData?.publishedAt ? new Date(initialData.publishedAt).toISOString().slice(0, 16) : '',
     readTime: initialData?.readTime !== undefined && initialData?.readTime !== null ? String(initialData.readTime) : '',
     status: (initialData?.status as 'draft' | 'published') || 'draft',
