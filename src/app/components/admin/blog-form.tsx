@@ -118,14 +118,13 @@ export function BlogForm({ initialData, isEditing = false }: BlogFormProps) {
     if (
       !formData.title ||
       !formData.slug ||
-      !formData.excerpt ||
-      !formData.content
+      !formData.excerpt
     ) {
       setError('Please fill in all required fields');
       return false;
     }
-    if (formData.content.length < 100) {
-      setError('Content must be at least 100 characters');
+    if (!editorData.blocks || editorData.blocks.length === 0) {
+      setError('Please add content to your blog post');
       return false;
     }
     // Require one image
