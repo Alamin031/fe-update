@@ -29,6 +29,7 @@ import {
 } from '../../../components/ui/tabs';
 import {Checkbox} from '../../../components/ui/checkbox';
 import {withProtectedRoute} from '../../../lib/auth/protected-route';
+import { RichTextEditor } from '../../../components/ui/rich-text-editor';
 
 type ProductType = 'basic' | 'network' | 'region';
 
@@ -296,6 +297,11 @@ function NewProductPage() {
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSlug(slugify(e.target.value));
+  };
+
+  // Handle description change from RichTextEditor
+  const handleDescriptionChange = (content: string) => {
+    setDescription(content);
   };
 
   // Thumbnail handling
@@ -1666,24 +1672,28 @@ function NewProductPage() {
 
               <div>
                 <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={e => setDescription(e.target.value)}
-                  placeholder="Enter product description (Markdown supported)"
-                  rows={4}
-                />
+                <div className="mt-1">
+                  <RichTextEditor
+                    value={description}
+                    onChange={handleDescriptionChange}
+                    placeholder="Enter detailed product description..."
+                    className="min-h-[200px]"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Use the toolbar to format your description with headings, lists, bold, etc.
+                </p>
               </div>
 
               <div>
                 <Label htmlFor="shortDescription">Short Description</Label>
-                <input
+                <Input
                   id="shortDescription"
                   type="text"
                   value={shortDescription}
                   onChange={e => setShortDescription(e.target.value)}
                   className="min-h-10 rounded-lg border-2 border-gray-200 p-4 focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-opacity-10 transition-all w-full"
-                  placeholder="Enter short description"
+                  placeholder="Enter short description (shown in product listings)"
                 />
               </div>
 

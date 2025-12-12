@@ -80,7 +80,10 @@ export function ProductTabs({ product, faqs = [] }: ProductTabsProps) {
         {activeTab === "description" && (
           <div className="space-y-8 max-w-3xl">
             <div>
-              <p className="text-base text-muted-foreground leading-relaxed text-justify">{product.description}</p>
+              <div
+                className="text-base text-muted-foreground leading-relaxed text-justify"
+                dangerouslySetInnerHTML={{ __html: product.description || '' }}
+              />
             </div>
             {product.highlights.length > 0 && (
               <div>

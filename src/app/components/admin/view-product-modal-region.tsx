@@ -236,7 +236,10 @@ export function ViewProductModalRegion({
               {product.description && (
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground uppercase">Description</label>
-                  <p className="mt-2 text-sm whitespace-pre-wrap">{product.description}</p>
+                  <div
+                    className="mt-2 text-sm whitespace-pre-wrap"
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  />
                 </div>
               )}
 

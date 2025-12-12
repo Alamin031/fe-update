@@ -4,12 +4,10 @@
 import { useState, useEffect, useRef } from "react"
 import { productsService } from "@/app/lib/api/services/products"
 import { useRouter } from "next/navigation"
-import { Search, X, Clock, TrendingUp, ArrowRight } from "lucide-react"
+import { Search, X, ArrowRight } from "lucide-react"
 import { Button } from "../ui/button"
 
-const popularSearches = ["iPhone 15 Pro", "Samsung Galaxy", "MacBook Pro", "AirPods", "iPad", "Galaxy Watch"]
-
-const recentSearches = ["Wireless charger", "Phone case", "USB-C cable"]
+// Removed popularSearches and recentSearches
 
 interface SearchModalProps {
   isOpen: boolean
@@ -122,73 +120,40 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             </Button>
           </div>
 
-          {/* Content */}
-          <div className="max-h-[60vh] overflow-y-auto p-4">
-            {query.length === 0 ? (
-              <>
-                {/* Recent Searches */}
-                {recentSearches.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      Recent Searches
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {recentSearches.map((search) => (
-                        <button
-                          key={search}
-                          onClick={() => handleSearch(search)}
-                          className="rounded-full border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
-                        >
-                          {search}
-                        </button>
-                      ))}
-                    </div>
+          {/* Content: Only search results, with loading spinner */}
+          <div className="max-h-[60vh] overflow-y-auto p-4 flex items-center justify-center">
+            {query.length === 0 ? null : (
+              <div className="w-full">
+                {loading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <svg className="animate-spin h-8 w-8 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
                   </div>
-                )}
-
-                {/* Popular Searches */}
-                <div>
-                  <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <TrendingUp className="h-4 w-4" />
-                    Popular Searches
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {popularSearches.map((search) => (
+                ) : results.filter(product =>
+                    product.name && product.name.toLowerCase().includes(query.trim().toLowerCase())
+                  ).length > 0 ? (
+                  <div className="space-y-1">
+                    {results.filter(product =>
+                      product.name && product.name.toLowerCase().includes(query.trim().toLowerCase())
+                    ).map((product) => (
                       <button
-                        key={search}
-                        onClick={() => handleSearch(search)}
-                        className="rounded-full bg-muted px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted/80"
+                        key={product.id}
+                        onClick={() => handleProductClick(product)}
+                        className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-accent"
                       >
-                        {search}
+                        <span className="font-medium">{product.name}</span>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
                       </button>
                     ))}
                   </div>
-                </div>
-              </>
-            ) : (
-              <div className="space-y-1">
-                {loading ? (
-                  <div className="p-3 text-center text-muted-foreground">Searching...</div>
-                ) : results.length > 0 ? (
-                  results.map((product) => (
-                    <button
-                      key={product.id}
-                      onClick={() => handleProductClick(product)}
-                      className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-accent"
-                    >
-                      <span className="font-medium">{product.name}</span>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                  ))
                 ) : (
-                  <button
-                    onClick={() => handleSearch(query)}
-                    className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors hover:bg-accent"
-                  >
-                    <span className="font-medium">Search for &quot;{query}&quot;</span>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  </button>
+                  query.trim().length > 0 && !loading ? (
+                    <div className="flex justify-center items-center py-8 text-muted-foreground">
+                      searching...
+                    </div>
+                  ) : null
                 )}
               </div>
             )}

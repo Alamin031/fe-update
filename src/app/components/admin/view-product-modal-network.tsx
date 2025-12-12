@@ -217,9 +217,10 @@ export function ViewProductModalNetwork({
                       <label className="text-xs font-semibold text-muted-foreground uppercase">
                         Description
                       </label>
-                      <div className="mt-2 text-sm whitespace-pre-wrap bg-muted/30 p-3 rounded-lg">
-                        {product.description}
-                      </div>
+                      <div
+                        className="mt-2 text-sm whitespace-pre-wrap bg-muted/30 p-3 rounded-lg"
+                        dangerouslySetInnerHTML={{ __html: product.description }}
+                      />
                     </div>
                   )}
 

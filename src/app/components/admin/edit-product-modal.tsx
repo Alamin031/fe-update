@@ -4,7 +4,7 @@
 
 import {useState, useEffect, useRef} from 'react';
 import {toast} from 'sonner';
-import {X, Plus, Upload} from 'lucide-react';
+import {X, Plus, Upload, Bold, Italic} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
+import {RichTextEditor} from '../../components/ui/rich-text-editor';
 
 import productsService from '../../lib/api/services/products';
 import categoriesService from '../../lib/api/services/categories';
@@ -48,6 +49,7 @@ export function EditProductModal({
 }: EditProductModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [productType, setProductType] = useState<ProductType>('basic');
+  const [descriptionPreviewMode, setDescriptionPreviewMode] = useState(false);
 
   // Basic product info
   const [productName, setProductName] = useState('');
@@ -136,19 +138,19 @@ export function EditProductModal({
   const [ratingPoint, setRatingPoint] = useState(product?.ratingPoint || '');
 
   // Network helper functions
-  const addNetwork = () => {
-    setNetworks([
-      ...networks,
-      {
-        id: `network-${Date.now()}`,
-        networkType: '',
-        isDefault: false,
-        hasDefaultStorages: false,
-        defaultStorages: [],
-        colors: [],
-      },
-    ]);
-  };
+ const addNetwork = () => {
+  setNetworks([
+    ...networks,
+    {
+      id: `network-${Date.now()}`,
+      networkType: '',
+      isDefault: false,
+      hasDefaultStorages: false,
+      defaultStorages: [],
+      colors: [],
+    },
+  ]); // <-- Added missing parenthesis here
+};
 
   const removeNetwork = (networkId: string) => {
     setNetworks(networks.filter(n => n.id !== networkId));
@@ -466,17 +468,17 @@ export function EditProductModal({
 
   // Region helper functions
   const addRegion = () => {
-    setRegions([
-      ...regions,
-      {
-        id: `region-${Date.now()}`,
-        regionName: '',
-        isDefault: false,
-        defaultStorages: [],
-        colors: [],
-      },
-    ]);
-  };
+  setRegions([
+    ...regions,
+    {
+      id: `region-${Date.now()}`,
+      regionName: '',
+      isDefault: false,
+      defaultStorages: [],
+      colors: [],
+    },
+  ]);
+};
 
   const removeRegion = (regionId: string) => {
     setRegions(regions.filter(r => r.id !== regionId));
@@ -1564,11 +1566,64 @@ export function EditProductModal({
               </div>
               <div>
                 <Label>Description</Label>
-                <Textarea
-                  value={description}
-                  onChange={e => setDescription(e.target.value)}
-                  rows={4}
-                />
+                <div className="mb-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDescriptionPreviewMode(prev => !prev)}
+                    className="text-xs mb-2"
+                  >
+                    {descriptionPreviewMode ? 'Edit Mode' : 'Preview Mode'}
+                  </Button>
+                </div>
+                {descriptionPreviewMode ? (
+                  <div className="border rounded-md p-6 min-h-[300px] overflow-auto bg-muted/10">
+                    <div
+                      className="prose prose-lg max-w-none"
+                      dangerouslySetInnerHTML={{__html: description}}
+                    />
+                    {!description && (
+                      <div className="text-center text-muted-foreground py-12">
+                        No content to preview
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <RichTextEditor
+                    value={description}
+                    onChange={setDescription}
+                    placeholder="Enter product description..."
+                    className="min-h-[300px]"
+                  />
+                )}
+                <div className="flex items-center justify-between text-sm text-muted-foreground pt-2">
+                  <div>
+                    <span className="font-medium">Character Count:</span>{' '}
+                    {description.replace(/<[^>]*>/g, '').length}
+                    {description.replace(/<[^>]*>/g, '').length < 30 && (
+                      <span className="text-red-500 ml-2">(Minimum 30 required)</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center gap-1 text-xs">
+                      <Bold className="h-3 w-3" /> Bold: Ctrl+B
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs">
+                      <Italic className="h-3 w-3" /> Italic: Ctrl+I
+                    </span>
+                  </div>
+                </div>
+                <div className="bg-muted/20 rounded-lg p-4 border mt-2">
+                  <h4 className="font-medium text-sm mb-2">Formatting Tips:</h4>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• Use toolbar buttons or keyboard shortcuts for formatting</li>
+                    <li>• Headings help structure your content (H1, H2, H3)</li>
+                    <li>• Use lists (bullet or numbered) for better readability</li>
+                    <li>• Add blockquotes for important quotes or highlights</li>
+                    <li>• Use code blocks for technical content</li>
+                  </ul>
+                </div>
               </div>
               <div>
                 <Label>Short Description</Label>
@@ -2172,7 +2227,9 @@ export function EditProductModal({
                         )}
 
                         <div className="space-y-3">
-                          <h4 className="font-semibold text-sm">Colors</h4>
+                          <h4 className="font-semibold text-sm mb-2">
+                            Colors
+                          </h4>
                           {network.colors.map((color: any) => (
                             <div
                               key={color.id}
@@ -2632,7 +2689,7 @@ export function EditProductModal({
                         </div>
 
                         <div className="space-y-3">
-                          <h4 className="font-semibold text-sm">Colors</h4>
+                          <h4 className="font-semibold text-sm mb-2">Colors</h4>
                           {region.colors.map((color: any) => (
                             <div
                               key={color.id}
