@@ -1,50 +1,41 @@
-import type { Metadata } from "next"
-import Image from "next/image"
-import Link from "next/link"
-import { Calendar, User, ArrowLeft, Share2 } from "lucide-react"
-import { notFound } from "next/navigation"
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, Share2 } from "lucide-react";
+import { notFound } from "next/navigation";
+import blogsService, { BlogPost } from "../../../lib/api/services/blogs";
 
 
-interface BlogPostPageProps {
-  params: Promise<{
-    slug: string
-  }>
-}
-
-export async function generateMetadata({
-  params,
-}: BlogPostPageProps): Promise<Metadata> {
-  const { slug } = await params
-  const post = blogPosts.find((p) => p.slug === slug)
-
-  if (!post) {
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { slug } = params;
+  try {
+    const post: BlogPost = await blogsService.getBySlug(slug);
+    return {
+      title: post.title,
+      description: post.excerpt || post.title,
+    };
+  } catch {
     return {
       title: "Article Not Found",
       description: "The article you are looking for does not exist",
-    }
+    };
   }
-
-  return generateSEO({
-    title: post.title,
-    description: post.excerpt,
-    url: `/blog/${post.slug}`,
-    keywords: [post.category.toLowerCase(), "blog", "article", ...post.title.split(" ").slice(0, 5)],
-    type: "article",
-  })
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { slug } = await params
-  const post = blogPosts.find((p) => p.slug === slug)
-
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
+  let post: BlogPost | null = null;
+  try {
+    post = await blogsService.getBySlug(slug);
+  } catch {
+    notFound();
+  }
   if (!post) {
-    notFound()
+    notFound();
   }
 
-  // Get related posts from same category (excluding current)
-  const relatedPosts = blogPosts
-    .filter((p) => p.category === post.category && p.id !== post.id)
-    .slice(0, 3)
+  // Related posts logic removed (no category field)
+  // Related posts removed
 
   return (
     <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
@@ -62,31 +53,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <article className="space-y-8">
           {/* Title and Meta */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-primary">{post.category}</span>
-            </div>
+            {/* Category removed */}
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{post.title}</h1>
-            <p className="text-xl text-muted-foreground">{post.excerpt}</p>
+            {post.excerpt && <p className="text-xl text-muted-foreground">{post.excerpt}</p>}
 
-            {/* Author and Date */}
+            {/* Author, Date, ReadTime removed */}
             <div className="flex flex-wrap items-center gap-6 pt-4 border-t border-border/40">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{post.author}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{new Date(post.date).toLocaleDateString()}</span>
-              </div>
-              <span className="text-sm text-muted-foreground">{post.readTime}</span>
               <button
                 onClick={() => {
                   if (navigator.share) {
                     navigator.share({
                       title: post.title,
-                      text: post.excerpt,
+                      text: post.excerpt || post.title,
                       url: `/blog/${post.slug}`,
-                    })
+                    });
                   }
                 }}
                 className="ml-auto text-primary hover:underline"
@@ -110,7 +90,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Article Content */}
           <div className="prose prose-neutral dark:prose-invert max-w-none">
             <div className="space-y-6 text-base leading-relaxed">
-              {post.content.split("\n\n").map((paragraph, index) => {
+              {post.content.split("\n\n").map((paragraph: string, index: number) => {
                 if (paragraph.startsWith("##")) {
                   return (
                     <h2 key={index} className="text-2xl font-bold mt-8 mb-4">
@@ -128,7 +108,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 if (paragraph.startsWith("- ")) {
                   return (
                     <ul key={index} className="list-disc list-inside space-y-2 ml-4">
-                      {paragraph.split("\n").map((item, idx) => (
+                      {paragraph.split("\n").map((item: string, idx: number) => (
                         <li key={idx} className="text-muted-foreground">
                           {item.replace(/^-\s*/, "")}
                         </li>
@@ -148,61 +128,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Divider */}
           <div className="border-t border-border/40 my-12" />
 
-          {/* Author Bio */}
-          <div className="rounded-lg bg-muted/50 p-6">
-            <div className="flex items-start gap-4">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <User className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold">{post.author}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Tech writer and product reviewer with over 5 years of experience in the tech industry.
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* Author Bio removed */}
 
           {/* Divider */}
           <div className="border-t border-border/40 my-12" />
 
-          {/* Related Posts */}
-          {relatedPosts.length > 0 && (
-            <div>
-              <h2 className="mb-8 text-2xl font-bold">Related Articles</h2>
-              <div className="grid gap-6 md:grid-cols-3">
-                {relatedPosts.map((relatedPost) => (
-                  <Card
-                    key={relatedPost.id}
-                    className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
-                  >
-                    <div className="relative aspect-video overflow-hidden bg-muted">
-                      <Image
-                        src={relatedPost.image || "/placeholder.svg"}
-                        alt={relatedPost.title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <CardContent className="flex flex-col justify-between pt-6 flex-1">
-                      <div>
-                        <p className="text-xs font-medium text-primary">{relatedPost.category}</p>
-                        <h3 className="mt-2 text-lg font-semibold line-clamp-2">
-                          {relatedPost.title}
-                        </h3>
-                      </div>
-                      <Link
-                        href={`/blog/${relatedPost.slug}`}
-                        className="mt-4 inline-block text-primary hover:underline font-medium text-sm"
-                      >
-                        Read Article →
-                      </Link>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Related Posts removed */}
         </article>
       </div>
     </div>
