@@ -4,6 +4,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { OutputData } from '@editorjs/editorjs';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -16,6 +17,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { AlertCircle, Loader2 } from 'lucide-react';
+import { EditorJSWrapper } from './editor-js-wrapper';
 import blogsService, { BlogPost } from '../../lib/api/services/blogs';
 
 interface BlogFormProps {
