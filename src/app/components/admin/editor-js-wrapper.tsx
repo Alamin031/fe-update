@@ -288,7 +288,7 @@ export function EditorJSWrapper({
       </div>
 
       {/* Helper Text */}
-      <div className="editor-help text-xs text-slate-500 dark:text-slate-400 space-y-2">
+      <div className="editor-help text-xs text-slate-500 space-y-2">
         <p className="flex items-start gap-2">
           <span className="inline-block w-1 h-1 rounded-full bg-blue-400 mt-1.5 flex-shrink-0" />
           <span>
