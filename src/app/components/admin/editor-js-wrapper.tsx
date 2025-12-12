@@ -551,6 +551,21 @@ export function EditorJSWrapper({
           color: white;
         }
 
+        :global(.dark .editor-js-container .ce-code) {
+          background-color: rgb(30, 41, 59);
+          color: rgb(226, 232, 240);
+          border-color: rgb(71, 85, 105);
+        }
+
+        :global(.dark .editor-js-container .ce-inline-toolbar) {
+          background-color: rgb(30, 41, 59);
+          border-color: rgb(71, 85, 105);
+        }
+
+        :global(.dark .editor-js-container .ce-inline-toolbar__button) {
+          color: rgb(203, 213, 225);
+        }
+
         :global(.dark .editor-js-container .ce-popover) {
           background-color: rgb(30, 41, 59);
           border-color: rgb(71, 85, 105);
