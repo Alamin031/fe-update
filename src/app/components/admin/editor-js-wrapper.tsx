@@ -577,9 +577,9 @@ export function EditorJSWrapper({
         }
 
         :global(.dark .editor-js-container .ce-code) {
-          background-color: rgb(30, 41, 59);
-          color: rgb(226, 232, 240);
-          border-color: rgb(71, 85, 105);
+          background-color: rgb(248, 250, 252);
+          color: rgb(30, 41, 59);
+          border-color: rgb(203, 213, 225);
         }
 
         :global(.dark .editor-js-container .ce-inline-toolbar) {
