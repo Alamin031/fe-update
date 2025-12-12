@@ -304,25 +304,28 @@ export function BlogForm({ initialData, isEditing = false }: BlogFormProps) {
                 className="mt-1"
                 ref={fileInputRef}
               />
-              <div className="flex flex-wrap gap-3 mt-2">
-                {images[0] && (
-                  <div className="relative group">
+              {images[0] ? (
+                <div className="mt-4">
+                  <p className="text-sm font-medium text-foreground mb-2">Image Preview</p>
+                  <div className="relative inline-block group">
                     <img
                       src={typeof images[0] === 'string' ? images[0] : URL.createObjectURL(images[0])}
-                      alt="Image preview"
-                      className="w-20 h-20 object-cover rounded border"
+                      alt="Uploaded image preview"
+                      className="max-w-xs max-h-64 object-contain rounded-lg border border-border bg-background p-2"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveImage(0)}
-                      className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-80 group-hover:opacity-100"
-                      title="Remove"
+                      className="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold transition-all opacity-90 group-hover:opacity-100 shadow-md"
+                      title="Remove image"
                     >
                       ×
                     </button>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <p className="mt-2 text-sm text-muted-foreground">No image selected yet</p>
+              )}
             </div>
             <div>
               <Label htmlFor="excerpt">
