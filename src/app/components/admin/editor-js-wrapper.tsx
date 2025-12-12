@@ -221,7 +221,7 @@ export function EditorJSWrapper({
     <div className="editor-wrapper space-y-4">
       {/* Quick Add Toolbar */}
       {!readOnly && (
-        <div className="editor-toolbar bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-800 p-4">
+        <div className="editor-toolbar bg-white dark:bg-white rounded-lg border border-slate-200 dark:border-slate-800 p-4">
           <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-3 uppercase tracking-wider">
             Quick Add Block
           </p>
